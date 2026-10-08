@@ -18,7 +18,7 @@
 
   Build the target hero, metrics, next fixture, featured news, activity overview, quote, partner strip, and responsive transformations. Ensure optional sections degrade cleanly and preserve request-rendered SSR + ISR behavior.
 
-- [ ] **05 — Implement the high-fidelity Chi siamo page**
+- [x] **05 — Implement the high-fidelity Chi siamo page**
 
   Build history, timeline, values, fictional board, facilities, and document introduction from the about DTO. Match the desktop/mobile HTML references and do not represent generated or placeholder people as real officers.
 
