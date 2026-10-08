@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+
+<html lang="it"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_standard" name="shell-type"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&amp;family=Manrope:wght@300;400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "error": "#ba1a1a",
+            "on-error-container": "#93000a",
+            "on-secondary": "#ffffff",
+            "surface-tint": "#785a00",
+            "surface-bright": "#f7f9ff",
+            "on-secondary-fixed-variant": "#45474c",
+            "primary-container": "#d4a000",
+            "on-surface": "#181c20",
+            "error-container": "#ffdad6",
+            "on-tertiary-container": "#443d1b",
+            "inverse-on-surface": "#eef1f7",
+            "surface-container-low": "#f1f4fa",
+            "on-background": "#181c20",
+            "on-error": "#ffffff",
+            "on-tertiary": "#ffffff",
+            "surface": "#f7f9ff",
+            "outline": "#817661",
+            "surface-container": "#ebeef4",
+            "surface-container-highest": "#dfe3e8",
+            "surface-dim": "#d7dae0",
+            "secondary-container": "#dfdfe6",
+            "on-secondary-container": "#616269",
+            "on-primary-fixed": "#251a00",
+            "tertiary": "#675f39",
+            "primary": "#785a00",
+            "tertiary-fixed-dim": "#d2c799",
+            "on-tertiary-fixed": "#211b00",
+            "tertiary-fixed": "#efe3b3",
+            "inverse-primary": "#f6be2f",
+            "secondary": "#5d5e64",
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed": "#ffdf9d",
+            "secondary-fixed-dim": "#c6c6cd",
+            "on-primary-fixed-variant": "#5b4300",
+            "on-secondary-fixed": "#1a1b21",
+            "inverse-surface": "#2d3135",
+            "surface-container-high": "#e5e8ee",
+            "on-surface-variant": "#4f4634",
+            "on-primary-container": "#4f3a00",
+            "on-tertiary-fixed-variant": "#4e4724",
+            "secondary-fixed": "#e2e2e9",
+            "primary-fixed-dim": "#f6be2f",
+            "outline-variant": "#d3c5ad",
+            "on-primary": "#ffffff",
+            "surface-variant": "#dfe3e8",
+            "tertiary-container": "#b2a87d",
+            "background": "#f7f9ff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-lg": "1.75rem",
+            "space-md": "1rem",
+            "margin": "3rem",
+            "margin-mobile": "1.25rem",
+            "gutter-mobile": "1rem",
+            "space-xl": "3rem",
+            "gutter": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem"
+          },
+          "fontFamily": {
+            "display": ["Epilogue", "sans-serif"],
+            "headline-lg": ["Epilogue", "sans-serif"],
+            "headline-md": ["Epilogue", "sans-serif"],
+            "headline-sm": ["Epilogue", "sans-serif"],
+            "body-lg": ["Manrope", "sans-serif"],
+            "body-md": ["Manrope", "sans-serif"],
+            "body-sm": ["Manrope", "sans-serif"],
+            "label-lg": ["Manrope", "sans-serif"],
+            "label-md": ["Manrope", "sans-serif"],
+            "label-caps": ["Manrope", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Header: Elegante, arioso e privo di CTA invasive -->
+<header class="w-full bg-surface/90 backdrop-blur-md border-b border-outline-variant/30 sticky top-0 z-50">
+<div class="max-w-7xl mx-auto px-6 md:px-12 h-24 flex items-center justify-between">
+<a class="flex items-center gap-4 group" href="#">
+<img alt="U.S. Albatese 1968" class="h-11 w-auto object-contain transition-opacity group-hover:opacity-85" src="https://lh3.googleusercontent.com/aida/AEtjO1VZdfaKyEAjtMhdLgvVeEihV8LYiyoAtKK8XcAZnVUHcOOM5Mc3SdeC7gNG7t0qtF2aHNfF1NGy5l1-bBZUP8mV-BoCjY3iWXxwsdM3AVe3HEU6DfpSrhKS1p9nFpvGbnG6Ng5ICP7gD8UqmvRd4EbzI_x0DaXiJT7HWEJ-QtLwoN4ropMbvB9V1Ei1g3hdIBWHA5UT-v8qW0Nu3cg47Zs1KDTp0R6doIdMqaVkoO59b87PtZYWiePbm5wN"/>
+<div class="hidden sm:flex flex-col pl-3 border-l border-outline-variant/40">
+<span class="font-display font-bold text-xs uppercase tracking-[0.2em] text-on-surface">U.S. Albatese</span>
+<span class="font-body-sm text-[11px] text-secondary tracking-wider">Polisportiva dal 1968</span>
+</div>
+</a>
+<!-- Navigazione essenziale e distesa -->
+<nav class="flex items-center gap-8 md:gap-10">
+<a class="font-body-sm text-sm uppercase tracking-widest text-secondary hover:text-on-surface transition-colors" href="#">Home</a>
+<a class="font-body-sm text-sm uppercase tracking-widest text-secondary hover:text-on-surface transition-colors" href="#">Chi Siamo</a>
+<a class="font-body-sm text-sm uppercase tracking-widest text-secondary hover:text-on-surface transition-colors" href="#">Attività</a>
+<a class="font-body-sm text-sm uppercase tracking-widest text-on-surface font-semibold relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-full after:h-px after:bg-primary" href="#">Notizie &amp; Calendario</a>
+<a class="font-body-sm text-sm uppercase tracking-widest text-secondary hover:text-on-surface transition-colors" href="#">Contatti</a>
+</nav>
+</div>
+</header>
+<main class="w-full">
+<!-- Hero Editoriale: Puro respiro tipografico -->
+<section class="max-w-7xl mx-auto px-6 md:px-12 pt-20 pb-16">
+<div class="max-w-3xl">
+<div class="flex items-center gap-3 mb-6">
+<span class="h-px w-8 bg-primary"></span>
+<span class="font-body-sm text-xs uppercase tracking-[0.25em] text-primary font-semibold">Notiziario &amp; Match Center</span>
+</div>
+<h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight text-on-surface leading-[1.15]">
+          Cronache di campo, calendario e vita del club.
+        </h1>
+<p class="font-body-lg text-lg text-secondary mt-6 leading-relaxed max-w-2xl font-light">
+          I risultati dell’ultimo turno, le prossime sfide all’Acquanera e le novità dall’Oratorio San Giovanni Bosco.
+        </p>
+</div>
+</section>
+<!-- Sezione Match & Risultati: Pulita, ordinata, poche gare chiave -->
+<section class="border-y border-outline-variant/30 bg-surface-container-lowest/50 py-16">
+<div class="max-w-7xl mx-auto px-6 md:px-12">
+<div class="flex flex-col md:flex-row md:items-baseline justify-between gap-4 pb-10 border-b border-outline-variant/20">
+<div>
+<span class="font-body-sm text-xs uppercase tracking-[0.2em] text-secondary">Attività Agonistica</span>
+<h2 class="font-display text-2xl font-normal text-on-surface mt-1">Gare Chiave &amp; Risultati</h2>
+</div>
+<span class="font-body-sm text-xs text-secondary tracking-wide">Campionati CSI Como &amp; FIDAL Lombardia</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-10">
+<!-- Prossima Gara: Open CSI -->
+<div class="flex flex-col justify-between p-7 rounded bg-surface-container-lowest border border-outline-variant/30 hover:border-outline transition-colors">
+<div>
+<div class="flex items-center justify-between text-xs font-body-sm uppercase tracking-wider text-secondary pb-6 border-b border-outline-variant/20">
+<span class="text-primary font-semibold">Prossimo Turno</span>
+<span>Sab 15 Mar • 15:30</span>
+</div>
+<div class="py-6 space-y-3">
+<div class="flex items-center justify-between">
+<span class="font-display text-base font-semibold text-on-surface">U.S. Albatese</span>
+<span class="text-xs uppercase tracking-wider text-secondary">Casa</span>
+</div>
+<div class="text-center py-0.5">
+<span class="text-xs uppercase tracking-widest text-outline">vs</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-display text-base font-medium text-secondary">Albate HF</span>
+<span class="text-xs uppercase tracking-wider text-secondary">Ospite</span>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/20 flex items-center justify-between text-xs text-secondary">
+<span>Open CSI • Campo "L. Meroni"</span>
+<span class="font-medium text-on-surface">Ingresso libero</span>
+</div>
+</div>
+<!-- Ultimo Risultato: Allievi U16 -->
+<div class="flex flex-col justify-between p-7 rounded bg-surface-container-lowest border border-outline-variant/30 hover:border-outline transition-colors">
+<div>
+<div class="flex items-center justify-between text-xs font-body-sm uppercase tracking-wider text-secondary pb-6 border-b border-outline-variant/20">
+<span class="text-secondary font-medium">Referto Ufficiale</span>
+<span>Sab 8 Mar</span>
+</div>
+<div class="py-6 space-y-3">
+<div class="flex items-center justify-between">
+<span class="font-display text-base font-semibold text-on-surface">U.S. Albatese</span>
+<span class="font-display text-lg font-bold text-on-surface">3</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-display text-base font-normal text-secondary">Valduce Como</span>
+<span class="font-display text-lg font-normal text-secondary">1</span>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/20 text-xs text-secondary leading-relaxed">
+<span>Allievi U16 • Doppietta di Marchesi e rete di Fontana all'Acquanera.</span>
+</div>
+</div>
+<!-- Evento Atletica / Corsa Campestre -->
+<div class="flex flex-col justify-between p-7 rounded bg-surface-container-lowest border border-outline-variant/30 hover:border-outline transition-colors">
+<div>
+<div class="flex items-center justify-between text-xs font-body-sm uppercase tracking-wider text-secondary pb-6 border-b border-outline-variant/20">
+<span class="text-primary font-semibold">Atletica FIDAL</span>
+<span>Dom 23 Mar • 08:45</span>
+</div>
+<div class="py-6">
+<h3 class="font-display text-lg font-medium text-on-surface leading-snug">
+                  38° Trofeo Lanfrutto - Maggioni
+                </h3>
+<p class="font-body-sm text-xs text-secondary mt-2 leading-relaxed">
+                  Corsa campestre promozionale per esordienti, cadetti e master lungo il circuito parrocchiale.
+                </p>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/20 flex items-center justify-between text-xs text-secondary">
+<span>Parco Oratorio Albate</span>
+<span class="text-on-surface font-medium">Iscrizioni aperte</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Magazine & Notizie: Griglia editoriale con ampi spazi bianchi -->
+<section class="max-w-7xl mx-auto px-6 md:px-12 py-24">
+<div class="flex items-baseline justify-between mb-16 pb-4 border-b border-outline-variant/20">
+<div>
+<span class="font-body-sm text-xs uppercase tracking-[0.2em] text-secondary">Dal Club</span>
+<h2 class="font-display text-3xl font-normal text-on-surface mt-1">Articoli &amp; Approfondimenti</h2>
+</div>
+<span class="hidden sm:inline font-body-sm text-xs text-secondary tracking-widest uppercase">Archivio 2024/2025</span>
+</div>
+<!-- Griglia Editoriale -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+<!-- Notizia Principale / Grande Copertina (7 col) -->
+<article class="lg:col-span-7 flex flex-col group">
+<div class="aspect-[16/10] overflow-hidden rounded bg-surface-container">
+<img class="w-full h-full object-cover grayscale-[15%] group-hover:grayscale-0 group-hover:scale-[1.02] transition-all duration-700 ease-out" data-alt="Young Italian football players in yellow and black kits celebrating together on a green grass pitch at Oratorio San Giovanni Bosco in Albate Como" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD658jYGJvMoL-vMnKamxWR3kolX_1UyQtJ0wOZNZtX3pNAz3JivptSz64EKsTS01CQYUx-G1Scqw5OplBJblWsLUbvjJYkw-pKVgdvqTYQyDo6Gue6S6aynDcjE-AXZrhGY-ADoWky5rhVFX7b9RoqTYQ0Y7JrconfPRsr-tikxLZKJbpvnf5G8GhHIdgAoHBeAvzpP3smoVT5uh6l4G5998v_oG44BF4X-FnQEjdi9SB-s_Bf6iXgkw"/>
+</div>
+<div class="pt-6 flex flex-col flex-grow">
+<div class="flex items-center gap-3 text-xs text-secondary font-body-sm uppercase tracking-wider mb-3">
+<span>Primo Piano</span>
+<span>•</span>
+<time datetime="2025-03-10">10 Marzo 2025</time>
+</div>
+<h3 class="font-display text-2xl lg:text-3xl font-medium text-on-surface group-hover:text-primary transition-colors leading-tight">
+              Presentata la nuova stagione sportiva all'Oratorio di Albate: oltre 250 giovani tesserati
+            </h3>
+<p class="font-body-md text-secondary mt-4 leading-relaxed font-light line-clamp-3">
+              Grande partecipazione all’incontro con le famiglie nel salone parrocchiale. Il presidente Salvatore Romanò ribadisce i valori di comunità, inclusione e dedizione formativa che guidano l’U.S. Albatese fin dal 1968.
+            </p>
+<div class="pt-6 mt-auto">
+<span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-on-surface group-hover:text-primary transition-colors">
+                Leggi l'articolo
+                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</span>
+</div>
+</div>
+</article>
+<!-- Colonna Notizie Secondarie (5 col) -->
+<div class="lg:col-span-5 flex flex-col justify-between divide-y divide-outline-variant/30">
+<!-- News Card 1 -->
+<article class="pb-8 first:pt-0 pt-8 group flex flex-col">
+<div class="flex items-center gap-3 text-xs text-secondary font-body-sm uppercase tracking-wider mb-2">
+<span>Atletica FIDAL</span>
+<span>•</span>
+<time datetime="2025-03-08">8 Marzo 2025</time>
+</div>
+<h4 class="font-display text-xl font-medium text-on-surface group-hover:text-primary transition-colors leading-snug">
+              Trofeo Lanfrutto-Maggioni: aperte le iscrizioni per la 38ª edizione
+            </h4>
+<p class="font-body-sm text-secondary mt-2 leading-relaxed font-light">
+              Il tradizionale appuntamento podistico primaverile con percorsi dedicati al settore giovanile e camminata non competitiva per il quartiere.
+            </p>
+<div class="pt-3">
+<span class="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-secondary group-hover:text-on-surface transition-colors">
+                Dettagli &amp; Modulo
+                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</span>
+</div>
+</article>
+<!-- News Card 2 -->
+<article class="py-8 group flex flex-col">
+<div class="flex items-center gap-3 text-xs text-secondary font-body-sm uppercase tracking-wider mb-2">
+<span>Scuola Calcio</span>
+<span>•</span>
+<time datetime="2025-03-03">3 Marzo 2025</time>
+</div>
+<h4 class="font-display text-xl font-medium text-on-surface group-hover:text-primary transition-colors leading-snug">
+              Esordienti protagonisti nel torneo primaverile CSI Como
+            </h4>
+<p class="font-body-sm text-secondary mt-2 leading-relaxed font-light">
+              Ottima prestazione e spirito di squadra per i ragazzi guidati da mister Pozzi nella gara casalinga disputata contro il San Fermo.
+            </p>
+<div class="pt-3">
+<span class="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-secondary group-hover:text-on-surface transition-colors">
+                Resoconto gara
+                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</span>
+</div>
+</article>
+<!-- News Card 3 -->
+<article class="pt-8 group flex flex-col">
+<div class="flex items-center gap-3 text-xs text-secondary font-body-sm uppercase tracking-wider mb-2">
+<span>Comunicazione Ufficiale</span>
+<span>•</span>
+<time datetime="2025-02-25">25 Febbraio 2025</time>
+</div>
+<h4 class="font-display text-xl font-medium text-on-surface group-hover:text-primary transition-colors leading-snug">
+              Convenzione visite mediche sportive di idoneità
+            </h4>
+<p class="font-body-sm text-secondary mt-2 leading-relaxed font-light">
+              Aggiornate le procedure e i centri convenzionati sul territorio di Como per il rinnovo della certificazione agonistica e non agonistica.
+            </p>
+<div class="pt-3">
+<span class="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-secondary group-hover:text-on-surface transition-colors">
+                Informazioni segreteria
+                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</span>
+</div>
+</article>
+</div>
+</div>
+</section>
+<!-- Documenti Societari: Box minimale, discreto e senza fronzoli -->
+<section class="max-w-7xl mx-auto px-6 md:px-12 pb-24">
+<div class="rounded border border-outline-variant/30 bg-surface-container-low p-8 md:p-12">
+<div class="max-w-2xl mb-8">
+<span class="font-body-sm text-xs uppercase tracking-[0.2em] text-secondary">Documenti &amp; Trasparenza</span>
+<h3 class="font-display text-2xl font-normal text-on-surface mt-1">Bollettini &amp; Modulistica Ufficiale</h3>
+<p class="font-body-sm text-secondary mt-2 leading-relaxed">
+            I documenti istituzionali e i comunicati federali sono liberamente consultabili dai tesserati e dai soci.
+          </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Doc 1 -->
+<a class="p-5 rounded bg-surface-container-lowest border border-outline-variant/30 hover:border-outline transition-colors flex items-center justify-between group" href="#">
+<div class="min-w-0 pr-3">
+<span class="font-body-sm text-[11px] text-secondary uppercase tracking-wider block">CSI Como • N° 24/2025</span>
+<h4 class="font-display text-sm font-semibold text-on-surface mt-1 truncate">Bollettino Settimanale</h4>
+<span class="font-body-sm text-xs text-secondary mt-0.5 block">PDF • 1.2 MB</span>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-[20px] shrink-0">download</span>
+</a>
+<!-- Doc 2 -->
+<a class="p-5 rounded bg-surface-container-lowest border border-outline-variant/30 hover:border-outline transition-colors flex items-center justify-between group" href="#">
+<div class="min-w-0 pr-3">
+<span class="font-body-sm text-[11px] text-secondary uppercase tracking-wider block">Stagione 2024/2025</span>
+<h4 class="font-display text-sm font-semibold text-on-surface mt-1 truncate">Modulo Tesseramento ASD</h4>
+<span class="font-body-sm text-xs text-secondary mt-0.5 block">PDF • 480 KB</span>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-[20px] shrink-0">download</span>
+</a>
+<!-- Doc 3 -->
+<a class="p-5 rounded bg-surface-container-lowest border border-outline-variant/30 hover:border-outline transition-colors flex items-center justify-between group" href="#">
+<div class="min-w-0 pr-3">
+<span class="font-body-sm text-[11px] text-secondary uppercase tracking-wider block">Oratorio S. Giovanni Bosco</span>
+<h4 class="font-display text-sm font-semibold text-on-surface mt-1 truncate">Orari Segreteria &amp; Contatti</h4>
+<span class="font-body-sm text-xs text-secondary mt-0.5 block">Mar e Gio 17:30 - 19:30</span>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-[20px] shrink-0">arrow_forward</span>
+</a>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer: Pulito, arioso e discreto -->
+<footer class="border-t border-outline-variant/30 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto px-6 md:px-12 py-16">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-12 pb-12 border-b border-outline-variant/20">
+<!-- Colonna Logo & Descrizione -->
+<div class="md:col-span-1 space-y-4">
+<img alt="U.S. Albatese" class="h-9 w-auto object-contain opacity-90" src="https://lh3.googleusercontent.com/aida/AEtjO1VZdfaKyEAjtMhdLgvVeEihV8LYiyoAtKK8XcAZnVUHcOOM5Mc3SdeC7gNG7t0qtF2aHNfF1NGy5l1-bBZUP8mV-BoCjY3iWXxwsdM3AVe3HEU6DfpSrhKS1p9nFpvGbnG6Ng5ICP7gD8UqmvRd4EbzI_x0DaXiJT7HWEJ-QtLwoN4ropMbvB9V1Ei1g3hdIBWHA5UT-v8qW0Nu3cg47Zs1KDTp0R6doIdMqaVkoO59b87PtZYWiePbm5wN"/>
+<p class="font-body-sm text-xs text-secondary leading-relaxed">
+            Unione Sportiva Albatese A.S.D.<br/>
+            Fondata nel 1968 ad Albate (Como).<br/>
+            C.F. / P.IVA 01849200135
+          </p>
+</div>
+<!-- Sede & Recapiti -->
+<div class="space-y-3">
+<h4 class="font-display text-xs uppercase tracking-[0.2em] font-semibold text-on-surface">Sede Operativa</h4>
+<p class="font-body-sm text-xs text-secondary leading-relaxed">
+            Oratorio San Giovanni Bosco<br/>
+            Via Acquanera 10 / Via Venusti 7<br/>
+            22100 Como (CO)
+          </p>
+<p class="font-body-sm text-xs text-secondary">
+            segreteria@albatese.it • 031 523349
+          </p>
+</div>
+<!-- Riconoscimenti -->
+<div class="space-y-3">
+<h4 class="font-display text-xs uppercase tracking-[0.2em] font-semibold text-on-surface">Affiliazioni</h4>
+<p class="font-body-sm text-xs text-secondary leading-relaxed">
+            Centro Sportivo Italiano (CSI Como)<br/>
+            Federazione Italiana Atletica Leggera (FIDAL)<br/>
+            Iscritta al Registro Nazionale CONI n. 28419
+          </p>
+</div>
+<!-- Collegamenti veloci -->
+<div class="space-y-3">
+<h4 class="font-display text-xs uppercase tracking-[0.2em] font-semibold text-on-surface">Navigazione</h4>
+<ul class="space-y-2 text-xs font-body-sm text-secondary">
+<li><a class="hover:text-on-surface transition-colors" href="#">Statuto &amp; Codice Etico</a></li>
+<li><a class="hover:text-on-surface transition-colors" href="#">Attività Giovanile</a></li>
+<li><a class="hover:text-on-surface transition-colors" href="#">Normativa Privacy</a></li>
+</ul>
+</div>
+</div>
+<div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-body-sm text-secondary">
+<p>© 2025 U.S. Albatese A.S.D. Tutti i diritti riservati.</p>
+<div class="flex items-center gap-6">
+<a class="hover:text-on-surface transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-on-surface transition-colors" href="#">Cookie Policy</a>
+<a class="hover:text-on-surface transition-colors" href="#">Note Legali</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

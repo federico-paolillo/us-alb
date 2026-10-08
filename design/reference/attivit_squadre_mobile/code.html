@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+
+<html lang="it"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<meta content="mobile_tab" name="shell-type"/>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body {
+        width: 100vw;
+        margin: 0;
+        padding: 0;
+        background-color: #f7f9ff;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+      .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom, 12px);
+      }
+      .pt-safe {
+        padding-top: env(safe-area-inset-top, 0px);
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "error": "#ba1a1a",
+            "on-error-container": "#93000a",
+            "on-secondary": "#ffffff",
+            "surface-tint": "#785a00",
+            "surface-bright": "#f7f9ff",
+            "on-secondary-fixed-variant": "#45474c",
+            "primary-container": "#d4a000",
+            "on-surface": "#181c20",
+            "error-container": "#ffdad6",
+            "on-tertiary-container": "#443d1b",
+            "inverse-on-surface": "#eef1f7",
+            "surface-container-low": "#f1f4fa",
+            "on-background": "#181c20",
+            "on-error": "#ffffff",
+            "on-tertiary": "#ffffff",
+            "surface": "#f7f9ff",
+            "outline": "#817661",
+            "surface-container": "#ebeef4",
+            "surface-container-highest": "#dfe3e8",
+            "surface-dim": "#d7dae0",
+            "secondary-container": "#dfdfe6",
+            "on-secondary-container": "#616269",
+            "on-primary-fixed": "#251a00",
+            "tertiary": "#675f39",
+            "primary": "#785a00",
+            "tertiary-fixed-dim": "#d2c799",
+            "on-tertiary-fixed": "#211b00",
+            "tertiary-fixed": "#efe3b3",
+            "inverse-primary": "#f6be2f",
+            "secondary": "#5d5e64",
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed": "#ffdf9d",
+            "secondary-fixed-dim": "#c6c6cd",
+            "on-primary-fixed-variant": "#5b4300",
+            "on-secondary-fixed": "#1a1b21",
+            "inverse-surface": "#2d3135",
+            "surface-container-high": "#e5e8ee",
+            "on-surface-variant": "#4f4634",
+            "on-primary-container": "#4f3a00",
+            "on-tertiary-fixed-variant": "#4e4724",
+            "secondary-fixed": "#e2e2e9",
+            "primary-fixed-dim": "#f6be2f",
+            "outline-variant": "#d3c5ad",
+            "on-primary": "#ffffff",
+            "surface-variant": "#dfe3e8",
+            "tertiary-container": "#b2a87d",
+            "background": "#f7f9ff"
+          },
+          fontFamily: {
+            "display": ["Epilogue", "sans-serif"],
+            "headline-lg": ["Epilogue", "sans-serif"],
+            "headline-md": ["Epilogue", "sans-serif"],
+            "headline-sm": ["Epilogue", "sans-serif"],
+            "body-lg": ["Manrope", "sans-serif"],
+            "body-md": ["Manrope", "sans-serif"],
+            "body-sm": ["Manrope", "sans-serif"],
+            "label-lg": ["Manrope", "sans-serif"],
+            "label-md": ["Manrope", "sans-serif"],
+            "label-caps": ["Manrope", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen pb-24">
+<!-- Header Mobile Pulito & Essenziale -->
+<header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-md border-b border-surface-container-high/60 pt-safe transition-all">
+<div class="h-16 px-5 flex items-center justify-between">
+<a class="flex items-center gap-3" href="#">
+<img alt="U.S. Albatese" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VZdfaKyEAjtMhdLgvVeEihV8LYiyoAtKK8XcAZnVUHcOOM5Mc3SdeC7gNG7t0qtF2aHNfF1NGy5l1-bBZUP8mV-BoCjY3iWXxwsdM3AVe3HEU6DfpSrhKS1p9nFpvGbnG6Ng5ICP7gD8UqmvRd4EbzI_x0DaXiJT7HWEJ-QtLwoN4ropMbvB9V1Ei1g3hdIBWHA5UT-v8qW0Nu3cg47Zs1KDTp0R6doIdMqaVkoO59b87PtZYWiePbm5wN"/>
+</a>
+<button aria-label="Menu di navigazione" class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[24px]">menu</span>
+</button>
+</div>
+</header>
+<!-- Spacing offset per header fisso -->
+<div class="h-16 pt-safe"></div>
+<main class="flex flex-col w-full"><div class="flex flex-col w-full">
+<!-- Intestazione Ariosa ed Editoriale -->
+<section class="px-5 pt-8 pb-6 flex flex-col gap-3">
+<div class="flex items-center gap-2">
+<span class="inline-block w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="font-label-caps text-label-caps text-secondary tracking-widest uppercase">Stagione Sportiva 2024 / 2025</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight">
+      Attività &amp; Squadre
+    </h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-sm font-light">
+      Crescita tecnica, lealtà e disciplina sportiva nel cuore della comunità di Albate. Dai primi passi con il pallone alle competizioni regionali FIDAL.
+    </p>
+</section>
+<!-- Filtri Categorie Minimali -->
+<section class="px-5 pb-6">
+<div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1" id="category-filters">
+<button class="filter-chip active-filter px-4 py-2 rounded-full bg-inverse-surface text-surface font-label-md text-label-md transition-all duration-200 shrink-0" onclick="filterCategory('tutte', this)">
+        Tutte le attività
+      </button>
+<button class="filter-chip px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-highest transition-all duration-200 shrink-0" onclick="filterCategory('scuola-calcio', this)">
+        Scuola Calcio
+      </button>
+<button class="filter-chip px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-highest transition-all duration-200 shrink-0" onclick="filterCategory('agonistica', this)">
+        Settore Agonistico
+      </button>
+<button class="filter-chip px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-highest transition-all duration-200 shrink-0" onclick="filterCategory('atletica', this)">
+        Atletica Leggera
+      </button>
+</div>
+</section>
+<!-- Banner Immagine Suggestiva di Settore -->
+<section class="px-5 mb-8">
+<div class="relative w-full h-44 rounded-xl overflow-hidden bg-surface-container shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Young Italian football players training on a pristine green natural grass pitch in Albate during soft afternoon golden hour light. Editorial sports documentary photography with authentic atmosphere, clean composition, natural tones and understated Italian club dignity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQ_WreF5ARhQxUq5MsQC2VmZnlYw8MhLKxcs1GOPE2JTrZOVvp0PiylxeodoSo_5mWENErm1OHUL3N0RBfyoUv3PnZPcxrCJkRLKZrRPh0fSxo3DHxZ-AxcPxHpkh1NZUT1kusZFcBibIYRrpOiuskGRRPPOplyrjJgcxFqkFi058ikT7QxhRKKscA63e4vzKoKnFQJ6BS5N8nu5HGFRwu34Jsj8nvT0QLKOfOKW8e"/>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/85 via-inverse-surface/20 to-transparent"></div>
+<div class="absolute bottom-3 left-4 right-4 flex items-end justify-between">
+<div>
+<span class="font-label-caps text-label-caps text-primary-fixed uppercase tracking-wider block">Centro Sportivo Albate</span>
+<span class="font-headline-sm text-headline-sm text-surface-container-lowest font-medium">Campi in erba e pista dedicata</span>
+</div>
+<span class="material-symbols-outlined text-surface-container-lowest/80 text-[20px]">sports_soccer</span>
+</div>
+</div>
+</section>
+<!-- Elenco Squadre & Categorie -->
+<section class="px-5 flex flex-col gap-6" id="squadre-list">
+<!-- Categoria: Piccoli Amici (Scuola Calcio) -->
+<article class="team-card bg-surface-container-lowest rounded-xl p-5 shadow-sm flex flex-col gap-4 transition-all" data-group="scuola-calcio">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">Leva 2018 - 2019</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Primi Calci &amp; Piccoli Amici</h2>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps">
+          Attività di Base
+        </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+        Approccio ludico-motorio incentrato sulla coordinazione, sul rispetto reciproco e sulla confidenza naturale con la palla.
+      </p>
+<div class="bg-surface-container-low rounded-lg p-3.5 flex flex-col gap-2">
+<div class="flex items-center gap-2.5 text-on-surface">
+<span class="material-symbols-outlined text-[18px] text-primary">schedule</span>
+<span class="font-label-md text-label-md">Martedì e Giovedì • 17:00 – 18:30</span>
+</div>
+<div class="flex items-center gap-2.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-secondary">location_on</span>
+<span class="font-body-sm text-body-sm">Campo Sintetico Parrocchiale, Albate</span>
+</div>
+</div>
+</article>
+<!-- Categoria: Pulcini (Scuola Calcio) -->
+<article class="team-card bg-surface-container-lowest rounded-xl p-5 shadow-sm flex flex-col gap-4 transition-all" data-group="scuola-calcio">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">Leva 2015 - 2017</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Pulcini a 7</h2>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps">
+          Campionato FIGC
+        </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+        Sviluppo della tecnica individuale e introduzione alle prime dinamiche collaborative di squadra in un ambiente sereno e privo di esasperazioni.
+      </p>
+<div class="bg-surface-container-low rounded-lg p-3.5 flex flex-col gap-2">
+<div class="flex items-center gap-2.5 text-on-surface">
+<span class="material-symbols-outlined text-[18px] text-primary">schedule</span>
+<span class="font-label-md text-label-md">Lunedì, Mercoledì, Venerdì • 17:30 – 19:00</span>
+</div>
+<div class="flex items-center gap-2.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-secondary">location_on</span>
+<span class="font-body-sm text-body-sm">Campo A – Oratorio Don Bosco</span>
+</div>
+</div>
+</article>
+<!-- Categoria: Esordienti (Agonistica) -->
+<article class="team-card bg-surface-container-lowest rounded-xl p-5 shadow-sm flex flex-col gap-4 transition-all" data-group="agonistica">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">Leva 2013 - 2014</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Esordienti a 9</h2>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps">
+          Pre-Agonistica
+        </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+        Consolidamento tattico di reparto, potenziamento coordinativo e partecipazione ai tornei provinciali di Como.
+      </p>
+<div class="bg-surface-container-low rounded-lg p-3.5 flex flex-col gap-2">
+<div class="flex items-center gap-2.5 text-on-surface">
+<span class="material-symbols-outlined text-[18px] text-primary">schedule</span>
+<span class="font-label-md text-label-md">Martedì e Venerdì • 18:00 – 19:45</span>
+</div>
+<div class="flex items-center gap-2.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-secondary">location_on</span>
+<span class="font-body-sm text-body-sm">Campo Comunale Gigi Meroni</span>
+</div>
+</div>
+</article>
+<!-- Categoria: Giovanissimi & Allievi (Agonistica) -->
+<article class="team-card bg-surface-container-lowest rounded-xl p-5 shadow-sm flex flex-col gap-4 transition-all" data-group="agonistica">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">Leva 2009 - 2012</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Giovanissimi &amp; Allievi a 11</h2>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-caps text-label-caps">
+          Agonistica FIGC
+        </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+        Preparazione atletica strutturata, sedute video di approfondimento e confronto con le migliori realtà dilettantistiche lombarde.
+      </p>
+<div class="bg-surface-container-low rounded-lg p-3.5 flex flex-col gap-2">
+<div class="flex items-center gap-2.5 text-on-surface">
+<span class="material-symbols-outlined text-[18px] text-primary">schedule</span>
+<span class="font-label-md text-label-md">Tre sedute settimanali • 18:30 – 20:15</span>
+</div>
+<div class="flex items-center gap-2.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-secondary">location_on</span>
+<span class="font-body-sm text-body-sm">Centro Polisportivo – Campo Principale</span>
+</div>
+</div>
+</article>
+</section>
+<!-- Sezione Atletica FIDAL e Trofeo Lanfrutto-Maggioni -->
+<section class="team-card px-5 mt-10 flex flex-col gap-4" data-group="atletica">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">timer</span>
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-widest">Tradizione Storica</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm flex flex-col gap-5">
+<div class="flex flex-col gap-1">
+<h2 class="font-headline-md text-headline-md text-on-surface">Atletica Leggera FIDAL</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+          Una delle sezioni storiche dell'U.S. Albatese, attiva nelle discipline di mezzofondo, velocità su pista e corsa campestre giovanile.
+        </p>
+</div>
+<!-- Card Trofeo Lanfrutto-Maggioni in evidenza -->
+<div class="bg-surface-container-low rounded-xl p-4 flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-on-primary-container bg-primary-fixed px-2.5 py-0.5 rounded-full font-semibold">
+            Edizione XLII
+          </span>
+<span class="font-label-caps text-label-caps text-secondary">Maggio 2025</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Trofeo Lanfrutto – Maggioni</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+            La storica manifestazione podistica su strada e campestre che riunisce centinaia di giovani atleti provenienti da tutta la provincia comasca.
+          </p>
+</div>
+<div class="pt-2 flex items-center gap-4 text-on-surface-variant text-body-sm font-body-sm">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">map</span>
+            Percorso cittadino Albate
+          </span>
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">groups</span>
+            Tutte le categorie
+          </span>
+</div>
+</div>
+<!-- Orari Atletica -->
+<div class="flex flex-col gap-2">
+<span class="font-label-caps text-label-caps text-secondary uppercase tracking-wider">Allenamenti pista e campestre</span>
+<div class="flex items-center gap-2.5 text-on-surface">
+<span class="material-symbols-outlined text-[18px] text-primary">schedule</span>
+<span class="font-body-md text-body-md">Martedì e Giovedì • 17:30 – 19:15</span>
+</div>
+<div class="flex items-center gap-2.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-secondary">place</span>
+<span class="font-body-sm text-body-sm">Anello di Atletica – Via Sant'Antonino</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Fotografia Editoriale di Stile -->
+<section class="px-5 mt-8">
+<div class="w-full h-48 rounded-xl overflow-hidden shadow-sm bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Monochrome or vintage-toned warm athletic track details with white chalk lines on clay and grass surface at sunset. Minimalist Italian sports heritage framing evoking discipline, patience and authentic parish club values in Lombardy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3CE0te7VzReVyxQt0M1vAbrmbBEJI-_UMUQAXHKnaJ8gjqZOc_uej1fYS5NBO5U_KdCfYP4hFDuxEsgcB2TMJIbAHZyAk3jFSc05019IUpx_hrO3nREZxSDEIhrtrGGE_z--lcuvaTf97_TbeSNoCHUYba87HMexbkYsRDKx8M0NkzvXHMcommTpoXyaPlJ1gcwHbyrTo10mt42LkhMMu514E9-q6lWfdoiOUOg-4"/>
+</div>
+</section>
+<!-- Guida alle Iscrizioni & Segreteria -->
+<section class="px-5 mt-10 mb-8 flex flex-col gap-4">
+<div class="flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-widest">Informazioni &amp; Accoglienza</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Guida alle Iscrizioni</h2>
+<p class="font-body-md text-body-md text-on-surface-variant font-light">
+        Crediamo nell'accoglienza di persona: la segreteria parrocchiale è a disposizione delle famiglie per orientamento, visite ai campi e modulistica federale.
+      </p>
+</div>
+<!-- Modulo Informativo Pulito -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm flex flex-col gap-5">
+<!-- Passo 1 -->
+<div class="flex gap-4 items-start">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center shrink-0 text-on-surface font-label-md text-label-md">
+          1
+        </div>
+<div class="flex flex-col">
+<h3 class="font-label-lg text-label-lg text-on-surface font-semibold">Colloquio Conoscitivo e Prova</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+            Offriamo due settimane di prova gratuita per tutte le fasce d'età prima della formalizzazione dell'adesione.
+          </p>
+</div>
+</div>
+<!-- Passo 2 -->
+<div class="flex gap-4 items-start">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center shrink-0 text-on-surface font-label-md text-label-md">
+          2
+        </div>
+<div class="flex flex-col">
+<h3 class="font-label-lg text-label-lg text-on-surface font-semibold">Documentazione Sanitaria</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+            Certificato medico non agonistico con ECG per i minori di 12 anni; visita medico-sportiva agonistica dai 12 anni compiuti.
+          </p>
+</div>
+</div>
+<!-- Passo 3 -->
+<div class="flex gap-4 items-start">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center shrink-0 text-on-surface font-label-md text-label-md">
+          3
+        </div>
+<div class="flex flex-col">
+<h3 class="font-label-lg text-label-lg text-on-surface font-semibold">Segreteria Parrocchiale</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+            Consegna dei moduli firmati e ritiro del kit gara presso la sede parrocchiale.
+          </p>
+</div>
+</div>
+<!-- Recapiti & Orari Fisici -->
+<div class="bg-surface-container-low rounded-xl p-4 flex flex-col gap-3 mt-1">
+<span class="font-label-caps text-label-caps text-secondary uppercase tracking-wider">Orari di Segreteria</span>
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-primary shrink-0 mt-0.5">calendar_month</span>
+<div class="flex flex-col text-on-surface">
+<span class="font-label-md text-label-md">Lunedì e Mercoledì • 17:30 – 19:30</span>
+<span class="font-label-md text-label-md">Sabato Mattina • 10:00 – 12:00</span>
+</div>
+</div>
+<div class="flex items-center gap-2.5 pt-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-secondary shrink-0">location_on</span>
+<span class="font-body-sm text-body-sm">Piazza Santi Pietro e Paolo 3, 22100 Albate (CO)</span>
+</div>
+<div class="flex items-center gap-2.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-secondary shrink-0">call</span>
+<span class="font-body-sm text-body-sm">+39 031 521876 • segreteria@usalbatese.it</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<script>
+  function filterCategory(cat, element) {
+    const buttons = document.querySelectorAll('#category-filters .filter-chip');
+    buttons.forEach(btn => {
+      btn.classList.remove('bg-inverse-surface', 'text-surface');
+      btn.classList.add('bg-surface-container-high', 'text-on-surface-variant');
+    });
+    element.classList.remove('bg-surface-container-high', 'text-on-surface-variant');
+    element.classList.add('bg-inverse-surface', 'text-surface');
+
+    const cards = document.querySelectorAll('.team-card');
+    cards.forEach(card => {
+      const group = card.getAttribute('data-group');
+      if (cat === 'tutte' || group === cat) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+</script></main>
+<!-- Barra di Navigazione Inferiore Discreta, Sottile ed Elegante -->
+<nav class="fixed bottom-0 inset-x-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md border-t border-surface-container-high/70 pb-safe">
+<div class="flex justify-around items-center h-14 px-2">
+<a class="flex flex-col items-center justify-center gap-0.5 w-16 py-1 text-secondary hover:text-on-surface transition-colors" data-path="home" href="#">
+<span class="material-symbols-outlined text-[20px] font-medium">home</span>
+<span class="font-label-caps text-[10px] font-semibold">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 w-16 py-1 text-secondary hover:text-on-surface transition-colors" data-path="chi-siamo" href="#">
+<span class="material-symbols-outlined text-[20px]">shield</span>
+<span class="font-label-caps text-[10px]">Società</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 w-16 py-1 text-secondary hover:text-on-surface transition-colors" data-path="attivita-squadre" href="#">
+<span class="material-symbols-outlined text-[20px]">sports_soccer</span>
+<span class="font-label-caps text-[10px]">Attività</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 w-16 py-1 text-secondary hover:text-on-surface transition-colors" data-path="notizie-calendario" href="#">
+<span class="material-symbols-outlined text-[20px]">calendar_today</span>
+<span class="font-label-caps text-[10px]">News</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 w-16 py-1 text-secondary hover:text-on-surface transition-colors" data-path="contatti" href="#">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+<span class="font-label-caps text-[10px]">Contatti</span>
+</a>
+</div>
+</nav>
+</body></html>

@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+
+<html lang="it"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<meta content="mobile_tab" name="shell-type"/>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body {
+        width: 100vw;
+        margin: 0;
+        padding: 0;
+        background-color: #f7f9ff;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+      .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom, 12px);
+      }
+      .pt-safe {
+        padding-top: env(safe-area-inset-top, 0px);
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "error": "#ba1a1a",
+            "on-error-container": "#93000a",
+            "on-secondary": "#ffffff",
+            "surface-tint": "#785a00",
+            "surface-bright": "#f7f9ff",
+            "on-secondary-fixed-variant": "#45474c",
+            "primary-container": "#d4a000",
+            "on-surface": "#181c20",
+            "error-container": "#ffdad6",
+            "on-tertiary-container": "#443d1b",
+            "inverse-on-surface": "#eef1f7",
+            "surface-container-low": "#f1f4fa",
+            "on-background": "#181c20",
+            "on-error": "#ffffff",
+            "on-tertiary": "#ffffff",
+            "surface": "#f7f9ff",
+            "outline": "#817661",
+            "surface-container": "#ebeef4",
+            "surface-container-highest": "#dfe3e8",
+            "surface-dim": "#d7dae0",
+            "secondary-container": "#dfdfe6",
+            "on-secondary-container": "#616269",
+            "on-primary-fixed": "#251a00",
+            "tertiary": "#675f39",
+            "primary": "#785a00",
+            "tertiary-fixed-dim": "#d2c799",
+            "on-tertiary-fixed": "#211b00",
+            "tertiary-fixed": "#efe3b3",
+            "inverse-primary": "#f6be2f",
+            "secondary": "#5d5e64",
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed": "#ffdf9d",
+            "secondary-fixed-dim": "#c6c6cd",
+            "on-primary-fixed-variant": "#5b4300",
+            "on-secondary-fixed": "#1a1b21",
+            "inverse-surface": "#2d3135",
+            "surface-container-high": "#e5e8ee",
+            "on-surface-variant": "#4f4634",
+            "on-primary-container": "#4f3a00",
+            "on-tertiary-fixed-variant": "#4e4724",
+            "secondary-fixed": "#e2e2e9",
+            "primary-fixed-dim": "#f6be2f",
+            "outline-variant": "#d3c5ad",
+            "on-primary": "#ffffff",
+            "surface-variant": "#dfe3e8",
+            "tertiary-container": "#b2a87d",
+            "background": "#f7f9ff"
+          },
+          fontFamily: {
+            "display": ["Epilogue", "sans-serif"],
+            "headline-lg": ["Epilogue", "sans-serif"],
+            "headline-md": ["Epilogue", "sans-serif"],
+            "headline-sm": ["Epilogue", "sans-serif"],
+            "body-lg": ["Manrope", "sans-serif"],
+            "body-md": ["Manrope", "sans-serif"],
+            "body-sm": ["Manrope", "sans-serif"],
+            "label-lg": ["Manrope", "sans-serif"],
+            "label-md": ["Manrope", "sans-serif"],
+            "label-caps": ["Manrope", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen pb-24">
+<!-- Header Mobile Pulito & Essenziale -->
+<header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-md border-b border-surface-container-high/60 pt-safe transition-all">
+<div class="h-16 px-5 flex items-center justify-between">
+<a class="flex items-center gap-3" href="#">
+<img alt="U.S. Albatese" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VZdfaKyEAjtMhdLgvVeEihV8LYiyoAtKK8XcAZnVUHcOOM5Mc3SdeC7gNG7t0qtF2aHNfF1NGy5l1-bBZUP8mV-BoCjY3iWXxwsdM3AVe3HEU6DfpSrhKS1p9nFpvGbnG6Ng5ICP7gD8UqmvRd4EbzI_x0DaXiJT7HWEJ-QtLwoN4ropMbvB9V1Ei1g3hdIBWHA5UT-v8qW0Nu3cg47Zs1KDTp0R6doIdMqaVkoO59b87PtZYWiePbm5wN"/>
+</a>
+<button aria-label="Menu di navigazione" class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[24px]">menu</span>
+</button>
+</div>
+</header>
+<!-- Spacing offset per header fisso -->
+<div class="h-16 pt-safe"></div>
+<main class="flex flex-col w-full"><div class="flex flex-col w-full">
+<!-- Sottile intestazione editoriale -->
+<section class="px-5 pt-3 pb-4 flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-widest flex items-center gap-1.5">
+<span class="inline-block w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+        U.S. Albatese 1948 • Stagione 2024/25
+      </span>
+<span class="font-label-md text-label-md text-secondary">
+        Weekend 15-16 Mar
+      </span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">
+      Notizie &amp; Gare
+    </h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-xs">
+      Cronache dai campi, comunicati ufficiali e il calendario settimanale di tutte le formazioni neroverdi.
+    </p>
+</section>
+<!-- Segmented / Filter Tabs (Mobile) -->
+<section class="px-5 pb-5">
+<div class="flex p-1 bg-surface-container rounded-xl gap-1" id="section-tabs" role="tablist">
+<button class="flex-1 py-2 text-center rounded-lg font-label-md text-label-md transition-all duration-200 bg-surface-container-lowest text-on-surface shadow-sm font-semibold" id="tab-tutto" onclick="switchTab('tutto')" type="button">
+        Tutto
+      </button>
+<button class="flex-1 py-2 text-center rounded-lg font-label-md text-label-md transition-all duration-200 text-secondary hover:text-on-surface" id="tab-match" onclick="switchTab('match')" type="button">
+        Gare
+      </button>
+<button class="flex-1 py-2 text-center rounded-lg font-label-md text-label-md transition-all duration-200 text-secondary hover:text-on-surface" id="tab-notizie" onclick="switchTab('notizie')" type="button">
+        Notizie
+      </button>
+<button class="flex-1 py-2 text-center rounded-lg font-label-md text-label-md transition-all duration-200 text-secondary hover:text-on-surface" id="tab-atti" onclick="switchTab('atti')" type="button">
+        Atti &amp; PDF
+      </button>
+</div>
+</section>
+<!-- MATCH CENTER WEEKEND (Gare) -->
+<section class="px-5 pb-8 flex flex-col gap-4 tab-section" data-tab-content="match">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-secondary uppercase tracking-wider">Centro Partite</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Prossimo Turno</h2>
+</div>
+<a class="font-label-md text-label-md text-primary font-semibold flex items-center gap-0.5" href="#">
+        Tutti i gironi
+        <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</a>
+</div>
+<!-- Match Card 1: In Evidenza (Prima Squadra) -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3 relative overflow-hidden">
+<div class="flex items-center justify-between">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-caps text-label-caps">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+          1ª Categoria Gir. B • 24ª Giornata
+        </span>
+<span class="font-label-md text-label-md text-secondary">Dom 16 Mar • 15:30</span>
+</div>
+<div class="flex items-center justify-between py-1">
+<!-- Casa -->
+<div class="flex flex-col items-center gap-1.5 w-5/12 text-center">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface shadow-sm">
+<span class="material-symbols-outlined text-[24px]">sports_soccer</span>
+</div>
+<span class="font-body-md text-body-md font-semibold text-on-surface leading-tight">U.S. Albatese</span>
+<span class="font-label-caps text-[10px] text-secondary">3° • 44 pt</span>
+</div>
+<!-- Orario / Versus -->
+<div class="flex flex-col items-center justify-center w-2/12">
+<span class="font-headline-sm text-headline-sm text-on-surface-variant font-display tracking-tight">VS</span>
+<span class="font-label-caps text-[10px] uppercase text-secondary tracking-widest mt-0.5">Stadio</span>
+</div>
+<!-- Trasferta -->
+<div class="flex flex-col items-center gap-1.5 w-5/12 text-center">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface shadow-sm">
+<span class="material-symbols-outlined text-[24px]">shield</span>
+</div>
+<span class="font-body-md text-body-md font-semibold text-on-surface leading-tight">G.S. Fino Mornasco</span>
+<span class="font-label-caps text-[10px] text-secondary">5° • 39 pt</span>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between bg-surface-container-low rounded-lg px-3 py-2">
+<div class="flex items-center gap-1.5 text-secondary">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">C.S. Comunale • Albate (CO)</span>
+</div>
+<button class="font-label-md text-label-md text-on-surface font-semibold hover:text-primary transition-colors">
+          Info campo
+        </button>
+</div>
+</div>
+<!-- Match Card 2: Settore Giovanile -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-caps text-label-caps">
+          Juniores Regionali U19
+        </span>
+<span class="font-label-md text-label-md text-secondary">Sab 15 Mar • 17:00</span>
+</div>
+<div class="flex items-center justify-between py-1">
+<div class="flex items-center gap-3 w-5/12">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface shrink-0">
+<span class="material-symbols-outlined text-[18px]">sports_soccer</span>
+</div>
+<span class="font-body-md text-body-md font-semibold text-on-surface leading-tight truncate">Albatese</span>
+</div>
+<div class="px-2.5 py-1 bg-surface-container-low rounded font-label-caps text-label-caps text-secondary font-semibold">
+          17:00
+        </div>
+<div class="flex items-center justify-end gap-3 w-5/12 text-right">
+<span class="font-body-md text-body-md font-semibold text-on-surface leading-tight truncate">Mariano Calcio</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface shrink-0">
+<span class="material-symbols-outlined text-[18px]">shield</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Ultimi Risultati Recenti (Strip Compatta) -->
+<div class="bg-surface-container-low rounded-xl p-4 flex flex-col gap-2.5">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps uppercase text-secondary tracking-wider">Ultimo Referto</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Domenica Scorsa</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="font-body-md text-body-md text-on-surface font-semibold">Cantù San Paolo – Albatese</span>
+</div>
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">1 – 2</span>
+</div>
+<span class="font-body-sm text-body-sm text-secondary">Reti di Ronchetti (34') e De Santis (78'). 3 punti pesanti in trasferta.</span>
+</div>
+</section>
+<!-- RASSEGNA NOTIZIE (Stile Rivista / Magazine) -->
+<section class="px-5 pb-8 flex flex-col gap-5 tab-section" data-tab-content="notizie">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-secondary uppercase tracking-wider">Primo Piano</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Cronache &amp; Società</h2>
+</div>
+<span class="font-label-md text-label-md text-secondary">3 Notizie</span>
+</div>
+<!-- Articolo 1: Hero Notizia con grande impatto fotografico -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm flex flex-col">
+<div class="relative w-full h-48 bg-surface-container overflow-hidden">
+<img alt="Trionfo esterno della Prima Squadra" class="w-full h-full object-cover transition-transform duration-300 hover:scale-105" data-alt="Intense high-angle football action shot on a pristine green Italian grass pitch, players in classic dark green and black striped kits celebrating a decisive goal with warm afternoon sunlight casting long graceful shadows in Como, editorial sports photography aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiZvsw0JvWQBDxhAE7nrrv28YGricqEumAk62JLZ0F5OqHmu1C9NpeYlj7ACsDZY_5kdHxSc-KqpWeys7_gM2z0dkewhu7p7zSggXhQz3Uyvmq-VohL-8jPRKCNl42jndCW9PqMAbkpZpE7ge5lvQOjnr08Vzb1zwjL5YKAgSRywQ__ROtel_hWtNXY4MHFZx71THAV6_t1EyU9OkVwkYo_1PKRQvB84H0pGHMUDKy"/>
+<div class="absolute top-3 left-3 bg-surface-container-lowest/90 backdrop-blur-sm px-2.5 py-1 rounded font-label-caps text-label-caps text-on-surface uppercase tracking-wide">
+          Prima Squadra
+        </div>
+</div>
+<div class="p-5 flex flex-col gap-2.5">
+<div class="flex items-center gap-2 text-secondary font-label-md text-label-md">
+<span>10 Marzo 2025</span>
+<span>•</span>
+<span>Lettura 3 min</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface leading-snug">
+          Vittoria di carattere a Cantù: la zampata di De Santis decide il derby
+        </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-3">
+          Una prestazione gagliarda e organizzata regala ai ragazzi di mister Colombo tre punti d'oro per consolidare il podio in classifica. Il gruppo mostra solidità tattica e uno spirito coeso nei momenti di massima pressione.
+        </p>
+<div class="pt-2 flex items-center justify-between">
+<a class="font-label-md text-label-md text-primary font-bold flex items-center gap-1 hover:underline" href="#">
+            Leggi il resoconto completo
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+<button aria-label="Condividi articolo" class="w-8 h-8 rounded-full flex items-center justify-center text-secondary hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">share</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Articolo 2: Card Editoriale con foto laterale/orizzontale -->
+<article class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex gap-4 items-start">
+<div class="w-24 h-24 rounded-lg bg-surface-container overflow-hidden shrink-0">
+<img alt="Open Day Scuola Calcio Neroverde" class="w-full h-full object-cover" data-alt="Young youth academy football players in clean green training jerseys listening attentively to their coach on a bright suburban pitch in Albate Italy, sports development, inspiring training atmosphere, golden hour natural light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCda6DkabVuPeI0WXivMaJt2zitz448ZvW9ka5hd6zLzwFKURf2B1JYLMLfMv3opzL_CAp-qCYFlM2vJEmiZESLvRSoGfARqyhvHVD4Ao3cNeBO5uuQ3WLrAfhQeNFVLZQnt3FvvK-M0LrFtefoifg2UVbA_gpDvvWcrQK0dlPy-NmBU8GiPzZKpLrxPIKYcyCftfL65XFuIA5TSC73-i27iX1zIbZTor8iNh0Co-Xk"/>
+</div>
+<div class="flex flex-col gap-1 min-w-0 flex-1">
+<div class="flex items-center gap-1.5 text-secondary font-label-caps text-[10px] uppercase tracking-wide">
+<span>Settore Giovanile</span>
+<span>•</span>
+<span>8 Mar</span>
+</div>
+<h3 class="font-body-md text-body-md font-semibold text-on-surface leading-snug line-clamp-2">
+          Open Day Primavera 2025: porte aperte per Primi Calci e Pulcini
+        </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mt-0.5">
+          Due giornate dedicate ai piccoli atleti nati tra il 2014 e il 2018 guidate dai tecnici federali FIGC.
+        </p>
+<a class="font-label-md text-label-md text-primary font-semibold mt-1 inline-flex items-center gap-0.5" href="#">
+          Dettagli &amp; Orari <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</a>
+</div>
+</article>
+<!-- Articolo 3: Notizia Istituzionale -->
+<article class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex gap-4 items-start">
+<div class="w-24 h-24 rounded-lg bg-surface-container overflow-hidden shrink-0">
+<img alt="Assemblea Straordinaria Soci" class="w-full h-full object-cover" data-alt="Architectural modern football club meeting room, clean wooden desks, club banners, soft warm lighting, refined sports institutional boardroom in Como." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUlsVHveyI-c_s_120EUvqysZ6Wd0USDA-7z7luopXTobIedVTcHEKVCEiOP6_wKYYONslXlak2j3CDaEn26_4FeyUhQVhnJjmF77rj1hmmmkB8KiqeGrKJfAy25ltUPsSya9YwOK3Ph6Tecn1e-ok3hDkl5TRPJNO__lO7ULUATfHNrOInCm81enUESDMQ0AYz0JSW9uvAuX2QNEdlqz7r2T36-Mi5Lw6L14lwXMM"/>
+</div>
+<div class="flex flex-col gap-1 min-w-0 flex-1">
+<div class="flex items-center gap-1.5 text-secondary font-label-caps text-[10px] uppercase tracking-wide">
+<span>Societario</span>
+<span>•</span>
+<span>3 Mar</span>
+</div>
+<h3 class="font-body-md text-body-md font-semibold text-on-surface leading-snug line-clamp-2">
+          Approvato il piano di riqualificazione per la tribuna coperta
+        </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mt-0.5">
+          Il Consiglio Direttivo delibera gli interventi di ammodernamento strutturale per la stagione 2025/2026.
+        </p>
+<a class="font-label-md text-label-md text-primary font-semibold mt-1 inline-flex items-center gap-0.5" href="#">
+          Leggi comunicato <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</a>
+</div>
+</article>
+</section>
+<!-- BOLLETTINI, MODULI & DOCUMENTI (Download Minimali) -->
+<section class="px-5 pb-8 flex flex-col gap-4 tab-section" data-tab-content="atti">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-secondary uppercase tracking-wider">Archivio Ufficiale</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Bollettini &amp; Documenti</h2>
+</div>
+<span class="font-label-md text-label-md text-secondary">Aggiornati semanalmente</span>
+</div>
+<!-- Lista Documenti Pulita -->
+<div class="flex flex-col gap-2.5">
+<!-- Item 1 -->
+<a class="bg-surface-container-lowest rounded-xl p-3.5 flex items-center justify-between shadow-sm active:scale-[0.99] transition-transform" href="#">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[22px]">picture_as_pdf</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md font-semibold text-on-surface truncate">Bollettino Gare Settimanale #24</span>
+<span class="font-label-caps text-label-caps text-secondary">PDF • 1.4 MB • 11 Mar 2025</span>
+</div>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface shrink-0 ml-2">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</div>
+</a>
+<!-- Item 2 -->
+<a class="bg-surface-container-lowest rounded-xl p-3.5 flex items-center justify-between shadow-sm active:scale-[0.99] transition-transform" href="#">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[22px]">description</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md font-semibold text-on-surface truncate">Modulo Visita Medico-Sportiva 2025</span>
+<span class="font-label-caps text-label-caps text-secondary">PDF • 420 KB • Modulistica Tesserati</span>
+</div>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface shrink-0 ml-2">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</div>
+</a>
+<!-- Item 3 -->
+<a class="bg-surface-container-lowest rounded-xl p-3.5 flex items-center justify-between shadow-sm active:scale-[0.99] transition-transform" href="#">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[22px]">verified_user</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md font-semibold text-on-surface truncate">Codice Etico &amp; Safeguarding Policy</span>
+<span class="font-label-caps text-label-caps text-secondary">PDF • 890 KB • Regolamento Giovanile</span>
+</div>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface shrink-0 ml-2">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</div>
+</a>
+</div>
+<!-- Box informativo discreto segreteria -->
+<div class="bg-surface-container-low rounded-xl p-4 flex items-center gap-3 mt-1">
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface shrink-0">
+<span class="material-symbols-outlined text-[20px]">info</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Hai bisogno di un documento specifico?</span>
+<span class="font-body-sm text-body-sm text-secondary">Contatta la segreteria dal martedì al venerdì (17:30 - 19:30).</span>
+</div>
+</div>
+</section>
+<!-- Newsletter / Aggiornamenti Elegante -->
+<section class="px-5 pb-8">
+<div class="bg-on-surface text-surface rounded-xl p-5 flex flex-col gap-3 shadow-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed text-[22px]">notifications_active</span>
+<span class="font-label-caps text-label-caps text-primary-fixed uppercase tracking-wider">Resta Informato</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-surface leading-tight">
+        Risultati e comunicati ogni domenica sera
+      </h3>
+<p class="font-body-sm text-body-sm text-surface-variant">
+        Ricevi il riepilogo con i tabellini di Prima Squadra e Giovanili direttamente via email, senza notifiche invasive.
+      </p>
+<form class="flex flex-col gap-2 pt-1" id="newsletter-form" onsubmit="event.preventDefault(); showSubscribed();">
+<input class="bg-surface-container-lowest/10 text-surface placeholder:text-surface-variant font-body-sm text-body-sm rounded-lg px-3.5 py-2.5 outline-none focus:bg-surface-container-lowest/20 transition-all" placeholder="Inserisci la tua email" required="" type="email"/>
+<button class="bg-primary-container text-on-primary-container font-label-md text-label-md font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-1.5 active:opacity-90 transition-opacity" type="submit">
+          Iscriviti al Riepilogo
+          <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</form>
+<div class="hidden text-primary-fixed font-body-sm text-body-sm py-1" id="sub-success">
+        ✓ Grazie! Ti invieremo il prossimo riepilogo domenicale.
+      </div>
+</div>
+</section>
+</div>
+<script>
+  function switchTab(tabId) {
+    const tabs = ['tutto', 'match', 'notizie', 'atti'];
+    const buttons = {
+      'tutto': document.getElementById('tab-tutto'),
+      'match': document.getElementById('tab-match'),
+      'notizie': document.getElementById('tab-notizie'),
+      'atti': document.getElementById('tab-atti')
+    };
+
+    tabs.forEach(key => {
+      const btn = buttons[key];
+      if (key === tabId) {
+        btn.classList.add('bg-surface-container-lowest', 'text-on-surface', 'shadow-sm', 'font-semibold');
+        btn.classList.remove('text-secondary');
+      } else {
+        btn.classList.remove('bg-surface-container-lowest', 'text-on-surface', 'shadow-sm', 'font-semibold');
+        btn.classList.add('text-secondary');
+      }
+    });
+
+    const sections = document.querySelectorAll('.tab-section');
+    sections.forEach(sec => {
+      const contentCategory = sec.getAttribute('data-tab-content');
+      if (tabId === 'tutto' || contentCategory === tabId) {
+        sec.style.display = 'flex';
+      } else {
+        sec.style.display = 'none';
+      }
+    });
+  }
+
+  function showSubscribed() {
+    const form = document.getElementById('newsletter-form');
+    const msg = document.getElementById('sub-success');
+    if (form && msg) {
+      form.style.display = 'none';
+      msg.classList.remove('hidden');
+    }
+  }
+</script></main>
+<!-- Barra di Navigazione Inferiore Discreta, Sottile ed Elegante -->
+<nav class="fixed bottom-0 inset-x-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md border-t border-surface-container-high/70 pb-safe">
+<div class="flex justify-around items-center h-14 px-2">
+<a class="flex flex-col items-center justify-center gap-0.5 w-16 py-1 text-secondary hover:text-on-surface transition-colors" data-path="home" href="#">
+<span class="material-symbols-outlined text-[20px] font-medium">home</span>
+<span class="font-label-caps text-[10px] font-semibold">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 w-16 py-1 text-secondary hover:text-on-surface transition-colors" data-path="chi-siamo" href="#">
+<span class="material-symbols-outlined text-[20px]">shield</span>
+<span class="font-label-caps text-[10px]">Società</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 w-16 py-1 text-secondary hover:text-on-surface transition-colors" data-path="attivita-squadre" href="#">
+<span class="material-symbols-outlined text-[20px]">sports_soccer</span>
+<span class="font-label-caps text-[10px]">Attività</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 w-16 py-1 text-secondary hover:text-on-surface transition-colors" data-path="notizie-calendario" href="#">
+<span class="material-symbols-outlined text-[20px]">calendar_today</span>
+<span class="font-label-caps text-[10px]">News</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 w-16 py-1 text-secondary hover:text-on-surface transition-colors" data-path="contatti" href="#">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+<span class="font-label-caps text-[10px]">Contatti</span>
+</a>
+</div>
+</nav>
+</body></html>
