@@ -6,7 +6,7 @@
 
   Implement final Strapi schemas/components, `TYPES.md`, generated backend/OpenAPI/frontend types, DTOs, client queries, mappers, connector methods, cached reads, cache tags, webhook mapping, Draft Mode previews, Italian routes, and minimal renderers. Remove the generic Article/Event domain and English routes. Validate empty-database startup, backend build/type generation, OpenAPI/frontend generation, checks, and unit tests.
 
-- [ ] **02 — Generate placeholder media and build the importable demonstration dataset**
+- [x] **02 — Generate placeholder media and build the importable demonstration dataset**
 
   Derive target-layout dimensions from the desktop/mobile HTML references and produce every image slot with repository-local `imagen` only. Include the eight semantic slots and honest Italian placeholder alt text, three sample PDFs, credible synthetic 2026/27 Strapi content, and `backend/seed-data/us-albatese-demo.tar.gz`. Verify an empty-database import, relations, media, public reads, and that the archive contains no secrets. Built-in `imagegen` must not be used.
 
