@@ -10,7 +10,10 @@ export async function generateMetadata({
   const { slug } = await params;
   const page = await getNewsBySlug(slug);
   if (!page) notFound();
-  return { title: page.identity.title, description: page.summary };
+  return {
+    title: page.identity.title.trim() || "Notizia",
+    description: page.summary.trim() || "Aggiornamento dall’U.S. Albatese.",
+  };
 }
 export default async function NewsRoute({
   params,

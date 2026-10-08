@@ -26,7 +26,7 @@
 
   Build programs, youth-football cards, competitive/open-team and athletics features, schedules/venues, and registration steps. Use only lightweight client-side filtering where interaction requires it, with no new dependency.
 
-- [ ] **07 — Implement Notizie, calendario, documents, and article detail**
+- [x] **07 — Implement Notizie, calendario, documents, and article detail**
 
   Build the combined hub and `/notizie/[slug]` through `PageSwitch`, including metadata and preview. Cover scores, chronological ordering, missing-score and empty states, downloads, and cache invalidation.
 
