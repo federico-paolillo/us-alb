@@ -1,22 +1,25 @@
 "use client";
 
+import { StatusPanel } from "@cmsjs/components/shared/status-panel";
+
 export default function ContentError({ retry }: { retry: () => void }) {
   return (
-    <main className="mx-auto w-full max-w-3xl px-5 py-12 sm:px-8 sm:py-16">
-      <p className="font-mono text-xs font-medium tracking-[0.18em] text-accent uppercase">
-        Content error
-      </p>
-      <h1 className="mt-4 text-4xl font-semibold tracking-tight text-text">
-        Unable to load this page
-      </h1>
-      <p className="mt-5 text-muted">Please try loading the content again.</p>
-      <button
-        className="mt-8 rounded-card border border-accent px-4 py-2 font-mono text-sm text-accent transition-colors hover:bg-accent/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        onClick={retry}
-        type="button"
-      >
-        Try again
-      </button>
+    <main className="site-container py-12 sm:py-16">
+      <StatusPanel
+        action={
+          <button
+            className="rounded-editorial-md bg-inverse px-5 py-3 font-body text-sm font-semibold text-inverse-text transition-colors hover:bg-ink"
+            onClick={retry}
+            type="button"
+          >
+            Riprova
+          </button>
+        }
+        body="Il contenuto non è disponibile in questo momento. Riprova tra poco."
+        eyebrow="Errore contenuto"
+        title="Non riusciamo a caricare questa pagina"
+        tone="error"
+      />
     </main>
   );
 }

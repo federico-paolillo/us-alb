@@ -4,6 +4,7 @@ import type {
   OfficialDocumentDto,
 } from "@cmsjs/cms/model";
 import { CmsImage } from "@cmsjs/components/shared/content";
+import { EmptyState } from "@cmsjs/components/shared/empty-state";
 import Link from "next/link";
 
 const calendarGroups: ReadonlyArray<{
@@ -58,7 +59,10 @@ export function NotizieListPage({
           ))}
         </div>
         {news.length === 0 && (
-          <p className="mt-5 text-muted">Nessuna notizia pubblicata.</p>
+          <EmptyState
+            body="Le cronache della società saranno disponibili qui appena pubblicate."
+            title="Nessuna notizia pubblicata"
+          />
         )}
       </section>
       <section className="mt-12">
@@ -119,10 +123,13 @@ export function NotizieListPage({
           })}
         </div>
         {calendar.length === 0 && (
-          <p className="mt-5 text-muted">Nessun appuntamento pubblicato.</p>
+          <EmptyState
+            body="Partite, risultati ed eventi compariranno qui quando il calendario sarà aggiornato."
+            title="Nessun appuntamento pubblicato"
+          />
         )}
       </section>
-      <section className="mt-12">
+      <section className="mt-12" id="documenti">
         <h2 className="text-2xl font-semibold text-text">
           Documenti ufficiali
         </h2>
@@ -142,7 +149,10 @@ export function NotizieListPage({
           ))}
         </ul>
         {documents.length === 0 && (
-          <p className="mt-5 text-muted">Nessun documento pubblicato.</p>
+          <EmptyState
+            body="La modulistica e gli atti ufficiali saranno disponibili in questa sezione."
+            title="Nessun documento pubblicato"
+          />
         )}
       </section>
     </main>

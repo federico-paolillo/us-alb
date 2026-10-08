@@ -10,7 +10,7 @@
 
   Derive target-layout dimensions from the desktop/mobile HTML references and produce every image slot with repository-local `imagen` only. Include the eight semantic slots and honest Italian placeholder alt text, three sample PDFs, credible synthetic 2026/27 Strapi content, and `backend/seed-data/us-albatese-demo.tar.gz`. Verify an empty-database import, relations, media, public reads, and that the archive contains no secrets. Built-in `imagegen` must not be used.
 
-- [ ] **03 — Implement the responsive design foundation and shared chrome**
+- [x] **03 — Implement the responsive design foundation and shared chrome**
 
   Add Epilogue/Manrope, Tailwind tokens, global layout, deterministic crest/wordmark, desktop and mobile headers/navigation, footer/contact block, version display, and target-consistent loading/error/not-found presentation. Check both required viewports and resolve every navigation target.
 

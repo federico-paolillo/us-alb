@@ -1,26 +1,78 @@
 @import "tailwindcss";
 
 @theme {
-  --color-canvas: #10121a;
-  --color-surface: #171a25;
-  --color-surface-raised: #222638;
-  --color-border: #31374d;
-  --color-muted: #a6aec2;
-  --color-text: #f1f3f8;
-  --color-accent: #a78bfa;
-  --radius-card: 0.25rem;
+  --color-surface-canvas: #f7f9ff;
+  --color-surface-lowest: #ffffff;
+  --color-surface-low: #f1f4fa;
+  --color-surface-container: #ebeef4;
+  --color-surface-high: #e5e8ee;
+  --color-surface-highest: #dfe3e8;
+  --color-ink: #181c20;
+  --color-ink-muted: #5d5e64;
+  --color-ink-variant: #4f4634;
+  --color-gold-deep: #785a00;
+  --color-gold-display: #d4a000;
+  --color-gold-pale: #f4e8b8;
+  --color-outline: #817661;
+  --color-outline-soft: #d3c5ad;
+  --color-inverse: #2d3135;
+  --color-inverse-text: #eef1f7;
+  --color-error: #ba1a1a;
+  --color-error-pale: #ffdad6;
+
+  /* Compatibility aliases for the task-01 renderers retained through tasks 04–07. */
+  --color-canvas: #f7f9ff;
+  --color-surface: #ffffff;
+  --color-surface-raised: #f1f4fa;
+  --color-border: #d3c5ad;
+  --color-muted: #5d5e64;
+  --color-text: #181c20;
+  --color-accent: #785a00;
+
+  --radius-card: 0.5rem;
+  --radius-editorial-sm: 0.25rem;
+  --radius-editorial-md: 0.375rem;
+  --radius-editorial-lg: 0.5rem;
+  --radius-editorial-xl: 0.75rem;
+
+  --shadow-card: 0 4px 20px -2px rgb(17 19 24 / 0.04);
+  --shadow-card-raised: 0 12px 32px -4px rgb(17 19 24 / 0.08);
+  --shadow-overlay: 0 24px 48px -12px rgb(17 19 24 / 0.12);
+
+  --tracking-editorial: 0.08em;
+  --tracking-display: -0.03em;
+
+  --text-display: 3.5rem;
+  --text-display--line-height: 4rem;
+  --text-headline-lg: 2.5rem;
+  --text-headline-lg--line-height: 3rem;
+  --text-headline-md: 1.75rem;
+  --text-headline-md--line-height: 2.25rem;
+  --text-headline-sm: 1.25rem;
+  --text-headline-sm--line-height: 1.75rem;
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.75rem;
+  --text-body-md: 0.9375rem;
+  --text-body-md--line-height: 1.5rem;
+  --text-body-sm: 0.8125rem;
+  --text-body-sm--line-height: 1.25rem;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1rem;
 }
 
 @theme inline {
-  --font-sans: var(--font-geist, ui-sans-serif, system-ui, sans-serif);
-  --font-mono: var(--font-geist-mono, ui-monospace, monospace);
+  --font-display: var(--font-epilogue), Arial, sans-serif;
+  --font-body: var(--font-manrope), Arial, sans-serif;
+  --font-sans: var(--font-manrope), Arial, sans-serif;
+  --font-mono: var(--font-manrope), Arial, sans-serif;
 }
 
 :root {
-  color-scheme: dark;
-  background: var(--color-canvas);
-  color: var(--color-text);
-  scroll-padding-top: 5rem;
+  color-scheme: light;
+  background: var(--color-surface-canvas);
+  color: var(--color-ink);
+  scroll-behavior: smooth;
+  scroll-padding-top: 7rem;
 }
 
 html,
@@ -29,12 +81,81 @@ body {
 }
 
 body {
-  background: var(--color-canvas);
-  color: var(--color-text);
-  font-family: var(--font-geist, ui-sans-serif, system-ui, sans-serif);
+  min-width: 20rem;
+  overflow-x: clip;
+  background: var(--color-surface-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-manrope), Arial, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-display {
+  font-family: var(--font-epilogue), Arial, sans-serif;
+}
+
+::selection {
+  background: var(--color-gold-pale);
+  color: var(--color-ink);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline: 3px solid var(--color-gold-display);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 1px var(--color-ink);
+}
+
+@utility site-container {
+  width: 100%;
+  max-width: 75rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+
+  @media (width >= 48rem) {
+    padding-inline: 2rem;
+  }
+
+  @media (width >= 80rem) {
+    padding-inline: 3rem;
+  }
+}
+
+@utility safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@utility safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.mobile-shell-clearance {
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (width >= 48rem) {
+  .mobile-shell-clearance {
+    padding-bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+  }
 }

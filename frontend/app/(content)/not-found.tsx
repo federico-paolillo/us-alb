@@ -1,15 +1,30 @@
+import { StatusPanel } from "@cmsjs/components/shared/status-panel";
+import Link from "next/link";
+
 export default function NotFound() {
   return (
-    <main className="mx-auto w-full max-w-3xl px-5 py-12 sm:px-8 sm:py-16">
-      <p className="font-mono text-xs font-medium tracking-[0.18em] text-accent uppercase">
-        404
-      </p>
-      <h1 className="mt-4 text-4xl font-semibold tracking-tight text-text">
-        Pagina non trovata
-      </h1>
-      <p className="mt-5 text-lg leading-8 text-muted">
-        Il contenuto richiesto non esiste o non è pubblicato.
-      </p>
+    <main className="site-container py-12 sm:py-16">
+      <StatusPanel
+        action={
+          <>
+            <Link
+              className="rounded-editorial-md bg-inverse px-5 py-3 text-sm font-semibold text-inverse-text transition-colors hover:bg-ink"
+              href="/"
+            >
+              Torna alla Home
+            </Link>
+            <Link
+              className="rounded-editorial-md border border-outline px-5 py-3 text-sm font-semibold text-ink transition-colors hover:bg-surface-low"
+              href="/notizie"
+            >
+              Vai alle Notizie
+            </Link>
+          </>
+        }
+        body="Il contenuto richiesto non esiste, è stato spostato oppure non è ancora pubblicato."
+        eyebrow="Errore 404"
+        title="Pagina non trovata"
+      />
     </main>
   );
 }
