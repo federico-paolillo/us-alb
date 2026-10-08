@@ -691,7 +691,7 @@ export interface components {
       updatedAt?: string;
       /**
        * @description A datetime field
-       * @default 2026-10-08T14:54:30.074Z
+       * @default 2026-10-08T17:01:46.268Z
        */
       publishedAt: string;
       related: unknown;
@@ -918,7 +918,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.065Z
+               * @default 2026-10-08T17:01:46.260Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1039,7 +1039,7 @@ export interface operations {
             documentIntroduction?: string;
             /**
              * @description A datetime field
-             * @default 2026-10-08T14:54:30.088Z
+             * @default 2026-10-08T17:01:46.284Z
              */
             publishedAt?: string;
             /** @description A media field */
@@ -1091,7 +1091,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.092Z
+               * @default 2026-10-08T17:01:46.288Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1228,7 +1228,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.096Z
+               * @default 2026-10-08T17:01:46.293Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1363,7 +1363,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.103Z
+               * @default 2026-10-08T17:01:46.304Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1483,7 +1483,7 @@ export interface operations {
             registrationIntroduction?: string;
             /**
              * @description A datetime field
-             * @default 2026-10-08T14:54:30.114Z
+             * @default 2026-10-08T17:01:46.317Z
              */
             publishedAt?: string;
             /** @description A media field */
@@ -1533,7 +1533,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.116Z
+               * @default 2026-10-08T17:01:46.321Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1669,7 +1669,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.119Z
+               * @default 2026-10-08T17:01:46.326Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1853,7 +1853,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.128Z
+               * @default 2026-10-08T17:01:46.340Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -1963,7 +1963,7 @@ export interface operations {
             summary: string;
             /**
              * @description A datetime field
-             * @default 2026-10-08T14:54:30.140Z
+             * @default 2026-10-08T17:01:46.353Z
              */
             publishedAt: string;
             /** @description A component field */
@@ -2016,7 +2016,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.142Z
+               * @default 2026-10-08T17:01:46.355Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -2184,7 +2184,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.135Z
+               * @default 2026-10-08T17:01:46.347Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -2296,7 +2296,7 @@ export interface operations {
             summary?: string;
             /**
              * @description A datetime field
-             * @default 2026-10-08T14:54:30.147Z
+             * @default 2026-10-08T17:01:46.360Z
              */
             publishedAt?: string;
             /** @description A component field */
@@ -2349,7 +2349,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.149Z
+               * @default 2026-10-08T17:01:46.362Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -2480,7 +2480,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.154Z
+               * @default 2026-10-08T17:01:46.366Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -2593,7 +2593,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.159Z
+               * @default 2026-10-08T17:01:46.371Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -2693,7 +2693,7 @@ export interface operations {
             introduction?: string;
             /**
              * @description A datetime field
-             * @default 2026-10-08T14:54:30.166Z
+             * @default 2026-10-08T17:01:46.378Z
              */
             publishedAt?: string;
             /** @description A media field */
@@ -2735,7 +2735,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.168Z
+               * @default 2026-10-08T17:01:46.380Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -2851,7 +2851,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.170Z
+               * @default 2026-10-08T17:01:46.383Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -3007,7 +3007,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.177Z
+               * @default 2026-10-08T17:01:46.391Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -3107,7 +3107,7 @@ export interface operations {
             featured: ("0" | "1" | "t" | "true" | "f" | "false") | null;
             /**
              * @description A datetime field
-             * @default 2026-10-08T14:54:30.188Z
+             * @default 2026-10-08T17:01:46.403Z
              */
             publishedAt: string;
             /** @description A component field */
@@ -3152,7 +3152,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.190Z
+               * @default 2026-10-08T17:01:46.405Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -3300,7 +3300,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.184Z
+               * @default 2026-10-08T17:01:46.399Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -3402,7 +3402,7 @@ export interface operations {
             featured?: ("0" | "1" | "t" | "true" | "f" | "false") | null;
             /**
              * @description A datetime field
-             * @default 2026-10-08T14:54:30.193Z
+             * @default 2026-10-08T17:01:46.410Z
              */
             publishedAt?: string;
             /** @description A component field */
@@ -3447,7 +3447,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.195Z
+               * @default 2026-10-08T17:01:46.412Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -3568,7 +3568,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.197Z
+               * @default 2026-10-08T17:01:46.417Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -3712,7 +3712,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.204Z
+               * @default 2026-10-08T17:01:46.424Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -3804,7 +3804,7 @@ export interface operations {
             displayOrder: number;
             /**
              * @description A datetime field
-             * @default 2026-10-08T14:54:30.211Z
+             * @default 2026-10-08T17:01:46.432Z
              */
             publishedAt: string;
             /** @description A media field */
@@ -3845,7 +3845,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.212Z
+               * @default 2026-10-08T17:01:46.433Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -3983,7 +3983,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.207Z
+               * @default 2026-10-08T17:01:46.428Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -4077,7 +4077,7 @@ export interface operations {
             displayOrder?: number;
             /**
              * @description A datetime field
-             * @default 2026-10-08T14:54:30.215Z
+             * @default 2026-10-08T17:01:46.436Z
              */
             publishedAt?: string;
             /** @description A media field */
@@ -4118,7 +4118,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.217Z
+               * @default 2026-10-08T17:01:46.438Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -4231,7 +4231,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T14:54:30.220Z
+               * @default 2026-10-08T17:01:46.441Z
                */
               publishedAt: string;
               /** @description A media field */

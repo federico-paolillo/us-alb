@@ -14,7 +14,7 @@
 
   Add Epilogue/Manrope, Tailwind tokens, global layout, deterministic crest/wordmark, desktop and mobile headers/navigation, footer/contact block, version display, and target-consistent loading/error/not-found presentation. Check both required viewports and resolve every navigation target.
 
-- [ ] **04 — Implement the high-fidelity Home page**
+- [x] **04 — Implement the high-fidelity Home page**
 
   Build the target hero, metrics, next fixture, featured news, activity overview, quote, partner strip, and responsive transformations. Ensure optional sections degrade cleanly and preserve request-rendered SSR + ISR behavior.
 
