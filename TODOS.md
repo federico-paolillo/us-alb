@@ -2,7 +2,7 @@
 
 `/goal TODOS.md` consumes unchecked top-level tasks in order. Each task must follow root `PLAN.md` and applicable `AGENTS.md`; a later task cannot start until the current task is reviewed, committed, and otherwise closed by the active workflow.
 
-- [ ] **01 — Replace the template domain with the U.S. Albatese CMS pipeline**
+- [x] **01 — Replace the template domain with the U.S. Albatese CMS pipeline**
 
   Implement final Strapi schemas/components, `TYPES.md`, generated backend/OpenAPI/frontend types, DTOs, client queries, mappers, connector methods, cached reads, cache tags, webhook mapping, Draft Mode previews, Italian routes, and minimal renderers. Remove the generic Article/Event domain and English routes. Validate empty-database startup, backend build/type generation, OpenAPI/frontend generation, checks, and unit tests.
 

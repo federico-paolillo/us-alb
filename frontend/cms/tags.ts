@@ -3,10 +3,12 @@
 import type { WebhookPayload } from "@cmsjs/cms/webhook";
 
 const tagsByModel = {
-  article: { collection: "articles", item: "article" },
-  event: { collection: "events", item: "event" },
   "news-item": { collection: "news", item: "news" },
   "home-page": { collection: "home-page", item: null },
+  "about-page": { collection: "about-page", item: null },
+  "activity-page": { collection: "activity-page", item: null },
+  "calendar-entry": { collection: "calendar-entries", item: null },
+  "official-document": { collection: "official-documents", item: null },
 } as const;
 
 export function tagsForWebhook(payload: WebhookPayload): string[] {

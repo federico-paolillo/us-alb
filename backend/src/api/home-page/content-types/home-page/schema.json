@@ -7,20 +7,51 @@
     "displayName": "Home Page"
   },
   "options": {
-    "draftAndPublish": false
+    "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
-    "title": {
+    "eyebrow": {
       "type": "string",
-      "maxLength": 100,
+      "required": true,
+      "maxLength": 80
+    },
+    "headline": {
+      "type": "string",
+      "required": true,
+      "maxLength": 200
+    },
+    "introduction": {
+      "type": "text",
       "required": true
     },
-    "content": {
+    "heroImage": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "metrics": {
       "type": "component",
-      "component": "shared.hero",
+      "component": "content.metric",
       "repeatable": true,
+      "required": true,
+      "min": 1
+    },
+    "institutionalQuote": {
+      "type": "component",
+      "component": "content.institutional-quote",
+      "repeatable": false,
       "required": true
+    },
+    "activityTeasers": {
+      "type": "component",
+      "component": "content.activity-teaser",
+      "repeatable": true,
+      "required": true,
+      "min": 1
     }
   }
 }

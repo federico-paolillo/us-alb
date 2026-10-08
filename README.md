@@ -27,9 +27,10 @@ in Strapi invalidate the affected cache tags.
 
 ## Preview mode
 
-Article and News Preview is available through Strapi Preview and Next Draft
-Mode. Draft requests bypass caches only in the editor's browser; public requests
-stay on the existing SSR + ISR path.
+Institutional pages and news details can be previewed through Strapi Preview and
+Next Draft Mode. Calendar entries and official documents preview through the
+aggregate `/notizie` page. Draft requests bypass caches only in the editor's
+browser; public requests stay on the existing SSR + ISR path.
 
 ## Presentation examples
 
@@ -52,8 +53,8 @@ Extend the existing pipeline end-to-end rather than adding a parallel path.
 2. `frontend/cms/client.ts`
 3. `mappers.ts`
 4. `connector.ts`
-5. `data.ts` (cached read + cache tags)
-6. Webhook tag mapping (`cms/tags.ts`, `cms/cache.ts`)
+5. `cms/data.ts` (cached reads)
+6. Webhook tag mapping and cache-tag ownership (`cms/tags.ts`)
 7. `sitemap.ts`
 8. Navigation entry
 9. A page component and its route

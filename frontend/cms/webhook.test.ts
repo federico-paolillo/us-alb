@@ -28,4 +28,22 @@ describe("parseWebhookPayload", () => {
       parseWebhookPayload({ model: "news-item", entry: { id: 1 } }),
     ).toBeNull();
   });
+
+  it("rejects malformed entry payloads", () => {
+    expect(
+      parseWebhookPayload({
+        event: "entry.update",
+        model: "news-item",
+        entry: { id: 1 },
+      }),
+    ).toBeNull();
+    expect(
+      parseWebhookPayload({
+        event: "entry.update",
+        createdAt: "2026-01-01T00:00:00.000Z",
+        model: "news-item",
+        entry: { id: "1" },
+      }),
+    ).toBeNull();
+  });
 });

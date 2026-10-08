@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_content_institutional_quotes",
+  "info": {
+    "displayName": "Institutional Quote"
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "text",
+      "required": true
+    },
+    "attribution": {
+      "type": "string",
+      "required": true,
+      "maxLength": 120
+    },
+    "role": {
+      "type": "string",
+      "maxLength": 120
+    }
+  }
+}

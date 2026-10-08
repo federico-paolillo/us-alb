@@ -1,14 +1,24 @@
 import { timingSafeCompareSecret } from "@cmsjs/cms/secret";
 
 export type ContentStatus = "draft" | "published";
-type PreviewPath = `/articles/${string}` | `/news/${string}`;
+type PreviewPath =
+  | "/"
+  | "/chi-siamo"
+  | "/attivita"
+  | "/notizie"
+  | `/notizie/${string}`;
 
 export interface PreviewRequest {
   pathname: PreviewPath;
   status: ContentStatus;
 }
 
-const previewPaths = new Set(["articles", "news"]);
+const staticPaths = new Set<PreviewPath>([
+  "/",
+  "/chi-siamo",
+  "/attivita",
+  "/notizie",
+]);
 
 export function parsePreviewRequest(
   requestUrl: string,
@@ -25,16 +35,20 @@ export function parsePreviewRequest(
     target.includes("?") ||
     target.includes("#") ||
     !target.startsWith("/") ||
-    target.startsWith("//")
+    target.startsWith("//") ||
+    target.includes("\\")
   ) {
     return null;
+  }
+
+  if (staticPaths.has(target as PreviewPath)) {
+    return { pathname: target as PreviewPath, status };
   }
 
   const [empty, contentType, encodedSlug, ...rest] = target.split("/");
   if (
     empty !== "" ||
-    !contentType ||
-    !previewPaths.has(contentType) ||
+    contentType !== "notizie" ||
     !encodedSlug ||
     rest.length > 0
   ) {
@@ -48,7 +62,7 @@ export function parsePreviewRequest(
     }
 
     return {
-      pathname: `/${contentType}/${encodeURIComponent(slug)}` as PreviewPath,
+      pathname: `/notizie/${encodeURIComponent(slug)}`,
       status,
     };
   } catch {

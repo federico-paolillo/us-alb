@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_content_registration_steps",
+  "info": {
+    "displayName": "Registration Step"
+  },
+  "options": {},
+  "attributes": {
+    "order": {
+      "type": "integer",
+      "required": true,
+      "min": 1
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 160
+    },
+    "body": {
+      "type": "text",
+      "required": true
+    },
+    "note": {
+      "type": "text"
+    }
+  }
+}

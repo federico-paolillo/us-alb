@@ -1,5 +1,5 @@
 [tools]
-node = "26"
+node = "24.20.0"
 
 [env]
 _.file = "frontend/.env.development"

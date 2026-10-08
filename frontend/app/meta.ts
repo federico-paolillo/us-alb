@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 export const defaultMetadata: Metadata = {
   title: {
-    default: "cmsjs-tmpl",
-    template: "%s | cmsjs-tmpl",
+    default: "U.S. Albatese",
+    template: "%s | U.S. Albatese",
   },
   other: {
     version: process.env.NEXT_PUBLIC_APP_VERSION ?? "development",

@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_content_call_to_actions",
+  "info": {
+    "displayName": "Call To Action"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true,
+      "maxLength": 120
+    },
+    "url": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    }
+  }
+}

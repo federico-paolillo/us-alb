@@ -3,11 +3,16 @@ import type { Core } from '@strapi/strapi';
 declare const strapi: Core.Strapi;
 
 const previewPaths = {
-  'api::article.article': '/articles/',
-  'api::news-item.news-item': '/news/',
+  'api::home-page.home-page': '/',
+  'api::about-page.about-page': '/chi-siamo',
+  'api::activity-page.activity-page': '/attivita',
+  'api::calendar-entry.calendar-entry': '/notizie',
+  'api::official-document.official-document': '/notizie',
 } as const;
 
-type PreviewContentType = keyof typeof previewPaths;
+const newsUid = 'api::news-item.news-item' as const;
+
+type PreviewContentType = keyof typeof previewPaths | typeof newsUid;
 
 const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Admin => {
   const previewClientUrl = requiredUrl(env('PREVIEW_CLIENT_URL'), 'PREVIEW_CLIENT_URL');
@@ -37,17 +42,24 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Admin => 
             return null;
           }
 
-          const entry = await strapi.documents(uid).findOne({
-            documentId,
-            status,
-            populate: { identity: true },
-          });
-          if (!hasSlug(entry)) {
-            return null;
+          let path: string;
+          if (uid === newsUid) {
+            const entry = await strapi.documents(newsUid).findOne({
+              documentId,
+              status,
+              populate: { identity: true },
+            });
+            if (!hasSlug(entry)) {
+              return null;
+            }
+
+            path = `/notizie/${encodeURIComponent(entry.identity.slug)}`;
+          } else {
+            path = previewPaths[uid];
           }
 
           const previewUrl = new URL('/preview', previewClientUrl);
-          previewUrl.searchParams.set('url', `${previewPaths[uid]}${encodeURIComponent(entry.identity.slug)}`);
+          previewUrl.searchParams.set('url', path);
           previewUrl.searchParams.set('secret', previewSecret);
           previewUrl.searchParams.set('status', status);
           return previewUrl.href;
@@ -79,7 +91,7 @@ function requiredUrl(value: string | undefined, name: string): URL {
 }
 
 function isPreviewContentType(uid: string): uid is PreviewContentType {
-  return uid in previewPaths;
+  return uid === newsUid || uid in previewPaths;
 }
 
 function isContentStatus(status: string | undefined): status is 'draft' | 'published' {

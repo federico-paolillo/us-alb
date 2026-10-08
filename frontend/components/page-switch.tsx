@@ -1,20 +1,20 @@
 import type { CmsPageDto } from "@cmsjs/cms/model";
-import { ArticlePage } from "@cmsjs/components/articles/page";
-import { EventPage } from "@cmsjs/components/events/page";
+import { AboutPage } from "@cmsjs/components/about/page";
+import { ActivityPage } from "@cmsjs/components/activity/page";
 import { HomePage } from "@cmsjs/components/home/page";
-import { NewsPage } from "@cmsjs/components/news/page";
+import { NewsDetailPage } from "@cmsjs/components/news-detail/page";
 import { notFound } from "next/navigation";
 
 export function PageSwitch({ page }: { page: CmsPageDto }) {
   switch (page.pageType) {
-    case "article":
-      return <ArticlePage page={page} />;
-    case "event":
-      return <EventPage page={page} />;
-    case "home-page":
+    case "home":
       return <HomePage page={page} />;
-    case "news":
-      return <NewsPage page={page} />;
+    case "about":
+      return <AboutPage page={page} />;
+    case "activity":
+      return <ActivityPage page={page} />;
+    case "news-detail":
+      return <NewsDetailPage page={page} />;
     default:
       notFound();
   }

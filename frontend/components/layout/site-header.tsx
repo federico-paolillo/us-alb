@@ -10,7 +10,7 @@ export function SiteHeader() {
           className="font-mono text-sm font-semibold tracking-[0.08em] text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           href="/"
         >
-          cmsjs-tmpl
+          U.S. Albatese
         </Link>
         <Suspense fallback={<SiteNavFallback />}>
           <SiteNav />

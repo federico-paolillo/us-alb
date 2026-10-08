@@ -1,4 +1,4 @@
-import { listArticles, listEvents, listNews } from "@cmsjs/cms/data";
+import { listNews } from "@cmsjs/cms/data";
 import { config } from "@cmsjs/config";
 import type { MetadataRoute } from "next";
 import { connection } from "next/server";
@@ -6,26 +6,17 @@ import { connection } from "next/server";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   await connection();
 
-  const [articles, events, news] = await Promise.all([
-    listArticles(),
-    listEvents(),
-    listNews(),
-  ]);
+  const news = await listNews();
 
   const base = config.siteUrl.href.replace(/\/$/, "");
 
   return [
     { url: `${base}/`, changeFrequency: "weekly", priority: 1 },
-    ...articles.map((item) => ({
-      url: `${base}/articles/${item.identity.slug}`,
-      changeFrequency: "monthly" as const,
-    })),
-    ...events.map((item) => ({
-      url: `${base}/events/${item.identity.slug}`,
-      changeFrequency: "weekly" as const,
-    })),
+    { url: `${base}/chi-siamo`, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${base}/attivita`, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${base}/notizie`, changeFrequency: "daily", priority: 0.9 },
     ...news.map((item) => ({
-      url: `${base}/news/${item.identity.slug}`,
+      url: `${base}/notizie/${item.identity.slug}`,
       changeFrequency: "weekly" as const,
     })),
   ];

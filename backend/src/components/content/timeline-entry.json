@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_content_timeline_entries",
+  "info": {
+    "displayName": "Timeline Entry"
+  },
+  "options": {},
+  "attributes": {
+    "year": {
+      "type": "string",
+      "required": true,
+      "maxLength": 32
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 160
+    },
+    "body": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

@@ -7,25 +7,28 @@ function payload(model: string, slug?: string): WebhookPayload {
     event: "entry.update",
     createdAt: "2026-01-01T00:00:00.000Z",
     model,
-    entry: slug
-      ? { id: 1, identity: { slug, title: "Hello World" } }
-      : { id: 1 },
+    entry: slug ? { id: 1, identity: { slug, title: "Titolo" } } : { id: 1 },
   };
 }
 
 describe("tagsForWebhook", () => {
-  it("always returns the collection tag for a known model", () => {
+  it.each([
+    ["home-page", ["home-page"]],
+    ["about-page", ["about-page"]],
+    ["activity-page", ["activity-page"]],
+    ["calendar-entry", ["calendar-entries"]],
+    ["official-document", ["official-documents"]],
+  ])("maps %s", (model, tags) => {
+    expect(tagsForWebhook(payload(model as string))).toEqual(tags);
+  });
+  it("maps news collection and slug tags", () => {
+    expect(tagsForWebhook(payload("news-item", "campionato"))).toEqual([
+      "news",
+      "news:campionato",
+    ]);
     expect(tagsForWebhook(payload("news-item"))).toEqual(["news"]);
   });
-
-  it("adds the item tag, without a space, when the entry exposes a slug", () => {
-    expect(tagsForWebhook(payload("news-item", "hello-world"))).toEqual([
-      "news",
-      "news:hello-world",
-    ]);
-  });
-
-  it("returns no tags for an unknown model", () => {
-    expect(tagsForWebhook(payload("unknown-model", "x"))).toEqual([]);
+  it("ignores unknown models", () => {
+    expect(tagsForWebhook(payload("unknown"))).toEqual([]);
   });
 });

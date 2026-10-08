@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_content_board_members",
+  "info": {
+    "displayName": "Board Member"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "maxLength": 160
+    },
+    "role": {
+      "type": "string",
+      "required": true,
+      "maxLength": 160
+    },
+    "bio": {
+      "type": "text",
+      "required": true
+    },
+    "portrait": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    }
+  }
+}

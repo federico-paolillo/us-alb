@@ -26,11 +26,13 @@ export function parseWebhookPayload(value: unknown): WebhookPayload | null {
     return value as unknown as WebhookPayload; // Short-circuit here for test payloads
   }
 
+  if (typeof value.createdAt !== "string") return null;
+
   if (typeof value.model !== "string") {
     return null;
   }
 
-  if (!isRecord(value.entry)) {
+  if (!isRecord(value.entry) || typeof value.entry.id !== "number") {
     return null;
   }
 

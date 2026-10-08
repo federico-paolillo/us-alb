@@ -4,65 +4,65 @@
  */
 
 export interface paths {
-  "/articles": {
+  "/about-page": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    get: operations["article/get/articles"];
+    get: operations["about-page/get/about_page"];
+    put: operations["about-page/put/about_page"];
+    post?: never;
+    delete: operations["about-page/delete/about_page"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/activity-page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["activity-page/get/activity_page"];
+    put: operations["activity-page/put/activity_page"];
+    post?: never;
+    delete: operations["activity-page/delete/activity_page"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/calendar-entries": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["calendar-entry/get/calendar_entries"];
     put?: never;
-    post: operations["article/post/articles"];
+    post: operations["calendar-entry/post/calendar_entries"];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  "/articles/{id}": {
+  "/calendar-entries/{id}": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    get: operations["article/get/articles_by_id"];
-    put: operations["article/put/articles_by_id"];
+    get: operations["calendar-entry/get/calendar_entries_by_id"];
+    put: operations["calendar-entry/put/calendar_entries_by_id"];
     post?: never;
-    delete: operations["article/delete/articles_by_id"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/events": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations["event/get/events"];
-    put?: never;
-    post: operations["event/post/events"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/events/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations["event/get/events_by_id"];
-    put: operations["event/put/events_by_id"];
-    post?: never;
-    delete: operations["event/delete/events_by_id"];
+    delete: operations["calendar-entry/delete/calendar_entries_by_id"];
     options?: never;
     head?: never;
     patch?: never;
@@ -111,6 +111,38 @@ export interface paths {
     put: operations["news-item/put/news_by_id"];
     post?: never;
     delete: operations["news-item/delete/news_by_id"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/official-documents": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["official-document/get/official_documents"];
+    put?: never;
+    post: operations["official-document/post/official_documents"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/official-documents/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["official-document/get/official_documents_by_id"];
+    put: operations["official-document/put/official_documents_by_id"];
+    post?: never;
+    delete: operations["official-document/delete/official_documents_by_id"];
     options?: never;
     head?: never;
     patch?: never;
@@ -616,20 +648,6 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
-    IdentitySlugEntry: {
-      /** @description A string field */
-      slug: string;
-      /** @description A string field */
-      title: string;
-    };
-    SharedSectionEntry: {
-      /** @description A string field */
-      header?: string;
-      /** @description A blocks field */
-      content: unknown[];
-      /** @description A media field */
-      hero?: components["schemas"]["PluginUploadFileDocument"];
-    };
     PluginUploadFileDocument: {
       /**
        * Format: uuid
@@ -673,20 +691,137 @@ export interface components {
       updatedAt?: string;
       /**
        * @description A datetime field
-       * @default 2026-08-31T07:43:39.032Z
+       * @default 2026-10-08T10:40:58.418Z
        */
       publishedAt: string;
       related: unknown;
     };
-    SharedHeroEntry: {
+    ContentTimelineEntryEntry: {
       /** @description A string field */
-      headline: string;
+      year: string;
       /** @description A string field */
-      subheading?: string;
+      title: string;
+      /** @description A text field */
+      body: string;
+    };
+    ContentValueEntry: {
       /** @description A string field */
-      cta?: string;
+      title: string;
+      /** @description A text field */
+      body: string;
+    };
+    ContentBoardMemberEntry: {
+      /** @description A string field */
+      name: string;
+      /** @description A string field */
+      role: string;
+      /** @description A text field */
+      bio: string;
       /** @description A media field */
-      visual: components["schemas"]["PluginUploadFileDocument"];
+      portrait?: components["schemas"]["PluginUploadFileDocument"];
+    };
+    ContentFacilityEntry: {
+      /** @description A string field */
+      name: string;
+      /** @description A text field */
+      summary: string;
+      /** @description A string field */
+      address: string;
+      /** @description A media field */
+      image?: components["schemas"]["PluginUploadFileDocument"];
+    };
+    ContentSportProgramEntry: {
+      /**
+       * @description An enum field
+       * @enum {string}
+       */
+      group:
+        | "youth-football"
+        | "competitive-football"
+        | "athletics"
+        | "community";
+      /** @description A string field */
+      title: string;
+      /** @description A string field */
+      audience?: string;
+      /** @description A text field */
+      summary: string;
+      /** @description A media field */
+      image?: components["schemas"]["PluginUploadFileDocument"];
+    };
+    ContentScheduleEntry: {
+      /** @description A string field */
+      title: string;
+      /** @description A string field */
+      days: string;
+      /** @description A string field */
+      time: string;
+      /** @description A string field */
+      venue: string;
+    };
+    ContentVenueEntry: {
+      /** @description A string field */
+      name: string;
+      /** @description A string field */
+      address: string;
+      /** @description A text field */
+      details: string;
+    };
+    ContentFeatureEntry: {
+      /** @description A string field */
+      eyebrow?: string;
+      /** @description A string field */
+      title: string;
+      /** @description A text field */
+      body: string;
+      /** @description A media field */
+      image?: components["schemas"]["PluginUploadFileDocument"];
+    };
+    ContentRegistrationStepEntry: {
+      /** @description An integer field */
+      order: number;
+      /** @description A string field */
+      title: string;
+      /** @description A text field */
+      body: string;
+      /** @description A text field */
+      note?: string;
+    };
+    ContentCallToActionEntry: {
+      /** @description A string field */
+      label: string;
+      /** @description A string field */
+      url: string;
+    };
+    ContentMetricEntry: {
+      /** @description A string field */
+      value: string;
+      /** @description A string field */
+      label: string;
+    };
+    ContentInstitutionalQuoteEntry: {
+      /** @description A text field */
+      text: string;
+      /** @description A string field */
+      attribution: string;
+      /** @description A string field */
+      role?: string;
+    };
+    ContentActivityTeaserEntry: {
+      /** @description A string field */
+      eyebrow?: string;
+      /** @description A string field */
+      title: string;
+      /** @description A text field */
+      summary: string;
+      /** @description A media field */
+      image?: components["schemas"]["PluginUploadFileDocument"];
+    };
+    IdentitySlugEntry: {
+      /** @description A string field */
+      slug: string;
+      /** @description A string field */
+      title: string;
     };
   };
   responses: never;
@@ -697,591 +832,40 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  "article/get/articles": {
-    parameters: {
-      query?: {
-        fields?: ("createdAt" | "updatedAt" | "publishedAt")[];
-        filters?: {
-          [key: string]: unknown;
-        };
-        _q?: string;
-        "pagination[withCount]"?: boolean;
-        "pagination[page]"?: number;
-        "pagination[pageSize]"?: number;
-        "pagination[start]"?: number;
-        "pagination[limit]"?: number;
-        sort?:
-          | ("createdAt" | "updatedAt" | "publishedAt")
-          | ("createdAt" | "updatedAt" | "publishedAt")[]
-          | {
-              [key: string]: "asc" | "desc";
-            }
-          | {
-              [key: string]: "asc" | "desc";
-            }[];
-        populate?:
-          | "*"
-          | ("identity" | "sections")
-          | ("identity" | "sections")[];
-        status?: "draft" | "published";
-        publicationFilter?:
-          | "never-published"
-          | "has-published-version"
-          | "modified"
-          | "unmodified"
-          | "never-published-document"
-          | "has-published-version-document"
-          | "published-without-draft"
-          | "published-with-draft";
-        hasPublishedVersion?: boolean | ("true" | "false");
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            data: {
-              /**
-               * Format: uuid
-               * @description The document ID, represented by a UUID
-               */
-              documentId: string;
-              id: string | number;
-              /** @description A datetime field */
-              createdAt?: string;
-              /** @description A datetime field */
-              updatedAt?: string;
-              /**
-               * @description A datetime field
-               * @default 2026-08-31T07:43:39.029Z
-               */
-              publishedAt: string;
-              /** @description A component field */
-              identity: components["schemas"]["IdentitySlugEntry"];
-              /** @description A component field */
-              sections: components["schemas"]["SharedSectionEntry"][];
-            }[];
-          };
-        };
-      };
-      /** @description Bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Forbidden */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  "article/post/articles": {
-    parameters: {
-      query?: {
-        fields?: ("createdAt" | "updatedAt" | "publishedAt")[];
-        populate?:
-          | "*"
-          | ("identity" | "sections")
-          | ("identity" | "sections")[];
-        status?: "draft" | "published";
-        publicationFilter?:
-          | "never-published"
-          | "has-published-version"
-          | "modified"
-          | "unmodified"
-          | "never-published-document"
-          | "has-published-version-document"
-          | "published-without-draft"
-          | "published-with-draft";
-        hasPublishedVersion?: boolean | ("true" | "false");
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": {
-          data: {
-            /**
-             * @description A datetime field
-             * @default 2026-08-31T07:43:39.036Z
-             */
-            publishedAt: string;
-            /** @description A component field */
-            identity: unknown;
-            /** @description A component field */
-            sections: unknown[];
-          };
-        };
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            data: {
-              /**
-               * Format: uuid
-               * @description The document ID, represented by a UUID
-               */
-              documentId: string;
-              id: string | number;
-              /** @description A datetime field */
-              createdAt?: string;
-              /** @description A datetime field */
-              updatedAt?: string;
-              /**
-               * @description A datetime field
-               * @default 2026-08-31T07:43:39.036Z
-               */
-              publishedAt: string;
-              /** @description A component field */
-              identity: components["schemas"]["IdentitySlugEntry"];
-              /** @description A component field */
-              sections: components["schemas"]["SharedSectionEntry"][];
-            };
-          };
-        };
-      };
-      /** @description Bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Forbidden */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  "article/get/articles_by_id": {
-    parameters: {
-      query?: {
-        fields?: ("createdAt" | "updatedAt" | "publishedAt")[];
-        populate?:
-          | "*"
-          | ("identity" | "sections")
-          | ("identity" | "sections")[];
-        filters?: {
-          [key: string]: unknown;
-        };
-        sort?:
-          | ("createdAt" | "updatedAt" | "publishedAt")
-          | ("createdAt" | "updatedAt" | "publishedAt")[]
-          | {
-              [key: string]: "asc" | "desc";
-            }
-          | {
-              [key: string]: "asc" | "desc";
-            }[];
-        status?: "draft" | "published";
-        publicationFilter?:
-          | "never-published"
-          | "has-published-version"
-          | "modified"
-          | "unmodified"
-          | "never-published-document"
-          | "has-published-version-document"
-          | "published-without-draft"
-          | "published-with-draft";
-        hasPublishedVersion?: boolean | ("true" | "false");
-      };
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            data: {
-              /**
-               * Format: uuid
-               * @description The document ID, represented by a UUID
-               */
-              documentId: string;
-              id: string | number;
-              /** @description A datetime field */
-              createdAt?: string;
-              /** @description A datetime field */
-              updatedAt?: string;
-              /**
-               * @description A datetime field
-               * @default 2026-08-31T07:43:39.033Z
-               */
-              publishedAt: string;
-              /** @description A component field */
-              identity: components["schemas"]["IdentitySlugEntry"];
-              /** @description A component field */
-              sections: components["schemas"]["SharedSectionEntry"][];
-            };
-          };
-        };
-      };
-      /** @description Bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Forbidden */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  "article/put/articles_by_id": {
-    parameters: {
-      query?: {
-        fields?: ("createdAt" | "updatedAt" | "publishedAt")[];
-        populate?:
-          | "*"
-          | ("identity" | "sections")
-          | ("identity" | "sections")[];
-        status?: "draft" | "published";
-        publicationFilter?:
-          | "never-published"
-          | "has-published-version"
-          | "modified"
-          | "unmodified"
-          | "never-published-document"
-          | "has-published-version-document"
-          | "published-without-draft"
-          | "published-with-draft";
-        hasPublishedVersion?: boolean | ("true" | "false");
-      };
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": {
-          data: {
-            /**
-             * @description A datetime field
-             * @default 2026-08-31T07:43:39.036Z
-             */
-            publishedAt?: string;
-            /** @description A component field */
-            identity?: unknown;
-            /** @description A component field */
-            sections?: unknown[];
-          };
-        };
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            data: {
-              /**
-               * Format: uuid
-               * @description The document ID, represented by a UUID
-               */
-              documentId: string;
-              id: string | number;
-              /** @description A datetime field */
-              createdAt?: string;
-              /** @description A datetime field */
-              updatedAt?: string;
-              /**
-               * @description A datetime field
-               * @default 2026-08-31T07:43:39.037Z
-               */
-              publishedAt: string;
-              /** @description A component field */
-              identity: components["schemas"]["IdentitySlugEntry"];
-              /** @description A component field */
-              sections: components["schemas"]["SharedSectionEntry"][];
-            };
-          };
-        };
-      };
-      /** @description Bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Forbidden */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  "article/delete/articles_by_id": {
-    parameters: {
-      query?: {
-        fields?: ("createdAt" | "updatedAt" | "publishedAt")[];
-        populate?:
-          | "*"
-          | ("identity" | "sections")
-          | ("identity" | "sections")[];
-        filters?: {
-          [key: string]: unknown;
-        };
-        status?: "draft" | "published";
-        publicationFilter?:
-          | "never-published"
-          | "has-published-version"
-          | "modified"
-          | "unmodified"
-          | "never-published-document"
-          | "has-published-version-document"
-          | "published-without-draft"
-          | "published-with-draft";
-        hasPublishedVersion?: boolean | ("true" | "false");
-      };
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            data: {
-              /**
-               * Format: uuid
-               * @description The document ID, represented by a UUID
-               */
-              documentId: string;
-              id: string | number;
-              /** @description A datetime field */
-              createdAt?: string;
-              /** @description A datetime field */
-              updatedAt?: string;
-              /**
-               * @description A datetime field
-               * @default 2026-08-31T07:43:39.037Z
-               */
-              publishedAt: string;
-              /** @description A component field */
-              identity: components["schemas"]["IdentitySlugEntry"];
-              /** @description A component field */
-              sections: components["schemas"]["SharedSectionEntry"][];
-            };
-          };
-        };
-      };
-      /** @description Bad request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Forbidden */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  "event/get/events": {
+  "about-page/get/about_page": {
     parameters: {
       query?: {
         fields?: (
-          | "summary"
-          | "content"
-          | "when"
+          | "eyebrow"
+          | "headline"
+          | "introduction"
+          | "history"
+          | "documentEyebrow"
+          | "documentTitle"
+          | "documentIntroduction"
           | "createdAt"
           | "updatedAt"
           | "publishedAt"
         )[];
+        populate?:
+          | "*"
+          | (
+              | "heroImage"
+              | "timeline"
+              | "values"
+              | "boardMembers"
+              | "facilities"
+            )
+          | (
+              | "heroImage"
+              | "timeline"
+              | "values"
+              | "boardMembers"
+              | "facilities"
+            )[];
         filters?: {
           [key: string]: unknown;
         };
-        _q?: string;
-        "pagination[withCount]"?: boolean;
-        "pagination[page]"?: number;
-        "pagination[pageSize]"?: number;
-        "pagination[start]"?: number;
-        "pagination[limit]"?: number;
-        sort?:
-          | (
-              | "summary"
-              | "content"
-              | "when"
-              | "createdAt"
-              | "updatedAt"
-              | "publishedAt"
-            )
-          | (
-              | "summary"
-              | "content"
-              | "when"
-              | "createdAt"
-              | "updatedAt"
-              | "publishedAt"
-            )[]
-          | {
-              [key: string]: "asc" | "desc";
-            }
-          | {
-              [key: string]: "asc" | "desc";
-            }[];
-        populate?: "*" | "identity" | "identity"[];
         status?: "draft" | "published";
         publicationFilter?:
           | "never-published"
@@ -1315,22 +899,965 @@ export interface operations {
               documentId: string;
               id: string | number;
               /** @description A string field */
-              summary: string;
+              eyebrow: string;
+              /** @description A string field */
+              headline: string;
+              /** @description A text field */
+              introduction: string;
               /** @description A blocks field */
-              content: unknown[];
-              /** @description A date field */
-              when?: string;
+              history: unknown[];
+              /** @description A string field */
+              documentEyebrow: string;
+              /** @description A string field */
+              documentTitle: string;
+              /** @description A text field */
+              documentIntroduction: string;
               /** @description A datetime field */
               createdAt?: string;
               /** @description A datetime field */
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-08-31T07:43:39.039Z
+               * @default 2026-10-08T10:40:58.410Z
+               */
+              publishedAt: string;
+              /** @description A media field */
+              heroImage: components["schemas"]["PluginUploadFileDocument"];
+              /** @description A component field */
+              timeline: components["schemas"]["ContentTimelineEntryEntry"][];
+              /** @description A component field */
+              values: components["schemas"]["ContentValueEntry"][];
+              /** @description A component field */
+              boardMembers: components["schemas"]["ContentBoardMemberEntry"][];
+              /** @description A component field */
+              facilities: components["schemas"]["ContentFacilityEntry"][];
+            };
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "about-page/put/about_page": {
+    parameters: {
+      query?: {
+        fields?: (
+          | "eyebrow"
+          | "headline"
+          | "introduction"
+          | "history"
+          | "documentEyebrow"
+          | "documentTitle"
+          | "documentIntroduction"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        populate?:
+          | "*"
+          | (
+              | "heroImage"
+              | "timeline"
+              | "values"
+              | "boardMembers"
+              | "facilities"
+            )
+          | (
+              | "heroImage"
+              | "timeline"
+              | "values"
+              | "boardMembers"
+              | "facilities"
+            )[];
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": {
+          data: {
+            /** @description A string field */
+            eyebrow?: string;
+            /** @description A string field */
+            headline?: string;
+            /** @description A text field */
+            introduction?: string;
+            /** @description A blocks field */
+            history?: unknown[];
+            /** @description A string field */
+            documentEyebrow?: string;
+            /** @description A string field */
+            documentTitle?: string;
+            /** @description A text field */
+            documentIntroduction?: string;
+            /**
+             * @description A datetime field
+             * @default 2026-10-08T10:40:58.431Z
+             */
+            publishedAt?: string;
+            /** @description A media field */
+            heroImage?: unknown;
+            /** @description A component field */
+            timeline?: unknown[];
+            /** @description A component field */
+            values?: unknown[];
+            /** @description A component field */
+            boardMembers?: unknown[];
+            /** @description A component field */
+            facilities?: unknown[];
+          };
+        };
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /**
+               * Format: uuid
+               * @description The document ID, represented by a UUID
+               */
+              documentId: string;
+              id: string | number;
+              /** @description A string field */
+              eyebrow: string;
+              /** @description A string field */
+              headline: string;
+              /** @description A text field */
+              introduction: string;
+              /** @description A blocks field */
+              history: unknown[];
+              /** @description A string field */
+              documentEyebrow: string;
+              /** @description A string field */
+              documentTitle: string;
+              /** @description A text field */
+              documentIntroduction: string;
+              /** @description A datetime field */
+              createdAt?: string;
+              /** @description A datetime field */
+              updatedAt?: string;
+              /**
+               * @description A datetime field
+               * @default 2026-10-08T10:40:58.434Z
+               */
+              publishedAt: string;
+              /** @description A media field */
+              heroImage: components["schemas"]["PluginUploadFileDocument"];
+              /** @description A component field */
+              timeline: components["schemas"]["ContentTimelineEntryEntry"][];
+              /** @description A component field */
+              values: components["schemas"]["ContentValueEntry"][];
+              /** @description A component field */
+              boardMembers: components["schemas"]["ContentBoardMemberEntry"][];
+              /** @description A component field */
+              facilities: components["schemas"]["ContentFacilityEntry"][];
+            };
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "about-page/delete/about_page": {
+    parameters: {
+      query?: {
+        fields?: (
+          | "eyebrow"
+          | "headline"
+          | "introduction"
+          | "history"
+          | "documentEyebrow"
+          | "documentTitle"
+          | "documentIntroduction"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        populate?:
+          | "*"
+          | (
+              | "heroImage"
+              | "timeline"
+              | "values"
+              | "boardMembers"
+              | "facilities"
+            )
+          | (
+              | "heroImage"
+              | "timeline"
+              | "values"
+              | "boardMembers"
+              | "facilities"
+            )[];
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /**
+               * Format: uuid
+               * @description The document ID, represented by a UUID
+               */
+              documentId: string;
+              id: string | number;
+              /** @description A string field */
+              eyebrow: string;
+              /** @description A string field */
+              headline: string;
+              /** @description A text field */
+              introduction: string;
+              /** @description A blocks field */
+              history: unknown[];
+              /** @description A string field */
+              documentEyebrow: string;
+              /** @description A string field */
+              documentTitle: string;
+              /** @description A text field */
+              documentIntroduction: string;
+              /** @description A datetime field */
+              createdAt?: string;
+              /** @description A datetime field */
+              updatedAt?: string;
+              /**
+               * @description A datetime field
+               * @default 2026-10-08T10:40:58.438Z
+               */
+              publishedAt: string;
+              /** @description A media field */
+              heroImage: components["schemas"]["PluginUploadFileDocument"];
+              /** @description A component field */
+              timeline: components["schemas"]["ContentTimelineEntryEntry"][];
+              /** @description A component field */
+              values: components["schemas"]["ContentValueEntry"][];
+              /** @description A component field */
+              boardMembers: components["schemas"]["ContentBoardMemberEntry"][];
+              /** @description A component field */
+              facilities: components["schemas"]["ContentFacilityEntry"][];
+            };
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "activity-page/get/activity_page": {
+    parameters: {
+      query?: {
+        fields?: (
+          | "eyebrow"
+          | "headline"
+          | "introduction"
+          | "registrationIntroduction"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        populate?:
+          | "*"
+          | (
+              | "heroImage"
+              | "programs"
+              | "schedules"
+              | "venues"
+              | "openTeamFeature"
+              | "athleticsFeature"
+              | "registrationSteps"
+            )
+          | (
+              | "heroImage"
+              | "programs"
+              | "schedules"
+              | "venues"
+              | "openTeamFeature"
+              | "athleticsFeature"
+              | "registrationSteps"
+            )[];
+        filters?: {
+          [key: string]: unknown;
+        };
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /**
+               * Format: uuid
+               * @description The document ID, represented by a UUID
+               */
+              documentId: string;
+              id: string | number;
+              /** @description A string field */
+              eyebrow: string;
+              /** @description A string field */
+              headline: string;
+              /** @description A text field */
+              introduction: string;
+              /** @description A text field */
+              registrationIntroduction: string;
+              /** @description A datetime field */
+              createdAt?: string;
+              /** @description A datetime field */
+              updatedAt?: string;
+              /**
+               * @description A datetime field
+               * @default 2026-10-08T10:40:58.445Z
+               */
+              publishedAt: string;
+              /** @description A media field */
+              heroImage: components["schemas"]["PluginUploadFileDocument"];
+              /** @description A component field */
+              programs: components["schemas"]["ContentSportProgramEntry"][];
+              /** @description A component field */
+              schedules: components["schemas"]["ContentScheduleEntry"][];
+              /** @description A component field */
+              venues: components["schemas"]["ContentVenueEntry"][];
+              /** @description A component field */
+              openTeamFeature: components["schemas"]["ContentFeatureEntry"];
+              /** @description A component field */
+              athleticsFeature: components["schemas"]["ContentFeatureEntry"];
+              /** @description A component field */
+              registrationSteps: components["schemas"]["ContentRegistrationStepEntry"][];
+            };
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "activity-page/put/activity_page": {
+    parameters: {
+      query?: {
+        fields?: (
+          | "eyebrow"
+          | "headline"
+          | "introduction"
+          | "registrationIntroduction"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        populate?:
+          | "*"
+          | (
+              | "heroImage"
+              | "programs"
+              | "schedules"
+              | "venues"
+              | "openTeamFeature"
+              | "athleticsFeature"
+              | "registrationSteps"
+            )
+          | (
+              | "heroImage"
+              | "programs"
+              | "schedules"
+              | "venues"
+              | "openTeamFeature"
+              | "athleticsFeature"
+              | "registrationSteps"
+            )[];
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": {
+          data: {
+            /** @description A string field */
+            eyebrow?: string;
+            /** @description A string field */
+            headline?: string;
+            /** @description A text field */
+            introduction?: string;
+            /** @description A text field */
+            registrationIntroduction?: string;
+            /**
+             * @description A datetime field
+             * @default 2026-10-08T10:40:58.454Z
+             */
+            publishedAt?: string;
+            /** @description A media field */
+            heroImage?: unknown;
+            /** @description A component field */
+            programs?: unknown[];
+            /** @description A component field */
+            schedules?: unknown[];
+            /** @description A component field */
+            venues?: unknown[];
+            /** @description A component field */
+            openTeamFeature?: unknown;
+            /** @description A component field */
+            athleticsFeature?: unknown;
+            /** @description A component field */
+            registrationSteps?: unknown[];
+          };
+        };
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /**
+               * Format: uuid
+               * @description The document ID, represented by a UUID
+               */
+              documentId: string;
+              id: string | number;
+              /** @description A string field */
+              eyebrow: string;
+              /** @description A string field */
+              headline: string;
+              /** @description A text field */
+              introduction: string;
+              /** @description A text field */
+              registrationIntroduction: string;
+              /** @description A datetime field */
+              createdAt?: string;
+              /** @description A datetime field */
+              updatedAt?: string;
+              /**
+               * @description A datetime field
+               * @default 2026-10-08T10:40:58.457Z
+               */
+              publishedAt: string;
+              /** @description A media field */
+              heroImage: components["schemas"]["PluginUploadFileDocument"];
+              /** @description A component field */
+              programs: components["schemas"]["ContentSportProgramEntry"][];
+              /** @description A component field */
+              schedules: components["schemas"]["ContentScheduleEntry"][];
+              /** @description A component field */
+              venues: components["schemas"]["ContentVenueEntry"][];
+              /** @description A component field */
+              openTeamFeature: components["schemas"]["ContentFeatureEntry"];
+              /** @description A component field */
+              athleticsFeature: components["schemas"]["ContentFeatureEntry"];
+              /** @description A component field */
+              registrationSteps: components["schemas"]["ContentRegistrationStepEntry"][];
+            };
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "activity-page/delete/activity_page": {
+    parameters: {
+      query?: {
+        fields?: (
+          | "eyebrow"
+          | "headline"
+          | "introduction"
+          | "registrationIntroduction"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        populate?:
+          | "*"
+          | (
+              | "heroImage"
+              | "programs"
+              | "schedules"
+              | "venues"
+              | "openTeamFeature"
+              | "athleticsFeature"
+              | "registrationSteps"
+            )
+          | (
+              | "heroImage"
+              | "programs"
+              | "schedules"
+              | "venues"
+              | "openTeamFeature"
+              | "athleticsFeature"
+              | "registrationSteps"
+            )[];
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /**
+               * Format: uuid
+               * @description The document ID, represented by a UUID
+               */
+              documentId: string;
+              id: string | number;
+              /** @description A string field */
+              eyebrow: string;
+              /** @description A string field */
+              headline: string;
+              /** @description A text field */
+              introduction: string;
+              /** @description A text field */
+              registrationIntroduction: string;
+              /** @description A datetime field */
+              createdAt?: string;
+              /** @description A datetime field */
+              updatedAt?: string;
+              /**
+               * @description A datetime field
+               * @default 2026-10-08T10:40:58.461Z
+               */
+              publishedAt: string;
+              /** @description A media field */
+              heroImage: components["schemas"]["PluginUploadFileDocument"];
+              /** @description A component field */
+              programs: components["schemas"]["ContentSportProgramEntry"][];
+              /** @description A component field */
+              schedules: components["schemas"]["ContentScheduleEntry"][];
+              /** @description A component field */
+              venues: components["schemas"]["ContentVenueEntry"][];
+              /** @description A component field */
+              openTeamFeature: components["schemas"]["ContentFeatureEntry"];
+              /** @description A component field */
+              athleticsFeature: components["schemas"]["ContentFeatureEntry"];
+              /** @description A component field */
+              registrationSteps: components["schemas"]["ContentRegistrationStepEntry"][];
+            };
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "calendar-entry/get/calendar_entries": {
+    parameters: {
+      query?: {
+        fields?: (
+          | "kind"
+          | "startsAt"
+          | "competition"
+          | "title"
+          | "homeTeam"
+          | "awayTeam"
+          | "homeScore"
+          | "awayScore"
+          | "venue"
+          | "summary"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        filters?: {
+          [key: string]: unknown;
+        };
+        _q?: string;
+        "pagination[withCount]"?: boolean;
+        "pagination[page]"?: number;
+        "pagination[pageSize]"?: number;
+        "pagination[start]"?: number;
+        "pagination[limit]"?: number;
+        sort?:
+          | (
+              | "kind"
+              | "startsAt"
+              | "competition"
+              | "title"
+              | "homeTeam"
+              | "awayTeam"
+              | "homeScore"
+              | "awayScore"
+              | "venue"
+              | "summary"
+              | "createdAt"
+              | "updatedAt"
+              | "publishedAt"
+            )
+          | (
+              | "kind"
+              | "startsAt"
+              | "competition"
+              | "title"
+              | "homeTeam"
+              | "awayTeam"
+              | "homeScore"
+              | "awayScore"
+              | "venue"
+              | "summary"
+              | "createdAt"
+              | "updatedAt"
+              | "publishedAt"
+            )[]
+          | {
+              [key: string]: "asc" | "desc";
+            }
+          | {
+              [key: string]: "asc" | "desc";
+            }[];
+        populate?: "*" | "callToAction" | "callToAction"[];
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /**
+               * Format: uuid
+               * @description The document ID, represented by a UUID
+               */
+              documentId: string;
+              id: string | number;
+              /**
+               * @description An enum field
+               * @enum {string}
+               */
+              kind: "match" | "result" | "event";
+              /** @description A datetime field */
+              startsAt: string;
+              /** @description A string field */
+              competition: string;
+              /** @description A string field */
+              title: string;
+              /** @description A string field */
+              homeTeam?: string;
+              /** @description A string field */
+              awayTeam?: string;
+              /** @description An integer field */
+              homeScore?: number;
+              /** @description An integer field */
+              awayScore?: number;
+              /** @description A string field */
+              venue: string;
+              /** @description A text field */
+              summary: string;
+              /** @description A datetime field */
+              createdAt?: string;
+              /** @description A datetime field */
+              updatedAt?: string;
+              /**
+               * @description A datetime field
+               * @default 2026-10-08T10:40:58.470Z
                */
               publishedAt: string;
               /** @description A component field */
-              identity: components["schemas"]["IdentitySlugEntry"];
+              callToAction?: components["schemas"]["ContentCallToActionEntry"];
             }[];
           };
         };
@@ -1372,18 +1899,25 @@ export interface operations {
       };
     };
   };
-  "event/post/events": {
+  "calendar-entry/post/calendar_entries": {
     parameters: {
       query?: {
         fields?: (
+          | "kind"
+          | "startsAt"
+          | "competition"
+          | "title"
+          | "homeTeam"
+          | "awayTeam"
+          | "homeScore"
+          | "awayScore"
+          | "venue"
           | "summary"
-          | "content"
-          | "when"
           | "createdAt"
           | "updatedAt"
           | "publishedAt"
         )[];
-        populate?: "*" | "identity" | "identity"[];
+        populate?: "*" | "callToAction" | "callToAction"[];
         status?: "draft" | "published";
         publicationFilter?:
           | "never-published"
@@ -1404,19 +1938,36 @@ export interface operations {
       content: {
         "application/json": {
           data: {
+            /**
+             * @description An enum field
+             * @enum {string}
+             */
+            kind: "match" | "result" | "event";
+            /** @description A datetime field */
+            startsAt: string;
             /** @description A string field */
+            competition: string;
+            /** @description A string field */
+            title: string;
+            /** @description A string field */
+            homeTeam?: string;
+            /** @description A string field */
+            awayTeam?: string;
+            /** @description A float field */
+            homeScore?: number;
+            /** @description A float field */
+            awayScore?: number;
+            /** @description A string field */
+            venue: string;
+            /** @description A text field */
             summary: string;
-            /** @description A blocks field */
-            content: unknown[];
-            /** @description A date field */
-            when?: string;
             /**
              * @description A datetime field
-             * @default 2026-08-31T07:43:39.040Z
+             * @default 2026-10-08T10:40:58.482Z
              */
             publishedAt: string;
             /** @description A component field */
-            identity: unknown;
+            callToAction?: unknown;
           };
         };
       };
@@ -1436,23 +1987,40 @@ export interface operations {
                */
               documentId: string;
               id: string | number;
+              /**
+               * @description An enum field
+               * @enum {string}
+               */
+              kind: "match" | "result" | "event";
+              /** @description A datetime field */
+              startsAt: string;
               /** @description A string field */
+              competition: string;
+              /** @description A string field */
+              title: string;
+              /** @description A string field */
+              homeTeam?: string;
+              /** @description A string field */
+              awayTeam?: string;
+              /** @description An integer field */
+              homeScore?: number;
+              /** @description An integer field */
+              awayScore?: number;
+              /** @description A string field */
+              venue: string;
+              /** @description A text field */
               summary: string;
-              /** @description A blocks field */
-              content: unknown[];
-              /** @description A date field */
-              when?: string;
               /** @description A datetime field */
               createdAt?: string;
               /** @description A datetime field */
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-08-31T07:43:39.040Z
+               * @default 2026-10-08T10:40:58.485Z
                */
               publishedAt: string;
               /** @description A component field */
-              identity: components["schemas"]["IdentitySlugEntry"];
+              callToAction?: components["schemas"]["ContentCallToActionEntry"];
             };
           };
         };
@@ -1494,34 +2062,55 @@ export interface operations {
       };
     };
   };
-  "event/get/events_by_id": {
+  "calendar-entry/get/calendar_entries_by_id": {
     parameters: {
       query?: {
         fields?: (
+          | "kind"
+          | "startsAt"
+          | "competition"
+          | "title"
+          | "homeTeam"
+          | "awayTeam"
+          | "homeScore"
+          | "awayScore"
+          | "venue"
           | "summary"
-          | "content"
-          | "when"
           | "createdAt"
           | "updatedAt"
           | "publishedAt"
         )[];
-        populate?: "*" | "identity" | "identity"[];
+        populate?: "*" | "callToAction" | "callToAction"[];
         filters?: {
           [key: string]: unknown;
         };
         sort?:
           | (
+              | "kind"
+              | "startsAt"
+              | "competition"
+              | "title"
+              | "homeTeam"
+              | "awayTeam"
+              | "homeScore"
+              | "awayScore"
+              | "venue"
               | "summary"
-              | "content"
-              | "when"
               | "createdAt"
               | "updatedAt"
               | "publishedAt"
             )
           | (
+              | "kind"
+              | "startsAt"
+              | "competition"
+              | "title"
+              | "homeTeam"
+              | "awayTeam"
+              | "homeScore"
+              | "awayScore"
+              | "venue"
               | "summary"
-              | "content"
-              | "when"
               | "createdAt"
               | "updatedAt"
               | "publishedAt"
@@ -1566,23 +2155,40 @@ export interface operations {
                */
               documentId: string;
               id: string | number;
+              /**
+               * @description An enum field
+               * @enum {string}
+               */
+              kind: "match" | "result" | "event";
+              /** @description A datetime field */
+              startsAt: string;
               /** @description A string field */
+              competition: string;
+              /** @description A string field */
+              title: string;
+              /** @description A string field */
+              homeTeam?: string;
+              /** @description A string field */
+              awayTeam?: string;
+              /** @description An integer field */
+              homeScore?: number;
+              /** @description An integer field */
+              awayScore?: number;
+              /** @description A string field */
+              venue: string;
+              /** @description A text field */
               summary: string;
-              /** @description A blocks field */
-              content: unknown[];
-              /** @description A date field */
-              when?: string;
               /** @description A datetime field */
               createdAt?: string;
               /** @description A datetime field */
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-08-31T07:43:39.039Z
+               * @default 2026-10-08T10:40:58.477Z
                */
               publishedAt: string;
               /** @description A component field */
-              identity: components["schemas"]["IdentitySlugEntry"];
+              callToAction?: components["schemas"]["ContentCallToActionEntry"];
             };
           };
         };
@@ -1624,18 +2230,25 @@ export interface operations {
       };
     };
   };
-  "event/put/events_by_id": {
+  "calendar-entry/put/calendar_entries_by_id": {
     parameters: {
       query?: {
         fields?: (
+          | "kind"
+          | "startsAt"
+          | "competition"
+          | "title"
+          | "homeTeam"
+          | "awayTeam"
+          | "homeScore"
+          | "awayScore"
+          | "venue"
           | "summary"
-          | "content"
-          | "when"
           | "createdAt"
           | "updatedAt"
           | "publishedAt"
         )[];
-        populate?: "*" | "identity" | "identity"[];
+        populate?: "*" | "callToAction" | "callToAction"[];
         status?: "draft" | "published";
         publicationFilter?:
           | "never-published"
@@ -1658,19 +2271,36 @@ export interface operations {
       content: {
         "application/json": {
           data: {
+            /**
+             * @description An enum field
+             * @enum {string}
+             */
+            kind?: "match" | "result" | "event";
+            /** @description A datetime field */
+            startsAt?: string;
             /** @description A string field */
+            competition?: string;
+            /** @description A string field */
+            title?: string;
+            /** @description A string field */
+            homeTeam?: string;
+            /** @description A string field */
+            awayTeam?: string;
+            /** @description A float field */
+            homeScore?: number;
+            /** @description A float field */
+            awayScore?: number;
+            /** @description A string field */
+            venue?: string;
+            /** @description A text field */
             summary?: string;
-            /** @description A blocks field */
-            content?: unknown[];
-            /** @description A date field */
-            when?: string;
             /**
              * @description A datetime field
-             * @default 2026-08-31T07:43:39.041Z
+             * @default 2026-10-08T10:40:58.489Z
              */
             publishedAt?: string;
             /** @description A component field */
-            identity?: unknown;
+            callToAction?: unknown;
           };
         };
       };
@@ -1690,23 +2320,40 @@ export interface operations {
                */
               documentId: string;
               id: string | number;
+              /**
+               * @description An enum field
+               * @enum {string}
+               */
+              kind: "match" | "result" | "event";
+              /** @description A datetime field */
+              startsAt: string;
               /** @description A string field */
+              competition: string;
+              /** @description A string field */
+              title: string;
+              /** @description A string field */
+              homeTeam?: string;
+              /** @description A string field */
+              awayTeam?: string;
+              /** @description An integer field */
+              homeScore?: number;
+              /** @description An integer field */
+              awayScore?: number;
+              /** @description A string field */
+              venue: string;
+              /** @description A text field */
               summary: string;
-              /** @description A blocks field */
-              content: unknown[];
-              /** @description A date field */
-              when?: string;
               /** @description A datetime field */
               createdAt?: string;
               /** @description A datetime field */
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-08-31T07:43:39.041Z
+               * @default 2026-10-08T10:40:58.491Z
                */
               publishedAt: string;
               /** @description A component field */
-              identity: components["schemas"]["IdentitySlugEntry"];
+              callToAction?: components["schemas"]["ContentCallToActionEntry"];
             };
           };
         };
@@ -1748,18 +2395,25 @@ export interface operations {
       };
     };
   };
-  "event/delete/events_by_id": {
+  "calendar-entry/delete/calendar_entries_by_id": {
     parameters: {
       query?: {
         fields?: (
+          | "kind"
+          | "startsAt"
+          | "competition"
+          | "title"
+          | "homeTeam"
+          | "awayTeam"
+          | "homeScore"
+          | "awayScore"
+          | "venue"
           | "summary"
-          | "content"
-          | "when"
           | "createdAt"
           | "updatedAt"
           | "publishedAt"
         )[];
-        populate?: "*" | "identity" | "identity"[];
+        populate?: "*" | "callToAction" | "callToAction"[];
         filters?: {
           [key: string]: unknown;
         };
@@ -1797,23 +2451,40 @@ export interface operations {
                */
               documentId: string;
               id: string | number;
+              /**
+               * @description An enum field
+               * @enum {string}
+               */
+              kind: "match" | "result" | "event";
+              /** @description A datetime field */
+              startsAt: string;
               /** @description A string field */
+              competition: string;
+              /** @description A string field */
+              title: string;
+              /** @description A string field */
+              homeTeam?: string;
+              /** @description A string field */
+              awayTeam?: string;
+              /** @description An integer field */
+              homeScore?: number;
+              /** @description An integer field */
+              awayScore?: number;
+              /** @description A string field */
+              venue: string;
+              /** @description A text field */
               summary: string;
-              /** @description A blocks field */
-              content: unknown[];
-              /** @description A date field */
-              when?: string;
               /** @description A datetime field */
               createdAt?: string;
               /** @description A datetime field */
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-08-31T07:43:39.041Z
+               * @default 2026-10-08T10:40:58.496Z
                */
               publishedAt: string;
               /** @description A component field */
-              identity: components["schemas"]["IdentitySlugEntry"];
+              callToAction?: components["schemas"]["ContentCallToActionEntry"];
             };
           };
         };
@@ -1858,11 +2529,37 @@ export interface operations {
   "home-page/get/home_page": {
     parameters: {
       query?: {
-        fields?: ("title" | "createdAt" | "updatedAt" | "publishedAt")[];
-        populate?: "*" | "content" | "content"[];
+        fields?: (
+          | "eyebrow"
+          | "headline"
+          | "introduction"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        populate?:
+          | "*"
+          | ("heroImage" | "metrics" | "institutionalQuote" | "activityTeasers")
+          | (
+              | "heroImage"
+              | "metrics"
+              | "institutionalQuote"
+              | "activityTeasers"
+            )[];
         filters?: {
           [key: string]: unknown;
         };
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
       };
       header?: never;
       path?: never;
@@ -1885,18 +2582,28 @@ export interface operations {
               documentId: string;
               id: string | number;
               /** @description A string field */
-              title: string;
+              eyebrow: string;
+              /** @description A string field */
+              headline: string;
+              /** @description A text field */
+              introduction: string;
               /** @description A datetime field */
               createdAt?: string;
               /** @description A datetime field */
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-08-31T07:43:39.042Z
+               * @default 2026-10-08T10:40:58.503Z
                */
               publishedAt: string;
+              /** @description A media field */
+              heroImage: components["schemas"]["PluginUploadFileDocument"];
               /** @description A component field */
-              content: components["schemas"]["SharedHeroEntry"][];
+              metrics: components["schemas"]["ContentMetricEntry"][];
+              /** @description A component field */
+              institutionalQuote: components["schemas"]["ContentInstitutionalQuoteEntry"];
+              /** @description A component field */
+              activityTeasers: components["schemas"]["ContentActivityTeaserEntry"][];
             };
           };
         };
@@ -1941,8 +2648,34 @@ export interface operations {
   "home-page/put/home_page": {
     parameters: {
       query?: {
-        fields?: ("title" | "createdAt" | "updatedAt" | "publishedAt")[];
-        populate?: "*" | "content" | "content"[];
+        fields?: (
+          | "eyebrow"
+          | "headline"
+          | "introduction"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        populate?:
+          | "*"
+          | ("heroImage" | "metrics" | "institutionalQuote" | "activityTeasers")
+          | (
+              | "heroImage"
+              | "metrics"
+              | "institutionalQuote"
+              | "activityTeasers"
+            )[];
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
       };
       header?: never;
       path?: never;
@@ -1953,14 +2686,24 @@ export interface operations {
         "application/json": {
           data: {
             /** @description A string field */
-            title?: string;
+            eyebrow?: string;
+            /** @description A string field */
+            headline?: string;
+            /** @description A text field */
+            introduction?: string;
             /**
              * @description A datetime field
-             * @default 2026-08-31T07:43:39.043Z
+             * @default 2026-10-08T10:40:58.511Z
              */
             publishedAt?: string;
+            /** @description A media field */
+            heroImage?: unknown;
             /** @description A component field */
-            content?: unknown[];
+            metrics?: unknown[];
+            /** @description A component field */
+            institutionalQuote?: unknown;
+            /** @description A component field */
+            activityTeasers?: unknown[];
           };
         };
       };
@@ -1981,18 +2724,28 @@ export interface operations {
               documentId: string;
               id: string | number;
               /** @description A string field */
-              title: string;
+              eyebrow: string;
+              /** @description A string field */
+              headline: string;
+              /** @description A text field */
+              introduction: string;
               /** @description A datetime field */
               createdAt?: string;
               /** @description A datetime field */
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-08-31T07:43:39.043Z
+               * @default 2026-10-08T10:40:58.513Z
                */
               publishedAt: string;
+              /** @description A media field */
+              heroImage: components["schemas"]["PluginUploadFileDocument"];
               /** @description A component field */
-              content: components["schemas"]["SharedHeroEntry"][];
+              metrics: components["schemas"]["ContentMetricEntry"][];
+              /** @description A component field */
+              institutionalQuote: components["schemas"]["ContentInstitutionalQuoteEntry"];
+              /** @description A component field */
+              activityTeasers: components["schemas"]["ContentActivityTeaserEntry"][];
             };
           };
         };
@@ -2037,8 +2790,34 @@ export interface operations {
   "home-page/delete/home_page": {
     parameters: {
       query?: {
-        fields?: ("title" | "createdAt" | "updatedAt" | "publishedAt")[];
-        populate?: "*" | "content" | "content"[];
+        fields?: (
+          | "eyebrow"
+          | "headline"
+          | "introduction"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        populate?:
+          | "*"
+          | ("heroImage" | "metrics" | "institutionalQuote" | "activityTeasers")
+          | (
+              | "heroImage"
+              | "metrics"
+              | "institutionalQuote"
+              | "activityTeasers"
+            )[];
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
       };
       header?: never;
       path?: never;
@@ -2061,18 +2840,28 @@ export interface operations {
               documentId: string;
               id: string | number;
               /** @description A string field */
-              title: string;
+              eyebrow: string;
+              /** @description A string field */
+              headline: string;
+              /** @description A text field */
+              introduction: string;
               /** @description A datetime field */
               createdAt?: string;
               /** @description A datetime field */
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-08-31T07:43:39.044Z
+               * @default 2026-10-08T10:40:58.518Z
                */
               publishedAt: string;
+              /** @description A media field */
+              heroImage: components["schemas"]["PluginUploadFileDocument"];
               /** @description A component field */
-              content: components["schemas"]["SharedHeroEntry"][];
+              metrics: components["schemas"]["ContentMetricEntry"][];
+              /** @description A component field */
+              institutionalQuote: components["schemas"]["ContentInstitutionalQuoteEntry"];
+              /** @description A component field */
+              activityTeasers: components["schemas"]["ContentActivityTeaserEntry"][];
             };
           };
         };
@@ -2118,8 +2907,11 @@ export interface operations {
     parameters: {
       query?: {
         fields?: (
+          | "category"
           | "summary"
+          | "editorialDate"
           | "content"
+          | "featured"
           | "createdAt"
           | "updatedAt"
           | "publishedAt"
@@ -2134,10 +2926,22 @@ export interface operations {
         "pagination[start]"?: number;
         "pagination[limit]"?: number;
         sort?:
-          | ("summary" | "content" | "createdAt" | "updatedAt" | "publishedAt")
           | (
+              | "category"
               | "summary"
+              | "editorialDate"
               | "content"
+              | "featured"
+              | "createdAt"
+              | "updatedAt"
+              | "publishedAt"
+            )
+          | (
+              | "category"
+              | "summary"
+              | "editorialDate"
+              | "content"
+              | "featured"
               | "createdAt"
               | "updatedAt"
               | "publishedAt"
@@ -2148,7 +2952,10 @@ export interface operations {
           | {
               [key: string]: "asc" | "desc";
             }[];
-        populate?: "*" | "identity" | "identity"[];
+        populate?:
+          | "*"
+          | ("identity" | "heroImage")
+          | ("identity" | "heroImage")[];
         status?: "draft" | "published";
         publicationFilter?:
           | "never-published"
@@ -2182,20 +2989,31 @@ export interface operations {
               documentId: string;
               id: string | number;
               /** @description A string field */
+              category: string;
+              /** @description A text field */
               summary: string;
+              /** @description A date field */
+              editorialDate: string;
               /** @description A blocks field */
               content: unknown[];
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              featured: boolean | null;
               /** @description A datetime field */
               createdAt?: string;
               /** @description A datetime field */
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-08-31T07:43:39.045Z
+               * @default 2026-10-08T10:40:58.526Z
                */
               publishedAt: string;
               /** @description A component field */
               identity: components["schemas"]["IdentitySlugEntry"];
+              /** @description A media field */
+              heroImage: components["schemas"]["PluginUploadFileDocument"];
             }[];
           };
         };
@@ -2241,13 +3059,19 @@ export interface operations {
     parameters: {
       query?: {
         fields?: (
+          | "category"
           | "summary"
+          | "editorialDate"
           | "content"
+          | "featured"
           | "createdAt"
           | "updatedAt"
           | "publishedAt"
         )[];
-        populate?: "*" | "identity" | "identity"[];
+        populate?:
+          | "*"
+          | ("identity" | "heroImage")
+          | ("identity" | "heroImage")[];
         status?: "draft" | "published";
         publicationFilter?:
           | "never-published"
@@ -2269,16 +3093,27 @@ export interface operations {
         "application/json": {
           data: {
             /** @description A string field */
+            category: string;
+            /** @description A text field */
             summary: string;
+            /** @description A date field */
+            editorialDate: string;
             /** @description A blocks field */
             content: unknown[];
             /**
+             * @description A boolean field
+             * @default false
+             */
+            featured: ("0" | "1" | "t" | "true" | "f" | "false") | null;
+            /**
              * @description A datetime field
-             * @default 2026-08-31T07:43:39.046Z
+             * @default 2026-10-08T10:40:58.538Z
              */
             publishedAt: string;
             /** @description A component field */
             identity: unknown;
+            /** @description A media field */
+            heroImage: unknown;
           };
         };
       };
@@ -2299,20 +3134,31 @@ export interface operations {
               documentId: string;
               id: string | number;
               /** @description A string field */
+              category: string;
+              /** @description A text field */
               summary: string;
+              /** @description A date field */
+              editorialDate: string;
               /** @description A blocks field */
               content: unknown[];
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              featured: boolean | null;
               /** @description A datetime field */
               createdAt?: string;
               /** @description A datetime field */
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-08-31T07:43:39.046Z
+               * @default 2026-10-08T10:40:58.540Z
                */
               publishedAt: string;
               /** @description A component field */
               identity: components["schemas"]["IdentitySlugEntry"];
+              /** @description A media field */
+              heroImage: components["schemas"]["PluginUploadFileDocument"];
             };
           };
         };
@@ -2358,21 +3204,39 @@ export interface operations {
     parameters: {
       query?: {
         fields?: (
+          | "category"
           | "summary"
+          | "editorialDate"
           | "content"
+          | "featured"
           | "createdAt"
           | "updatedAt"
           | "publishedAt"
         )[];
-        populate?: "*" | "identity" | "identity"[];
+        populate?:
+          | "*"
+          | ("identity" | "heroImage")
+          | ("identity" | "heroImage")[];
         filters?: {
           [key: string]: unknown;
         };
         sort?:
-          | ("summary" | "content" | "createdAt" | "updatedAt" | "publishedAt")
           | (
+              | "category"
               | "summary"
+              | "editorialDate"
               | "content"
+              | "featured"
+              | "createdAt"
+              | "updatedAt"
+              | "publishedAt"
+            )
+          | (
+              | "category"
+              | "summary"
+              | "editorialDate"
+              | "content"
+              | "featured"
               | "createdAt"
               | "updatedAt"
               | "publishedAt"
@@ -2418,20 +3282,31 @@ export interface operations {
               documentId: string;
               id: string | number;
               /** @description A string field */
+              category: string;
+              /** @description A text field */
               summary: string;
+              /** @description A date field */
+              editorialDate: string;
               /** @description A blocks field */
               content: unknown[];
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              featured: boolean | null;
               /** @description A datetime field */
               createdAt?: string;
               /** @description A datetime field */
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-08-31T07:43:39.045Z
+               * @default 2026-10-08T10:40:58.533Z
                */
               publishedAt: string;
               /** @description A component field */
               identity: components["schemas"]["IdentitySlugEntry"];
+              /** @description A media field */
+              heroImage: components["schemas"]["PluginUploadFileDocument"];
             };
           };
         };
@@ -2477,13 +3352,19 @@ export interface operations {
     parameters: {
       query?: {
         fields?: (
+          | "category"
           | "summary"
+          | "editorialDate"
           | "content"
+          | "featured"
           | "createdAt"
           | "updatedAt"
           | "publishedAt"
         )[];
-        populate?: "*" | "identity" | "identity"[];
+        populate?:
+          | "*"
+          | ("identity" | "heroImage")
+          | ("identity" | "heroImage")[];
         status?: "draft" | "published";
         publicationFilter?:
           | "never-published"
@@ -2507,16 +3388,27 @@ export interface operations {
         "application/json": {
           data: {
             /** @description A string field */
+            category?: string;
+            /** @description A text field */
             summary?: string;
+            /** @description A date field */
+            editorialDate?: string;
             /** @description A blocks field */
             content?: unknown[];
             /**
+             * @description A boolean field
+             * @default false
+             */
+            featured?: ("0" | "1" | "t" | "true" | "f" | "false") | null;
+            /**
              * @description A datetime field
-             * @default 2026-08-31T07:43:39.046Z
+             * @default 2026-10-08T10:40:58.544Z
              */
             publishedAt?: string;
             /** @description A component field */
             identity?: unknown;
+            /** @description A media field */
+            heroImage?: unknown;
           };
         };
       };
@@ -2537,20 +3429,31 @@ export interface operations {
               documentId: string;
               id: string | number;
               /** @description A string field */
+              category: string;
+              /** @description A text field */
               summary: string;
+              /** @description A date field */
+              editorialDate: string;
               /** @description A blocks field */
               content: unknown[];
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              featured: boolean | null;
               /** @description A datetime field */
               createdAt?: string;
               /** @description A datetime field */
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-08-31T07:43:39.046Z
+               * @default 2026-10-08T10:40:58.546Z
                */
               publishedAt: string;
               /** @description A component field */
               identity: components["schemas"]["IdentitySlugEntry"];
+              /** @description A media field */
+              heroImage: components["schemas"]["PluginUploadFileDocument"];
             };
           };
         };
@@ -2596,13 +3499,19 @@ export interface operations {
     parameters: {
       query?: {
         fields?: (
+          | "category"
           | "summary"
+          | "editorialDate"
           | "content"
+          | "featured"
           | "createdAt"
           | "updatedAt"
           | "publishedAt"
         )[];
-        populate?: "*" | "identity" | "identity"[];
+        populate?:
+          | "*"
+          | ("identity" | "heroImage")
+          | ("identity" | "heroImage")[];
         filters?: {
           [key: string]: unknown;
         };
@@ -2641,20 +3550,692 @@ export interface operations {
               documentId: string;
               id: string | number;
               /** @description A string field */
+              category: string;
+              /** @description A text field */
               summary: string;
+              /** @description A date field */
+              editorialDate: string;
               /** @description A blocks field */
               content: unknown[];
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              featured: boolean | null;
               /** @description A datetime field */
               createdAt?: string;
               /** @description A datetime field */
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-08-31T07:43:39.047Z
+               * @default 2026-10-08T10:40:58.550Z
                */
               publishedAt: string;
               /** @description A component field */
               identity: components["schemas"]["IdentitySlugEntry"];
+              /** @description A media field */
+              heroImage: components["schemas"]["PluginUploadFileDocument"];
+            };
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "official-document/get/official_documents": {
+    parameters: {
+      query?: {
+        fields?: (
+          | "title"
+          | "category"
+          | "season"
+          | "displayOrder"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        filters?: {
+          [key: string]: unknown;
+        };
+        _q?: string;
+        "pagination[withCount]"?: boolean;
+        "pagination[page]"?: number;
+        "pagination[pageSize]"?: number;
+        "pagination[start]"?: number;
+        "pagination[limit]"?: number;
+        sort?:
+          | (
+              | "title"
+              | "category"
+              | "season"
+              | "displayOrder"
+              | "createdAt"
+              | "updatedAt"
+              | "publishedAt"
+            )
+          | (
+              | "title"
+              | "category"
+              | "season"
+              | "displayOrder"
+              | "createdAt"
+              | "updatedAt"
+              | "publishedAt"
+            )[]
+          | {
+              [key: string]: "asc" | "desc";
+            }
+          | {
+              [key: string]: "asc" | "desc";
+            }[];
+        populate?: "*" | "file" | "file"[];
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /**
+               * Format: uuid
+               * @description The document ID, represented by a UUID
+               */
+              documentId: string;
+              id: string | number;
+              /** @description A string field */
+              title: string;
+              /** @description A string field */
+              category: string;
+              /** @description A string field */
+              season: string;
+              /**
+               * @description An integer field
+               * @default 0
+               */
+              displayOrder: number;
+              /** @description A datetime field */
+              createdAt?: string;
+              /** @description A datetime field */
+              updatedAt?: string;
+              /**
+               * @description A datetime field
+               * @default 2026-10-08T10:40:58.557Z
+               */
+              publishedAt: string;
+              /** @description A media field */
+              file: components["schemas"]["PluginUploadFileDocument"];
+            }[];
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "official-document/post/official_documents": {
+    parameters: {
+      query?: {
+        fields?: (
+          | "title"
+          | "category"
+          | "season"
+          | "displayOrder"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        populate?: "*" | "file" | "file"[];
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": {
+          data: {
+            /** @description A string field */
+            title: string;
+            /** @description A string field */
+            category: string;
+            /** @description A string field */
+            season: string;
+            /**
+             * @description A float field
+             * @default 0
+             */
+            displayOrder: number;
+            /**
+             * @description A datetime field
+             * @default 2026-10-08T10:40:58.566Z
+             */
+            publishedAt: string;
+            /** @description A media field */
+            file: unknown;
+          };
+        };
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /**
+               * Format: uuid
+               * @description The document ID, represented by a UUID
+               */
+              documentId: string;
+              id: string | number;
+              /** @description A string field */
+              title: string;
+              /** @description A string field */
+              category: string;
+              /** @description A string field */
+              season: string;
+              /**
+               * @description An integer field
+               * @default 0
+               */
+              displayOrder: number;
+              /** @description A datetime field */
+              createdAt?: string;
+              /** @description A datetime field */
+              updatedAt?: string;
+              /**
+               * @description A datetime field
+               * @default 2026-10-08T10:40:58.567Z
+               */
+              publishedAt: string;
+              /** @description A media field */
+              file: components["schemas"]["PluginUploadFileDocument"];
+            };
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "official-document/get/official_documents_by_id": {
+    parameters: {
+      query?: {
+        fields?: (
+          | "title"
+          | "category"
+          | "season"
+          | "displayOrder"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        populate?: "*" | "file" | "file"[];
+        filters?: {
+          [key: string]: unknown;
+        };
+        sort?:
+          | (
+              | "title"
+              | "category"
+              | "season"
+              | "displayOrder"
+              | "createdAt"
+              | "updatedAt"
+              | "publishedAt"
+            )
+          | (
+              | "title"
+              | "category"
+              | "season"
+              | "displayOrder"
+              | "createdAt"
+              | "updatedAt"
+              | "publishedAt"
+            )[]
+          | {
+              [key: string]: "asc" | "desc";
+            }
+          | {
+              [key: string]: "asc" | "desc";
+            }[];
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /**
+               * Format: uuid
+               * @description The document ID, represented by a UUID
+               */
+              documentId: string;
+              id: string | number;
+              /** @description A string field */
+              title: string;
+              /** @description A string field */
+              category: string;
+              /** @description A string field */
+              season: string;
+              /**
+               * @description An integer field
+               * @default 0
+               */
+              displayOrder: number;
+              /** @description A datetime field */
+              createdAt?: string;
+              /** @description A datetime field */
+              updatedAt?: string;
+              /**
+               * @description A datetime field
+               * @default 2026-10-08T10:40:58.562Z
+               */
+              publishedAt: string;
+              /** @description A media field */
+              file: components["schemas"]["PluginUploadFileDocument"];
+            };
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "official-document/put/official_documents_by_id": {
+    parameters: {
+      query?: {
+        fields?: (
+          | "title"
+          | "category"
+          | "season"
+          | "displayOrder"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        populate?: "*" | "file" | "file"[];
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": {
+          data: {
+            /** @description A string field */
+            title?: string;
+            /** @description A string field */
+            category?: string;
+            /** @description A string field */
+            season?: string;
+            /**
+             * @description A float field
+             * @default 0
+             */
+            displayOrder?: number;
+            /**
+             * @description A datetime field
+             * @default 2026-10-08T10:40:58.571Z
+             */
+            publishedAt?: string;
+            /** @description A media field */
+            file?: unknown;
+          };
+        };
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /**
+               * Format: uuid
+               * @description The document ID, represented by a UUID
+               */
+              documentId: string;
+              id: string | number;
+              /** @description A string field */
+              title: string;
+              /** @description A string field */
+              category: string;
+              /** @description A string field */
+              season: string;
+              /**
+               * @description An integer field
+               * @default 0
+               */
+              displayOrder: number;
+              /** @description A datetime field */
+              createdAt?: string;
+              /** @description A datetime field */
+              updatedAt?: string;
+              /**
+               * @description A datetime field
+               * @default 2026-10-08T10:40:58.573Z
+               */
+              publishedAt: string;
+              /** @description A media field */
+              file: components["schemas"]["PluginUploadFileDocument"];
+            };
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "official-document/delete/official_documents_by_id": {
+    parameters: {
+      query?: {
+        fields?: (
+          | "title"
+          | "category"
+          | "season"
+          | "displayOrder"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        populate?: "*" | "file" | "file"[];
+        filters?: {
+          [key: string]: unknown;
+        };
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /**
+               * Format: uuid
+               * @description The document ID, represented by a UUID
+               */
+              documentId: string;
+              id: string | number;
+              /** @description A string field */
+              title: string;
+              /** @description A string field */
+              category: string;
+              /** @description A string field */
+              season: string;
+              /**
+               * @description An integer field
+               * @default 0
+               */
+              displayOrder: number;
+              /** @description A datetime field */
+              createdAt?: string;
+              /** @description A datetime field */
+              updatedAt?: string;
+              /**
+               * @description A datetime field
+               * @default 2026-10-08T10:40:58.577Z
+               */
+              publishedAt: string;
+              /** @description A media field */
+              file: components["schemas"]["PluginUploadFileDocument"];
             };
           };
         };

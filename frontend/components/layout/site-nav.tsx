@@ -5,9 +5,10 @@ import { usePathname } from "next/navigation";
 
 const routes = [
   { href: "/", label: "Home" },
-  { href: "/news", label: "News" },
-  { href: "/events", label: "Events" },
-  { href: "/articles", label: "Articles" },
+  { href: "/chi-siamo", label: "Chi siamo" },
+  { href: "/attivita", label: "Attività" },
+  { href: "/notizie", label: "Notizie" },
+  { href: "/#contatti", label: "Contatti" },
 ] as const;
 
 export function SiteNav() {
@@ -20,12 +21,14 @@ export function SiteNavFallback() {
 
 function Navigation({ pathname }: { pathname?: string }) {
   return (
-    <nav aria-label="Main">
+    <nav aria-label="Principale">
       <ul className="flex flex-wrap gap-x-1 gap-y-1">
         {routes.map(({ href, label }) => {
           const active =
             pathname === href ||
-            (href !== "/" && pathname?.startsWith(`${href}/`));
+            (href !== "/" &&
+              !href.includes("#") &&
+              pathname?.startsWith(`${href}/`));
 
           return (
             <li key={href}>

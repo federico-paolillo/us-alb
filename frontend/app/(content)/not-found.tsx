@@ -5,10 +5,10 @@ export default function NotFound() {
         404
       </p>
       <h1 className="mt-4 text-4xl font-semibold tracking-tight text-text">
-        Page not found
+        Pagina non trovata
       </h1>
       <p className="mt-5 text-lg leading-8 text-muted">
-        The requested content does not exist or is not published.
+        Il contenuto richiesto non esiste o non è pubblicato.
       </p>
     </main>
   );

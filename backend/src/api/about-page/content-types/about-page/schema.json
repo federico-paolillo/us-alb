@@ -1,0 +1,83 @@
+{
+  "kind": "singleType",
+  "collectionName": "about_pages",
+  "info": {
+    "singularName": "about-page",
+    "pluralName": "about-pages",
+    "displayName": "About Page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string",
+      "required": true,
+      "maxLength": 80
+    },
+    "headline": {
+      "type": "string",
+      "required": true,
+      "maxLength": 200
+    },
+    "introduction": {
+      "type": "text",
+      "required": true
+    },
+    "heroImage": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "history": {
+      "type": "blocks",
+      "required": true
+    },
+    "timeline": {
+      "type": "component",
+      "component": "content.timeline-entry",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    },
+    "values": {
+      "type": "component",
+      "component": "content.value",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    },
+    "boardMembers": {
+      "type": "component",
+      "component": "content.board-member",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    },
+    "facilities": {
+      "type": "component",
+      "component": "content.facility",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    },
+    "documentEyebrow": {
+      "type": "string",
+      "required": true,
+      "maxLength": 80
+    },
+    "documentTitle": {
+      "type": "string",
+      "required": true,
+      "maxLength": 160
+    },
+    "documentIntroduction": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

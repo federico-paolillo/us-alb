@@ -12,7 +12,7 @@
     "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",
     "upgrade:dry": "npx @strapi/upgrade latest --dry",
-    "types": "strapi ts:generate-type",
+    "types": "strapi ts:generate-types",
     "openapi": "strapi openapi generate --output ../frontend/cms/schema.json"
   },
   "dependencies": {

@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_content_schedules",
+  "info": {
+    "displayName": "Schedule"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 160
+    },
+    "days": {
+      "type": "string",
+      "required": true,
+      "maxLength": 160
+    },
+    "time": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "venue": {
+      "type": "string",
+      "required": true,
+      "maxLength": 160
+    }
+  }
+}

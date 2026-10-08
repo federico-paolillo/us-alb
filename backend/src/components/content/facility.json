@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_content_facilities",
+  "info": {
+    "displayName": "Facility"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "maxLength": 160
+    },
+    "summary": {
+      "type": "text",
+      "required": true
+    },
+    "address": {
+      "type": "string",
+      "required": true,
+      "maxLength": 240
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    }
+  }
+}

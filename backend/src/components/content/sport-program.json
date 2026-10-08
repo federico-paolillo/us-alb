@@ -1,0 +1,40 @@
+{
+  "collectionName": "components_content_sport_programs",
+  "info": {
+    "displayName": "Sport Program"
+  },
+  "options": {},
+  "attributes": {
+    "group": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "youth-football",
+        "competitive-football",
+        "athletics",
+        "community"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 160
+    },
+    "audience": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "summary": {
+      "type": "text",
+      "required": true
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "kind": "collectionType",
+  "collectionName": "official_documents",
+  "info": {
+    "singularName": "official-document",
+    "pluralName": "official-documents",
+    "displayName": "Official Document"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 160
+    },
+    "category": {
+      "type": "string",
+      "required": true,
+      "maxLength": 120
+    },
+    "season": {
+      "type": "string",
+      "required": true,
+      "maxLength": 32
+    },
+    "file": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "files"
+      ]
+    },
+    "displayOrder": {
+      "type": "integer",
+      "required": true,
+      "min": 0,
+      "default": 0
+    }
+  }
+}

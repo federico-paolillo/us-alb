@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_content_values",
+  "info": {
+    "displayName": "Value"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 160
+    },
+    "body": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

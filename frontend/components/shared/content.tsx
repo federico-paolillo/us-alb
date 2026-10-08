@@ -1,11 +1,9 @@
 import type {
   BlockDto,
   BlocksDto,
-  HeroDto,
   ImageDto,
   InlineDto,
   ListBlockDto,
-  SectionDto,
   TextDto,
 } from "@cmsjs/cms/model";
 import Image from "next/image";
@@ -13,47 +11,6 @@ import { Fragment, type ReactNode } from "react";
 
 const contentImageSizes =
   "(min-width: 768px) 704px, (min-width: 640px) calc(100vw - 64px), calc(100vw - 40px)";
-
-export function Hero({ hero }: { hero: HeroDto }) {
-  return (
-    <section className="grid gap-8 border-t border-border pt-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center">
-      <div>
-        <h2 className="text-3xl font-semibold tracking-tight text-text sm:text-4xl">
-          {hero.headline}
-        </h2>
-        {hero.subheading && (
-          <p className="mt-4 max-w-xl text-lg leading-8 text-muted">
-            {hero.subheading}
-          </p>
-        )}
-        {hero.cta && (
-          <p className="mt-7 font-mono text-sm text-accent">{hero.cta}</p>
-        )}
-      </div>
-      <CmsImage
-        loading="eager"
-        image={hero.visual}
-        sizes="(min-width: 1280px) 581px, (min-width: 1024px) calc((100vw - 96px) * 0.55), (min-width: 640px) calc(100vw - 64px), calc(100vw - 40px)"
-      />
-    </section>
-  );
-}
-
-export function Section({ section }: { section: SectionDto }) {
-  return (
-    <section className="space-y-6">
-      {section.header && (
-        <h2 className="text-2xl font-semibold tracking-tight text-text sm:text-3xl">
-          {section.header}
-        </h2>
-      )}
-      {section.hero && (
-        <CmsImage image={section.hero} sizes={contentImageSizes} />
-      )}
-      <Blocks blocks={section.content} />
-    </section>
-  );
-}
 
 export function Blocks({ blocks }: { blocks: BlocksDto }) {
   return (
@@ -182,7 +139,7 @@ function Text({ text }: { text: TextDto }) {
   return content;
 }
 
-function CmsImage({
+export function CmsImage({
   image,
   loading,
   sizes,

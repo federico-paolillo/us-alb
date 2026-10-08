@@ -17,14 +17,36 @@
       "repeatable": false,
       "required": true
     },
-    "summary": {
+    "category": {
       "type": "string",
-      "maxLength": 64,
+      "required": true,
+      "maxLength": 120
+    },
+    "summary": {
+      "type": "text",
+      "required": true,
+      "maxLength": 280
+    },
+    "editorialDate": {
+      "type": "date",
       "required": true
+    },
+    "heroImage": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
     },
     "content": {
       "type": "blocks",
       "required": true
+    },
+    "featured": {
+      "type": "boolean",
+      "required": true,
+      "default": false
     }
   }
 }

@@ -1,5 +1,3 @@
-// Raw Strapi 5 client that returns Strapi-specific types
-
 import type { ContentStatus } from "@cmsjs/cms/preview";
 import {
   httpError,
@@ -11,39 +9,38 @@ import {
   type Result,
 } from "@cmsjs/cms/result";
 import type { paths } from "@cmsjs/cms/schema";
-import type { Client } from "openapi-fetch";
-import createClient from "openapi-fetch";
+import createClient, { type Client } from "openapi-fetch";
 
-export type ArticleData =
-  paths["/articles"]["get"]["responses"][200]["content"]["application/json"]["data"][number];
-export type EventData =
-  paths["/events"]["get"]["responses"][200]["content"]["application/json"]["data"][number];
-export type NewsData =
-  paths["/news"]["get"]["responses"][200]["content"]["application/json"]["data"][number];
 export type HomePageData =
   paths["/home-page"]["get"]["responses"][200]["content"]["application/json"]["data"];
-export type ArticleListData =
-  paths["/articles"]["get"]["responses"][200]["content"]["application/json"]["data"];
-export type EventListData =
-  paths["/events"]["get"]["responses"][200]["content"]["application/json"]["data"];
-export type NewsListData =
-  paths["/news"]["get"]["responses"][200]["content"]["application/json"]["data"];
+export type AboutPageData =
+  paths["/about-page"]["get"]["responses"][200]["content"]["application/json"]["data"];
+export type ActivityPageData =
+  paths["/activity-page"]["get"]["responses"][200]["content"]["application/json"]["data"];
+export type NewsData =
+  paths["/news"]["get"]["responses"][200]["content"]["application/json"]["data"][number];
+export type NewsListData = NewsData[];
+export type CalendarEntryData =
+  paths["/calendar-entries"]["get"]["responses"][200]["content"]["application/json"]["data"][number];
+export type CalendarEntryListData = CalendarEntryData[];
+export type OfficialDocumentData =
+  paths["/official-documents"]["get"]["responses"][200]["content"]["application/json"]["data"][number];
+export type OfficialDocumentListData = OfficialDocumentData[];
 
-// Provisional limit: Strapi's REST max page size. Recalibration trigger: raise
-// pagination in the list pipeline when a site is expected to exceed this.
 const LIST_PAGE_SIZE = 100;
 
 export interface CmsClient {
-  getArticleBySlug(
-    slug: string,
-    status: ContentStatus,
-  ): Promise<Result<ArticleData>>;
-  getEventBySlug(slug: string): Promise<Result<EventData>>;
+  getHomePage(status: ContentStatus): Promise<Result<HomePageData>>;
+  getAboutPage(status: ContentStatus): Promise<Result<AboutPageData>>;
+  getActivityPage(status: ContentStatus): Promise<Result<ActivityPageData>>;
   getNewsBySlug(slug: string, status: ContentStatus): Promise<Result<NewsData>>;
-  getHomePage(): Promise<Result<HomePageData>>;
-  listArticles(): Promise<Result<ArticleListData>>;
-  listEvents(): Promise<Result<EventListData>>;
   listNews(): Promise<Result<NewsListData>>;
+  listCalendarEntries(
+    status: ContentStatus,
+  ): Promise<Result<CalendarEntryListData>>;
+  listOfficialDocuments(
+    status: ContentStatus,
+  ): Promise<Result<OfficialDocumentListData>>;
 }
 
 export function makeCmsClient(
@@ -57,60 +54,76 @@ export function makeCmsClient(
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     querySerializer: serializeQuery,
   });
-
   const client: CmsClient = {
-    getArticleBySlug: (slug, status) =>
-      getArticleBySlug(rawClient, slug, status),
-    getEventBySlug: (slug) => getEventBySlug(rawClient, slug),
+    getHomePage: (status) =>
+      singleton<HomePageData>(
+        rawClient,
+        "/home-page",
+        status,
+        homePopulate,
+        "home-page",
+      ),
+    getAboutPage: (status) =>
+      singleton<AboutPageData>(
+        rawClient,
+        "/about-page",
+        status,
+        aboutPopulate,
+        "about-page",
+      ),
+    getActivityPage: (status) =>
+      singleton<ActivityPageData>(
+        rawClient,
+        "/activity-page",
+        status,
+        activityPopulate,
+        "activity-page",
+      ),
     getNewsBySlug: (slug, status) => getNewsBySlug(rawClient, slug, status),
-    getHomePage: () => getHomePage(rawClient),
-    listArticles: () => listArticles(rawClient),
-    listEvents: () => listEvents(rawClient),
     listNews: () => listNews(rawClient),
+    listCalendarEntries: (status) => listCalendarEntries(rawClient, status),
+    listOfficialDocuments: (status) => listOfficialDocuments(rawClient, status),
   };
   return Object.freeze(client);
 }
 
-async function getArticleBySlug(
-  rawClient: Client<paths>,
-  slug: string,
-  status: ContentStatus,
-): Promise<Result<ArticleData>> {
-  const result = await toResult(
-    rawClient.GET("/articles", {
-      params: {
-        query: contentQuery(slug, status, {
-          identity: true,
-          sections: { populate: { hero: true } },
-        }),
-      },
-    }),
-    { resource: "article", slug },
-  );
-  if (!result.ok) {
-    return result;
-  }
-  const article = result.value[0];
-  return article ? ok(article) : notFound({ resource: "article", slug });
-}
+const homePopulate = {
+  heroImage: true,
+  metrics: true,
+  institutionalQuote: true,
+  activityTeasers: { populate: { image: true } },
+};
+const aboutPopulate = {
+  heroImage: true,
+  timeline: true,
+  values: true,
+  boardMembers: { populate: { portrait: true } },
+  facilities: { populate: { image: true } },
+};
+const activityPopulate = {
+  heroImage: true,
+  programs: { populate: { image: true } },
+  schedules: true,
+  venues: true,
+  openTeamFeature: { populate: { image: true } },
+  athleticsFeature: { populate: { image: true } },
+  registrationSteps: true,
+};
+const newsPopulate = { identity: true, heroImage: true };
 
-async function getEventBySlug(
+async function singleton<T>(
   rawClient: Client<paths>,
-  slug: string,
-): Promise<Result<EventData>> {
-  const result = await toResult(
-    rawClient.GET("/events", {
-      params: {
-        query: contentQuery(slug, "published", { identity: true }),
-      },
-    }),
-    { resource: "event", slug },
+  path: "/home-page" | "/about-page" | "/activity-page",
+  status: ContentStatus,
+  populate: unknown,
+  resource: string,
+): Promise<Result<T>> {
+  return toResult(
+    rawClient.GET(path, {
+      params: { query: deepQuery({ status, populate }) },
+    }) as Promise<{ data?: { data: T }; response: Response }>,
+    { resource },
   );
-  if (!result.ok) {
-    return result;
-  }
-  const event = result.value[0];
-  return event ? ok(event) : notFound({ resource: "event", slug });
 }
 
 async function getNewsBySlug(
@@ -120,68 +133,63 @@ async function getNewsBySlug(
 ): Promise<Result<NewsData>> {
   const result = await toResult(
     rawClient.GET("/news", {
-      params: { query: contentQuery(slug, status, { identity: true }) },
-    }),
-    { resource: "news", slug },
-  );
-  if (!result.ok) {
-    return result;
-  }
-  const news = result.value[0];
-  return news ? ok(news) : notFound({ resource: "news", slug });
-}
-
-async function getHomePage(
-  rawClient: Client<paths>,
-): Promise<Result<HomePageData>> {
-  return toResult(
-    rawClient.GET("/home-page", {
       params: {
         query: deepQuery({
-          populate: { content: { populate: { visual: true } } },
+          status,
+          populate: newsPopulate,
+          filters: { identity: { slug: { $eq: slug } } },
+          pagination: { pageSize: 1 },
         }),
       },
     }),
-    { resource: "home-page" },
+    { resource: "news", slug },
   );
+  if (!result.ok) return result;
+  return result.value[0]
+    ? ok(result.value[0])
+    : notFound({ resource: "news", slug });
 }
 
-async function listArticles(
-  rawClient: Client<paths>,
-): Promise<Result<ArticleListData>> {
-  return toResult(
-    rawClient.GET("/articles", {
-      params: {
-        query: listQuery({ identity: true }, "publishedAt:desc"),
-      },
-    }),
-    { resource: "articles" },
-  );
-}
-
-async function listEvents(
-  rawClient: Client<paths>,
-): Promise<Result<EventListData>> {
-  return toResult(
-    rawClient.GET("/events", {
-      params: {
-        query: listQuery({ identity: true }, "publishedAt:desc"),
-      },
-    }),
-    { resource: "events" },
-  );
-}
-
-async function listNews(
-  rawClient: Client<paths>,
-): Promise<Result<NewsListData>> {
+function listNews(rawClient: Client<paths>): Promise<Result<NewsListData>> {
   return toResult(
     rawClient.GET("/news", {
       params: {
-        query: listQuery({ identity: true }, "publishedAt:desc"),
+        query: listQuery(newsPopulate, "editorialDate:desc", "published"),
       },
     }),
     { resource: "news" },
+  );
+}
+
+function listCalendarEntries(
+  rawClient: Client<paths>,
+  status: ContentStatus,
+): Promise<Result<CalendarEntryListData>> {
+  return toResult(
+    rawClient.GET("/calendar-entries", {
+      params: {
+        query: listQuery({ callToAction: true }, "startsAt:asc", status),
+      },
+    }),
+    { resource: "calendar-entries" },
+  );
+}
+
+function listOfficialDocuments(
+  rawClient: Client<paths>,
+  status: ContentStatus,
+): Promise<Result<OfficialDocumentListData>> {
+  return toResult(
+    rawClient.GET("/official-documents", {
+      params: {
+        query: listQuery(
+          { file: true },
+          ["displayOrder:asc", "title:asc"],
+          status,
+        ),
+      },
+    }),
+    { resource: "official-documents" },
   );
 }
 
@@ -191,71 +199,55 @@ async function toResult<T>(
 ): Promise<Result<T>> {
   try {
     const result = await resultPromise;
-    if (result.data !== undefined) {
-      return ok(result.data.data);
-    }
-    if (result.response.status === 404) {
-      return notFound(metadata);
-    }
+    if (result.data !== undefined) return ok(result.data.data);
+    if (result.response.status === 404) return notFound(metadata);
     return httpError(result.response.status, metadata);
   } catch (underlying) {
-    if (underlying instanceof SyntaxError) {
-      return parseError(metadata, underlying);
-    }
-    return networkError(metadata, underlying);
+    return underlying instanceof SyntaxError
+      ? parseError(metadata, underlying)
+      : networkError(metadata, underlying);
   }
 }
 
-function contentQuery(
-  slug: string,
-  status: ContentStatus,
+function listQuery(
   populate: unknown,
+  sort: string | string[],
+  status: ContentStatus,
 ): never {
   return deepQuery({
     status,
-    populate,
-    filters: { identity: { slug: { $eq: slug } } },
-  });
-}
-
-function listQuery(populate: unknown, sort: string): never {
-  return deepQuery({
-    status: "published",
     populate,
     sort,
     pagination: { pageSize: LIST_PAGE_SIZE },
   });
 }
 
-// Strapi uses qs-style brackets, which OpenAPI cannot describe deeply enough.
 function deepQuery(query: Record<string, unknown>): never {
   return query as never;
 }
 
 export function serializeQuery(query: Record<string, unknown>): string {
   const params = new URLSearchParams();
-
   function append(path: string, value: unknown): void {
-    if (value === undefined || value === null) {
-      return;
-    }
+    if (value === undefined || value === null) return;
     if (Array.isArray(value)) {
-      for (const [index, item] of value.entries()) {
+      value.forEach((item, index) => {
         append(`${path}[${index}]`, item);
-      }
+      });
       return;
     }
     if (typeof value === "object") {
-      for (const [key, item] of Object.entries(value)) {
-        append(path ? `${path}[${key}]` : key, item);
-      }
+      Object.entries(value as Record<string, unknown>).forEach(
+        ([key, item]) => {
+          append(path ? `${path}[${key}]` : key, item);
+        },
+      );
       return;
     }
     params.append(path, String(value));
   }
-
-  for (const [key, value] of Object.entries(query)) {
+  Object.entries(query).forEach(([key, value]) => {
     append(key, value);
-  }
+  });
   return params.toString();
 }

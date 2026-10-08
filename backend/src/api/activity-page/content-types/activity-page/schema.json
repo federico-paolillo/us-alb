@@ -1,0 +1,81 @@
+{
+  "kind": "singleType",
+  "collectionName": "activity_pages",
+  "info": {
+    "singularName": "activity-page",
+    "pluralName": "activity-pages",
+    "displayName": "Activity Page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string",
+      "required": true,
+      "maxLength": 80
+    },
+    "headline": {
+      "type": "string",
+      "required": true,
+      "maxLength": 200
+    },
+    "introduction": {
+      "type": "text",
+      "required": true
+    },
+    "heroImage": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "programs": {
+      "type": "component",
+      "component": "content.sport-program",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    },
+    "schedules": {
+      "type": "component",
+      "component": "content.schedule",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    },
+    "venues": {
+      "type": "component",
+      "component": "content.venue",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    },
+    "openTeamFeature": {
+      "type": "component",
+      "component": "content.feature",
+      "repeatable": false,
+      "required": true
+    },
+    "athleticsFeature": {
+      "type": "component",
+      "component": "content.feature",
+      "repeatable": false,
+      "required": true
+    },
+    "registrationIntroduction": {
+      "type": "text",
+      "required": true
+    },
+    "registrationSteps": {
+      "type": "component",
+      "component": "content.registration-step",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    }
+  }
+}
