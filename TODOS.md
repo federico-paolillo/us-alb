@@ -22,7 +22,7 @@
 
   Build history, timeline, values, fictional board, facilities, and document introduction from the about DTO. Match the desktop/mobile HTML references and do not represent generated or placeholder people as real officers.
 
-- [ ] **06 — Implement the high-fidelity Attività page**
+- [x] **06 — Implement the high-fidelity Attività page**
 
   Build programs, youth-football cards, competitive/open-team and athletics features, schedules/venues, and registration steps. Use only lightweight client-side filtering where interaction requires it, with no new dependency.
 
