@@ -1,5 +1,6 @@
 import type { NewsListItemDto } from "@cmsjs/cms/model";
 import { HomeMedia } from "@cmsjs/components/home/home-media";
+import { newsPath } from "@cmsjs/seo";
 import Link from "next/link";
 
 const editorialDateFormatter = new Intl.DateTimeFormat("it-IT", {
@@ -48,7 +49,7 @@ export function FeaturedNews({ news }: { news: readonly NewsListItemDto[] }) {
             >
               <Link
                 className="group flex h-full flex-col overflow-hidden rounded-editorial-lg border border-outline-soft/50 bg-surface-lowest shadow-card transition-shadow hover:shadow-card-raised"
-                href={`/notizie/${item.identity.slug}`}
+                href={newsPath(item.identity.slug)}
               >
                 <figure className="relative aspect-[16/10] overflow-hidden bg-surface-container">
                   <HomeMedia

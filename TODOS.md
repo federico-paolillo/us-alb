@@ -30,6 +30,6 @@
 
   Build the combined hub and `/notizie/[slug]` through `PageSwitch`, including metadata and preview. Cover scores, chronological ordering, missing-score and empty states, downloads, and cache invalidation.
 
-- [ ] **08 — Complete SEO, import rehearsal, and release validation**
+- [x] **08 — Complete SEO, import rehearsal, and release validation**
 
   Finalize Italian metadata, canonicals, Open Graph, Organization JSON-LD, sitemap/robots, alt text, and internal links. Rehearse a fresh archive import; start backend and frontend; inspect all routes at exactly 412x914 and 1600x900; run the canonical commands named in `PLAN.md`; and resolve every error before completion.

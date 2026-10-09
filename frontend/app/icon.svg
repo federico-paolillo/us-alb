@@ -1,0 +1,8 @@
+<!-- Original editorial mark; this is not a documented historical club crest. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Marchio editoriale U.S. Albatese</title>
+  <path d="M32 3 57 12v17c0 15.8-9.6 26.2-25 32C16.6 55.2 7 44.8 7 29V12L32 3Z" fill="#fff" stroke="#181c20" stroke-width="4"/>
+  <path d="M11 14 32 6v49.5C18.8 50 11 41.1 11 29V14Z" fill="#d4a000"/>
+  <path d="m32 6 21 8v15c0 12.1-7.8 21-21 26.5V6Z" fill="#2d3135"/>
+  <path d="m32 17 3.6 7.3 8 .9-5.8 5.7 1.4 8-7.2-3.8-7.2 3.8 1.4-8-5.8-5.7 8-.9L32 17Z" fill="#f7f9ff"/>
+</svg>

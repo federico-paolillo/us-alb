@@ -1,6 +1,7 @@
 import type { NewsListItemDto } from "@cmsjs/cms/model";
 import { NotizieMedia } from "@cmsjs/components/notizie/notizie-media";
 import { EmptyState } from "@cmsjs/components/shared/empty-state";
+import { newsPath } from "@cmsjs/seo";
 import Link from "next/link";
 
 const editorialDateFormatter = new Intl.DateTimeFormat("it-IT", {
@@ -52,7 +53,7 @@ export function NewsSection({
             <article className="lg:col-span-7">
               <Link
                 className="group block overflow-hidden rounded-editorial-xl border border-outline-soft/50 bg-surface-lowest shadow-card transition-shadow hover:shadow-card-raised"
-                href={`/notizie/${lead.identity.slug}`}
+                href={newsPath(lead.identity.slug)}
               >
                 <figure className="relative aspect-[16/10] overflow-hidden bg-surface-container">
                   <NotizieMedia
@@ -99,7 +100,7 @@ export function NewsSection({
                       <article>
                         <Link
                           className="group grid grid-cols-[7rem_minmax(0,1fr)] gap-4 py-5 sm:grid-cols-[10rem_1fr] lg:grid-cols-[8.5rem_1fr]"
-                          href={`/notizie/${item.identity.slug}`}
+                          href={newsPath(item.identity.slug)}
                         >
                           <figure className="relative aspect-square overflow-hidden rounded-editorial-md bg-surface-container">
                             <NotizieMedia

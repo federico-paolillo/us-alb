@@ -31,7 +31,7 @@ function makeConfig(): AppConfig {
   return Object.freeze({
     cmsUrl: new URL(requireEnvVar("CMS_URL")),
     cmsMediaUrl: new URL(requireEnvVar("CMS_MEDIA_URL")),
-    cmsApiToken: requireEnvVar("CMS_API_TOKEN"),
+    cmsApiToken: optionalEnvVar("CMS_API_TOKEN"),
     cmsWebhooksSecretHeader: requireEnvVar("CMS_WEBHOOKS_SECRET_HEADER"),
     cmsWebhooksSecretHeaderValue: requireEnvVar(
       "CMS_WEBHOOKS_SECRET_HEADER_VALUE",
@@ -39,6 +39,10 @@ function makeConfig(): AppConfig {
     previewSecret: requireEnvVar("PREVIEW_SECRET"),
     siteUrl: new URL(requireEnvVar("SITE_URL")),
   });
+}
+
+function optionalEnvVar(value: EnvVarKey): string | null {
+  return process.env[value]?.trim() || null;
 }
 
 function requireEnvVar(value: EnvVarKey): string {

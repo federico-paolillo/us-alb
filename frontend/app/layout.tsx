@@ -9,6 +9,7 @@ import {
   MobileSiteNavFallback,
 } from "@cmsjs/components/layout/site-nav";
 import { config } from "@cmsjs/config";
+import { createOrganizationJsonLd, serializeJsonLd } from "@cmsjs/seo";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
@@ -17,6 +18,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  const organizationJsonLd = createOrganizationJsonLd(config.siteUrl);
+
   return (
     <html
       className={`${epilogue.variable} ${manrope.variable}`}
@@ -24,6 +27,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="it"
     >
       <body className="mobile-shell-clearance flex min-h-screen flex-col antialiased">
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: The tested serializer escapes HTML starts in this fixed JSON-LD payload.
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(organizationJsonLd),
+          }}
+          type="application/ld+json"
+        />
         <a
           className="fixed top-3 left-3 z-[100] -translate-y-24 rounded-editorial-md bg-inverse px-4 py-3 font-body text-sm font-semibold text-inverse-text shadow-overlay transition-transform focus:translate-y-0"
           href="#contenuto"

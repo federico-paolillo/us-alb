@@ -4,14 +4,24 @@ import {
   listOfficialDocuments,
 } from "@cmsjs/cms/data";
 import { NotizieListPage } from "@cmsjs/components/notizie/list-page";
+import { splitNewsLead } from "@cmsjs/components/notizie/presentation";
+import { createPageMetadata, NEWS_DESCRIPTION } from "@cmsjs/seo";
 import type { Metadata } from "next";
 import { io } from "next/cache";
 
-export const metadata: Metadata = {
-  title: "Notizie e calendario",
-  description:
-    "Notizie, risultati, appuntamenti e documenti ufficiali dell’U.S. Albatese.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  await io();
+  const news = await listNews();
+
+  return createPageMetadata({
+    path: "/notizie",
+    title: "Notizie e calendario",
+    openGraphTitle: "Notizie e calendario | U.S. Albatese",
+    description: NEWS_DESCRIPTION,
+    image: splitNewsLead(news).lead?.heroImage,
+    type: "website",
+  });
+}
 
 export default async function NewsIndexRoute() {
   await io();
