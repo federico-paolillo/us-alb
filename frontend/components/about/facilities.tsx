@@ -1,12 +1,12 @@
-import type { FacilityDto } from "@cmsjs/cms/model";
+import type { LocationDto } from "@cmsjs/cms/model";
 import { AboutMedia } from "@cmsjs/components/about/about-media";
 
 export function FacilitiesSection({
-  facilities,
+  locations,
 }: {
-  facilities: readonly FacilityDto[];
+  locations: readonly LocationDto[];
 }) {
-  if (facilities.length === 0) return null;
+  if (locations.length === 0) return null;
 
   return (
     <section
@@ -26,31 +26,31 @@ export function FacilitiesSection({
         </h2>
 
         <ul className="mt-9 grid gap-7 md:mt-12 md:grid-cols-2 md:gap-10">
-          {facilities.map((facility) => (
-            <li key={`${facility.name}-${facility.address}`}>
+          {locations.map((location) => (
+            <li key={location.documentId}>
               <article className="flex h-full flex-col overflow-hidden rounded-editorial-xl border border-outline-soft/50 bg-surface-lowest shadow-card">
-                {facility.image && (
+                {location.aboutImage && (
                   <figure className="relative aspect-video overflow-hidden bg-surface-container">
                     <AboutMedia
-                      image={facility.image}
+                      image={location.aboutImage}
                       sizes="(min-width: 1280px) 576px, (min-width: 768px) 46vw, calc(100vw - 40px)"
                     />
                   </figure>
                 )}
                 <div className="flex flex-1 flex-col p-6 md:p-8">
-                  {facility.name.trim() && (
+                  {location.name.trim() && (
                     <h3 className="font-display text-xl leading-7 font-semibold text-ink md:text-headline-md">
-                      {facility.name}
+                      {location.name}
                     </h3>
                   )}
-                  {facility.summary.trim() && (
+                  {location.aboutSummary?.trim() && (
                     <p className="mt-4 whitespace-pre-line text-sm leading-6 text-ink-muted">
-                      {facility.summary}
+                      {location.aboutSummary}
                     </p>
                   )}
-                  {facility.address.trim() && (
+                  {location.address.trim() && (
                     <address className="mt-6 border-t border-outline-soft/60 pt-5 text-sm leading-6 font-semibold text-ink-variant not-italic">
-                      {facility.address}
+                      {location.address}
                     </address>
                   )}
                 </div>

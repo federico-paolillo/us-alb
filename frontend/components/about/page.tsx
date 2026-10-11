@@ -1,3 +1,4 @@
+import { listLocations } from "@cmsjs/cms/data";
 import type { AboutPageDto } from "@cmsjs/cms/model";
 import { BoardSection } from "@cmsjs/components/about/board";
 import { DocumentsIntro } from "@cmsjs/components/about/documents-intro";
@@ -6,12 +7,22 @@ import { type AboutSectionLink, Hero } from "@cmsjs/components/about/hero";
 import { HistorySection } from "@cmsjs/components/about/history";
 import { TimelineSection } from "@cmsjs/components/about/timeline";
 import { ValuesSection } from "@cmsjs/components/about/values";
+import { io } from "next/cache";
 
 function hasText(value: string): boolean {
   return value.trim().length > 0;
 }
 
-export function AboutPage({ page }: { page: AboutPageDto }) {
+export async function AboutPage({ page }: { page: AboutPageDto }) {
+  await io();
+  const locations = (await listLocations()).filter(
+    (location) =>
+      location.showOnAbout &&
+      (hasText(location.name) ||
+        hasText(location.aboutSummary ?? "") ||
+        hasText(location.address) ||
+        Boolean(location.aboutImage)),
+  );
   const timeline = page.timeline.filter(
     (entry) =>
       hasText(entry.year) || hasText(entry.title) || hasText(entry.body),
@@ -25,13 +36,6 @@ export function AboutPage({ page }: { page: AboutPageDto }) {
       hasText(member.role) ||
       hasText(member.bio) ||
       Boolean(member.portrait),
-  );
-  const facilities = page.facilities.filter(
-    (facility) =>
-      hasText(facility.name) ||
-      hasText(facility.summary) ||
-      hasText(facility.address) ||
-      Boolean(facility.image),
   );
   const hasDocuments =
     hasText(page.documentTitle) || hasText(page.documentIntroduction);
@@ -49,7 +53,7 @@ export function AboutPage({ page }: { page: AboutPageDto }) {
     ...(boardMembers.length > 0
       ? [{ href: "#direttivo" as const, label: "Direttivo" }]
       : []),
-    ...(facilities.length > 0
+    ...(locations.length > 0
       ? [{ href: "#impianti" as const, label: "Impianti" }]
       : []),
     ...(hasDocuments
@@ -70,7 +74,7 @@ export function AboutPage({ page }: { page: AboutPageDto }) {
       <TimelineSection entries={timeline} />
       <ValuesSection values={values} />
       <BoardSection members={boardMembers} />
-      <FacilitiesSection facilities={facilities} />
+      <FacilitiesSection locations={locations} />
       <DocumentsIntro
         eyebrow={page.documentEyebrow}
         introduction={page.documentIntroduction}

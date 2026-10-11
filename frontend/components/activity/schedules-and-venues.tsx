@@ -1,15 +1,15 @@
-import type { ScheduleDto, VenueDto } from "@cmsjs/cms/model";
+import type { LocationDto, ScheduleDto } from "@cmsjs/cms/model";
 
 export function SchedulesAndVenues({
+  locations,
   schedules,
-  venues,
 }: {
+  locations: readonly LocationDto[];
   schedules: readonly ScheduleDto[];
-  venues: readonly VenueDto[];
 }) {
-  if (schedules.length === 0 && venues.length === 0) return null;
+  if (schedules.length === 0 && locations.length === 0) return null;
 
-  const hasBoth = schedules.length > 0 && venues.length > 0;
+  const hasBoth = schedules.length > 0 && locations.length > 0;
 
   return (
     <section
@@ -84,7 +84,7 @@ export function SchedulesAndVenues({
             </section>
           )}
 
-          {venues.length > 0 && (
+          {locations.length > 0 && (
             <section
               aria-labelledby="sedi-heading"
               className={hasBoth ? "lg:col-span-4" : "lg:col-span-12"}
@@ -98,22 +98,22 @@ export function SchedulesAndVenues({
               <ul
                 className={`mt-5 grid gap-4 ${hasBoth ? "" : "md:grid-cols-2"}`}
               >
-                {venues.map((venue, index) => (
-                  <li key={`${venue.name}-${venue.address}-${index}`}>
+                {locations.map((location) => (
+                  <li key={location.documentId}>
                     <article className="h-full rounded-editorial-lg border border-outline-soft/50 bg-inverse p-5 text-inverse-text shadow-card md:p-6">
-                      {venue.name.trim() && (
+                      {location.name.trim() && (
                         <h4 className="font-display text-lg leading-7 font-semibold">
-                          {venue.name}
+                          {location.name}
                         </h4>
                       )}
-                      {venue.address.trim() && (
+                      {location.address.trim() && (
                         <address className="mt-3 text-sm leading-6 font-semibold text-gold-pale not-italic">
-                          {venue.address}
+                          {location.address}
                         </address>
                       )}
-                      {venue.details.trim() && (
+                      {location.activityDetails?.trim() && (
                         <p className="mt-4 whitespace-pre-line text-sm leading-6 text-inverse-text/70">
-                          {venue.details}
+                          {location.activityDetails}
                         </p>
                       )}
                     </article>

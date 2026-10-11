@@ -55,12 +55,6 @@ multi-line `body`. About uses a required repeatable list of values.
 image. About uses a required repeatable board. Seed content must use fictional
 people.
 
-### Content / Facility
-
-`content.facility` has required `name` capped at 160 characters, required
-multi-line `summary`, required `address` capped at 240, and an optional single
-image. About uses a required repeatable facilities list.
-
 ### Content / Sport Program
 
 `content.sport-program` has required `group`, required `title` capped at 160
@@ -74,12 +68,6 @@ repeatable programs list.
 `content.schedule` has required `title`, `days`, and `venue` strings capped at
 160 characters and required `time` capped at 100. Activity uses a required
 repeatable schedules list.
-
-### Content / Venue
-
-`content.venue` has required `name` capped at 160 characters, required `address`
-capped at 240, and required multi-line `details`. Activity uses a required
-repeatable venues list.
 
 ### Content / Feature
 
@@ -123,23 +111,26 @@ Location addresses and methods in its bottom contact section. Preview targets
 `about-page` is a single type consumed by `/chi-siamo` through `getAboutPage`.
 It has required `eyebrow` capped at 80 characters, required `headline` capped
 at 200, required multi-line `introduction`, one required hero image, and
-required blocks `history`. Timeline entries, values, board members, and
-facilities are required repeatable components with at least one item each.
+required blocks `history`. Timeline entries, values, and board members are
+required repeatable components with at least one item each.
 `documentEyebrow` is required and capped at 80 characters, `documentTitle` is
 required and capped at 160, and `documentIntroduction` is required multi-line
-text. Its frontend DTO is `AboutPageDto` with discriminant `pageType: "about"`.
-Preview targets `/chi-siamo`.
+text. Its frontend DTO is `AboutPageDto` with discriminant `pageType: "about"`;
+the page separately reads the ordered Location collection and filters it only
+by `showOnAbout`. Preview targets `/chi-siamo`.
 
 ### Activity Page
 
 `activity-page` is a single type consumed by `/attivita` through
 `getActivityPage`. It has required `eyebrow` capped at 80 characters, required
 `headline` capped at 200, required multi-line `introduction`, and one required
-hero image. Programs, schedules, venues, and registration steps are required
+hero image. Programs, schedules, and registration steps are required
 repeatable components with at least one item each. The open-team and athletics
 features are each required single components; `registrationIntroduction` is
 required multi-line text. Its frontend DTO is `ActivityPageDto` with
-discriminant `pageType: "activity"`. Preview targets `/attivita`.
+discriminant `pageType: "activity"`; the page separately reads the ordered
+Location collection and filters it only by `showOnActivity`. Preview targets
+`/attivita`.
 
 ### Location
 
@@ -152,15 +143,14 @@ defaults to zero and cannot be negative. Required `showOnHome`, `showOnAbout`,
 and `showOnActivity` switches each default to `false`, so a new location is not
 shown until an editor opts it into a page.
 
-Location is additive at this stage. About's required repeatable `facilities`
-still uses `content.facility`, Activity's required repeatable `venues` still
-uses `content.venue`, and schedule `venue` remains required free text. Those
-embedded models continue to supply the current frontend through task 04; the
-Location collection now has a status-aware `LocationDto` list read in the CMS
-pipeline. Home filters that list by `showOnHome` and presents each visible
-Location's name, address, and contact methods; About and Activity do not consume
-it until task 04. It has no Public role permission, and demonstration archive
-content remains pending until task 05.
+The Location collection has a status-aware `LocationDto` list read in the CMS
+pipeline. Home, About, and Activity preserve its `displayOrder` then name order
+and filter it only by `showOnHome`, `showOnAbout`, or `showOnActivity`,
+respectively. Home presents each visible Location's name, address, and contact
+methods; About uses `aboutSummary` and `aboutImage`; Activity uses
+`activityDetails`. Schedule `venue` remains required editorial free text and is
+not resolved against Location records. Location has no Public role permission,
+and demonstration archive content remains pending until task 05.
 
 ### News
 

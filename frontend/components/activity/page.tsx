@@ -1,3 +1,4 @@
+import { listLocations } from "@cmsjs/cms/data";
 import type { ActivityPageDto, FeatureDto } from "@cmsjs/cms/model";
 import { FeatureSection } from "@cmsjs/components/activity/feature";
 import {
@@ -7,6 +8,7 @@ import {
 import { ProgramsSection } from "@cmsjs/components/activity/programs";
 import { RegistrationSection } from "@cmsjs/components/activity/registration";
 import { SchedulesAndVenues } from "@cmsjs/components/activity/schedules-and-venues";
+import { io } from "next/cache";
 
 function hasText(value: string | undefined): boolean {
   return Boolean(value?.trim());
@@ -21,7 +23,15 @@ function hasFeatureContent(feature: FeatureDto): boolean {
   );
 }
 
-export function ActivityPage({ page }: { page: ActivityPageDto }) {
+export async function ActivityPage({ page }: { page: ActivityPageDto }) {
+  await io();
+  const locations = (await listLocations()).filter(
+    (location) =>
+      location.showOnActivity &&
+      (hasText(location.name) ||
+        hasText(location.address) ||
+        hasText(location.activityDetails)),
+  );
   const programs = page.programs.filter(
     (program) =>
       hasText(program.title) ||
@@ -35,10 +45,6 @@ export function ActivityPage({ page }: { page: ActivityPageDto }) {
       hasText(schedule.days) ||
       hasText(schedule.time) ||
       hasText(schedule.venue),
-  );
-  const venues = page.venues.filter(
-    (venue) =>
-      hasText(venue.name) || hasText(venue.address) || hasText(venue.details),
   );
   const registrationSteps = page.registrationSteps
     .filter(
@@ -98,7 +104,7 @@ export function ActivityPage({ page }: { page: ActivityPageDto }) {
           mediaPosition="end"
         />
       )}
-      <SchedulesAndVenues schedules={schedules} venues={venues} />
+      <SchedulesAndVenues locations={locations} schedules={schedules} />
       <RegistrationSection
         introduction={page.registrationIntroduction}
         steps={registrationSteps}

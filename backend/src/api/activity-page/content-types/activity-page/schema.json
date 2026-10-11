@@ -13,13 +13,13 @@
   "attributes": {
     "eyebrow": {
       "type": "string",
-      "required": true,
-      "maxLength": 80
+      "maxLength": 80,
+      "required": true
     },
     "headline": {
       "type": "string",
-      "required": true,
-      "maxLength": 200
+      "maxLength": 200,
+      "required": true
     },
     "introduction": {
       "type": "text",
@@ -43,13 +43,6 @@
     "schedules": {
       "type": "component",
       "component": "content.schedule",
-      "repeatable": true,
-      "required": true,
-      "min": 1
-    },
-    "venues": {
-      "type": "component",
-      "component": "content.venue",
       "repeatable": true,
       "required": true,
       "min": 1

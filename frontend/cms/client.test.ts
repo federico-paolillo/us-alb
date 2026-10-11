@@ -60,9 +60,14 @@ describe("CmsClient queries", () => {
     expect(
       urls[1]?.searchParams.get("populate[boardMembers][populate][portrait]"),
     ).toBe("true");
+    expect(urls[1]?.searchParams.get("populate[facilities]")).toBeNull();
+    expect(
+      urls[1]?.searchParams.get("populate[facilities][populate][image]"),
+    ).toBeNull();
     expect(
       urls[2]?.searchParams.get("populate[programs][populate][image]"),
     ).toBe("true");
+    expect(urls[2]?.searchParams.get("populate[venues]")).toBeNull();
     expect(urls[3]?.searchParams.get("filters[identity][slug][$eq]")).toBe(
       "una-notizia",
     );

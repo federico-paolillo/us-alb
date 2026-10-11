@@ -13,13 +13,13 @@
   "attributes": {
     "eyebrow": {
       "type": "string",
-      "required": true,
-      "maxLength": 80
+      "maxLength": 80,
+      "required": true
     },
     "headline": {
       "type": "string",
-      "required": true,
-      "maxLength": 200
+      "maxLength": 200,
+      "required": true
     },
     "introduction": {
       "type": "text",
@@ -58,22 +58,15 @@
       "required": true,
       "min": 1
     },
-    "facilities": {
-      "type": "component",
-      "component": "content.facility",
-      "repeatable": true,
-      "required": true,
-      "min": 1
-    },
     "documentEyebrow": {
       "type": "string",
-      "required": true,
-      "maxLength": 80
+      "maxLength": 80,
+      "required": true
     },
     "documentTitle": {
       "type": "string",
-      "required": true,
-      "maxLength": 160
+      "maxLength": 160,
+      "required": true
     },
     "documentIntroduction": {
       "type": "text",

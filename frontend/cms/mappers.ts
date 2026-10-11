@@ -18,7 +18,6 @@ import type {
   CallToActionDto,
   ContactMethodDto,
   ContactMethodKind,
-  FacilityDto,
   FeatureDto,
   FileDto,
   HomePageDto,
@@ -39,7 +38,6 @@ import type {
   TextDto,
   TimelineEntryDto,
   ValueDto,
-  VenueDto,
 } from "@cmsjs/cms/model";
 import type { ContentStatus } from "@cmsjs/cms/preview";
 import { ok, type Result, validationError } from "@cmsjs/cms/result";
@@ -902,31 +900,6 @@ export function toAboutPageDto(
           : undefined;
       },
     );
-    const facilities = entries<FacilityDto>(
-      node.facilities,
-      "$.facilities",
-      p,
-      status,
-      (n, path) => {
-        const base = strings3(n, path, p, status, [
-          "name",
-          "summary",
-          "address",
-        ]);
-        const mappedImage = optionalImage(
-          n.image,
-          `${path}.image`,
-          p,
-          mediaBaseUrl,
-        );
-        return base
-          ? ({
-              ...base,
-              ...(mappedImage ? { image: mappedImage } : {}),
-            } as FacilityDto)
-          : undefined;
-      },
-    );
     const scalar = strings3(node, "$", p, status, [
       "eyebrow",
       "headline",
@@ -940,7 +913,6 @@ export function toAboutPageDto(
       !timeline ||
       !values ||
       !boardMembers ||
-      !facilities ||
       !scalar
       ? undefined
       : ({
@@ -951,7 +923,6 @@ export function toAboutPageDto(
           timeline,
           values,
           boardMembers,
-          facilities,
         } as AboutPageDto);
   });
 }
@@ -1032,16 +1003,6 @@ export function toActivityPageDto(
           "venue",
         ]) as unknown as ScheduleDto,
     );
-    const venues = entries<VenueDto>(
-      node.venues,
-      "$.venues",
-      p,
-      status,
-      (n, path) =>
-        strings3(n, path, p, status, ["name", "address", "details"]) as
-          | VenueDto
-          | undefined,
-    );
     const feature = (value: unknown, path: string): FeatureDto | undefined => {
       const n = object(value, path, p);
       if (!n) return;
@@ -1090,7 +1051,6 @@ export function toActivityPageDto(
     return !heroImage ||
       !programs ||
       !schedules ||
-      !venues ||
       !openTeamFeature ||
       !athleticsFeature ||
       !registrationSteps ||
@@ -1102,7 +1062,6 @@ export function toActivityPageDto(
           heroImage,
           programs,
           schedules,
-          venues,
           openTeamFeature,
           athleticsFeature,
           registrationSteps,

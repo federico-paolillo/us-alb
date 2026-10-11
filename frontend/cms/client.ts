@@ -104,13 +104,11 @@ const aboutPopulate = {
   timeline: true,
   values: true,
   boardMembers: { populate: { portrait: true } },
-  facilities: { populate: { image: true } },
 };
 const activityPopulate = {
   heroImage: true,
   programs: { populate: { image: true } },
   schedules: true,
-  venues: true,
   openTeamFeature: { populate: { image: true } },
   athleticsFeature: { populate: { image: true } },
   registrationSteps: true,

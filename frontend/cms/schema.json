@@ -114,7 +114,7 @@
           },
           "publishedAt": {
             "description": "A datetime field",
-            "default": "2026-10-11T14:40:05.785Z",
+            "default": "2026-10-11T15:04:21.750Z",
             "type": "string"
           },
           "related": {}
@@ -197,31 +197,6 @@
         "additionalProperties": false,
         "id": "ContentBoardMemberEntry"
       },
-      "ContentFacilityEntry": {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "A string field",
-            "type": "string"
-          },
-          "summary": {
-            "description": "A text field",
-            "type": "string"
-          },
-          "address": {
-            "description": "A string field",
-            "type": "string"
-          },
-          "image": {
-            "description": "A media field",
-            "$ref": "#/components/schemas/PluginUploadFileDocument"
-          }
-        },
-        "required": ["name", "summary", "address"],
-        "additionalProperties": false,
-        "id": "ContentFacilityEntry"
-      },
       "ContentSportProgramEntry": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -281,27 +256,6 @@
         "required": ["title", "days", "time", "venue"],
         "additionalProperties": false,
         "id": "ContentScheduleEntry"
-      },
-      "ContentVenueEntry": {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "A string field",
-            "type": "string"
-          },
-          "address": {
-            "description": "A string field",
-            "type": "string"
-          },
-          "details": {
-            "description": "A text field",
-            "type": "string"
-          }
-        },
-        "required": ["name", "address", "details"],
-        "additionalProperties": false,
-        "id": "ContentVenueEntry"
       },
       "ContentFeatureEntry": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -532,26 +486,14 @@
                   "description": "Populate a single relation, component, file, or dynamic zone",
                   "readOnly": true,
                   "type": "string",
-                  "enum": [
-                    "heroImage",
-                    "timeline",
-                    "values",
-                    "boardMembers",
-                    "facilities"
-                  ]
+                  "enum": ["heroImage", "timeline", "values", "boardMembers"]
                 },
                 {
                   "description": "Populate a selection of multiple relations, components, files, or dynamic zones",
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "enum": [
-                      "heroImage",
-                      "timeline",
-                      "values",
-                      "boardMembers",
-                      "facilities"
-                    ]
+                    "enum": ["heroImage", "timeline", "values", "boardMembers"]
                   }
                 }
               ]
@@ -707,7 +649,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:05.776Z",
+                          "default": "2026-10-11T15:04:21.741Z",
                           "type": "string"
                         },
                         "heroImage": {
@@ -737,14 +679,6 @@
                           "items": {
                             "$ref": "#/components/schemas/ContentBoardMemberEntry"
                           }
-                        },
-                        "facilities": {
-                          "description": "A component field",
-                          "minItems": 1,
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/ContentFacilityEntry"
-                          }
                         }
                       },
                       "required": [
@@ -761,8 +695,7 @@
                         "heroImage",
                         "timeline",
                         "values",
-                        "boardMembers",
-                        "facilities"
+                        "boardMembers"
                       ],
                       "additionalProperties": false
                     }
@@ -838,26 +771,14 @@
                   "description": "Populate a single relation, component, file, or dynamic zone",
                   "readOnly": true,
                   "type": "string",
-                  "enum": [
-                    "heroImage",
-                    "timeline",
-                    "values",
-                    "boardMembers",
-                    "facilities"
-                  ]
+                  "enum": ["heroImage", "timeline", "values", "boardMembers"]
                 },
                 {
                   "description": "Populate a selection of multiple relations, components, files, or dynamic zones",
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "enum": [
-                      "heroImage",
-                      "timeline",
-                      "values",
-                      "boardMembers",
-                      "facilities"
-                    ]
+                    "enum": ["heroImage", "timeline", "values", "boardMembers"]
                   }
                 }
               ]
@@ -984,7 +905,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:05.808Z",
+                          "default": "2026-10-11T15:04:21.768Z",
                           "type": "string"
                         },
                         "heroImage": {
@@ -1014,14 +935,6 @@
                           "items": {
                             "$ref": "#/components/schemas/ContentBoardMemberEntry"
                           }
-                        },
-                        "facilities": {
-                          "description": "A component field",
-                          "minItems": 1,
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/ContentFacilityEntry"
-                          }
                         }
                       },
                       "required": [
@@ -1038,8 +951,7 @@
                         "heroImage",
                         "timeline",
                         "values",
-                        "boardMembers",
-                        "facilities"
+                        "boardMembers"
                       ],
                       "additionalProperties": false
                     }
@@ -1108,7 +1020,7 @@
                       },
                       "publishedAt": {
                         "description": "A datetime field",
-                        "default": "2026-10-11T14:40:05.805Z",
+                        "default": "2026-10-11T15:04:21.764Z",
                         "type": "string"
                       },
                       "heroImage": {
@@ -1127,12 +1039,6 @@
                         "items": {}
                       },
                       "boardMembers": {
-                        "description": "A component field",
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {}
-                      },
-                      "facilities": {
                         "description": "A component field",
                         "minItems": 1,
                         "type": "array",
@@ -1196,26 +1102,14 @@
                   "description": "Populate a single relation, component, file, or dynamic zone",
                   "readOnly": true,
                   "type": "string",
-                  "enum": [
-                    "heroImage",
-                    "timeline",
-                    "values",
-                    "boardMembers",
-                    "facilities"
-                  ]
+                  "enum": ["heroImage", "timeline", "values", "boardMembers"]
                 },
                 {
                   "description": "Populate a selection of multiple relations, components, files, or dynamic zones",
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "enum": [
-                      "heroImage",
-                      "timeline",
-                      "values",
-                      "boardMembers",
-                      "facilities"
-                    ]
+                    "enum": ["heroImage", "timeline", "values", "boardMembers"]
                   }
                 }
               ]
@@ -1342,7 +1236,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:05.814Z",
+                          "default": "2026-10-11T15:04:21.773Z",
                           "type": "string"
                         },
                         "heroImage": {
@@ -1372,14 +1266,6 @@
                           "items": {
                             "$ref": "#/components/schemas/ContentBoardMemberEntry"
                           }
-                        },
-                        "facilities": {
-                          "description": "A component field",
-                          "minItems": 1,
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/ContentFacilityEntry"
-                          }
                         }
                       },
                       "required": [
@@ -1396,8 +1282,7 @@
                         "heroImage",
                         "timeline",
                         "values",
-                        "boardMembers",
-                        "facilities"
+                        "boardMembers"
                       ],
                       "additionalProperties": false
                     }
@@ -1476,7 +1361,6 @@
                     "heroImage",
                     "programs",
                     "schedules",
-                    "venues",
                     "openTeamFeature",
                     "athleticsFeature",
                     "registrationSteps"
@@ -1491,7 +1375,6 @@
                       "heroImage",
                       "programs",
                       "schedules",
-                      "venues",
                       "openTeamFeature",
                       "athleticsFeature",
                       "registrationSteps"
@@ -1635,7 +1518,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:05.823Z",
+                          "default": "2026-10-11T15:04:21.782Z",
                           "type": "string"
                         },
                         "heroImage": {
@@ -1656,14 +1539,6 @@
                           "type": "array",
                           "items": {
                             "$ref": "#/components/schemas/ContentScheduleEntry"
-                          }
-                        },
-                        "venues": {
-                          "description": "A component field",
-                          "minItems": 1,
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/ContentVenueEntry"
                           }
                         },
                         "openTeamFeature": {
@@ -1694,7 +1569,6 @@
                         "heroImage",
                         "programs",
                         "schedules",
-                        "venues",
                         "openTeamFeature",
                         "athleticsFeature",
                         "registrationSteps"
@@ -1774,7 +1648,6 @@
                     "heroImage",
                     "programs",
                     "schedules",
-                    "venues",
                     "openTeamFeature",
                     "athleticsFeature",
                     "registrationSteps"
@@ -1789,7 +1662,6 @@
                       "heroImage",
                       "programs",
                       "schedules",
-                      "venues",
                       "openTeamFeature",
                       "athleticsFeature",
                       "registrationSteps"
@@ -1907,7 +1779,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:05.840Z",
+                          "default": "2026-10-11T15:04:21.803Z",
                           "type": "string"
                         },
                         "heroImage": {
@@ -1928,14 +1800,6 @@
                           "type": "array",
                           "items": {
                             "$ref": "#/components/schemas/ContentScheduleEntry"
-                          }
-                        },
-                        "venues": {
-                          "description": "A component field",
-                          "minItems": 1,
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/ContentVenueEntry"
                           }
                         },
                         "openTeamFeature": {
@@ -1966,7 +1830,6 @@
                         "heroImage",
                         "programs",
                         "schedules",
-                        "venues",
                         "openTeamFeature",
                         "athleticsFeature",
                         "registrationSteps"
@@ -2025,7 +1888,7 @@
                       },
                       "publishedAt": {
                         "description": "A datetime field",
-                        "default": "2026-10-11T14:40:05.836Z",
+                        "default": "2026-10-11T15:04:21.800Z",
                         "type": "string"
                       },
                       "heroImage": {
@@ -2038,12 +1901,6 @@
                         "items": {}
                       },
                       "schedules": {
-                        "description": "A component field",
-                        "minItems": 1,
-                        "type": "array",
-                        "items": {}
-                      },
-                      "venues": {
                         "description": "A component field",
                         "minItems": 1,
                         "type": "array",
@@ -2120,7 +1977,6 @@
                     "heroImage",
                     "programs",
                     "schedules",
-                    "venues",
                     "openTeamFeature",
                     "athleticsFeature",
                     "registrationSteps"
@@ -2135,7 +1991,6 @@
                       "heroImage",
                       "programs",
                       "schedules",
-                      "venues",
                       "openTeamFeature",
                       "athleticsFeature",
                       "registrationSteps"
@@ -2253,7 +2108,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:05.845Z",
+                          "default": "2026-10-11T15:04:21.808Z",
                           "type": "string"
                         },
                         "heroImage": {
@@ -2274,14 +2129,6 @@
                           "type": "array",
                           "items": {
                             "$ref": "#/components/schemas/ContentScheduleEntry"
-                          }
-                        },
-                        "venues": {
-                          "description": "A component field",
-                          "minItems": 1,
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/ContentVenueEntry"
                           }
                         },
                         "openTeamFeature": {
@@ -2312,7 +2159,6 @@
                         "heroImage",
                         "programs",
                         "schedules",
-                        "venues",
                         "openTeamFeature",
                         "athleticsFeature",
                         "registrationSteps"
@@ -2752,7 +2598,7 @@
                           },
                           "publishedAt": {
                             "description": "A datetime field",
-                            "default": "2026-10-11T14:40:05.855Z",
+                            "default": "2026-10-11T15:04:21.817Z",
                             "type": "string"
                           },
                           "callToAction": {
@@ -2999,7 +2845,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:05.869Z",
+                          "default": "2026-10-11T15:04:21.832Z",
                           "type": "string"
                         },
                         "callToAction": {
@@ -3101,7 +2947,7 @@
                       },
                       "publishedAt": {
                         "description": "A datetime field",
-                        "default": "2026-10-11T14:40:05.867Z",
+                        "default": "2026-10-11T15:04:21.829Z",
                         "type": "string"
                       },
                       "callToAction": {
@@ -3477,7 +3323,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:05.862Z",
+                          "default": "2026-10-11T15:04:21.824Z",
                           "type": "string"
                         },
                         "callToAction": {
@@ -3735,7 +3581,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:05.878Z",
+                          "default": "2026-10-11T15:04:21.845Z",
                           "type": "string"
                         },
                         "callToAction": {
@@ -3837,7 +3683,7 @@
                       },
                       "publishedAt": {
                         "description": "A datetime field",
-                        "default": "2026-10-11T14:40:05.874Z",
+                        "default": "2026-10-11T15:04:21.840Z",
                         "type": "string"
                       },
                       "callToAction": {
@@ -4098,7 +3944,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:05.882Z",
+                          "default": "2026-10-11T15:04:21.850Z",
                           "type": "string"
                         },
                         "callToAction": {
@@ -4355,7 +4201,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:05.889Z",
+                          "default": "2026-10-11T15:04:21.857Z",
                           "type": "string"
                         },
                         "heroImage": {
@@ -4611,7 +4457,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:05.904Z",
+                          "default": "2026-10-11T15:04:21.870Z",
                           "type": "string"
                         },
                         "heroImage": {
@@ -4716,7 +4562,7 @@
                       },
                       "publishedAt": {
                         "description": "A datetime field",
-                        "default": "2026-10-11T14:40:05.902Z",
+                        "default": "2026-10-11T15:04:21.867Z",
                         "type": "string"
                       },
                       "heroImage": {
@@ -4935,7 +4781,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:05.909Z",
+                          "default": "2026-10-11T15:04:21.874Z",
                           "type": "string"
                         },
                         "heroImage": {
@@ -5419,7 +5265,7 @@
                           },
                           "publishedAt": {
                             "description": "A datetime field",
-                            "default": "2026-10-11T14:40:05.922Z",
+                            "default": "2026-10-11T15:04:21.882Z",
                             "type": "string"
                           },
                           "aboutImage": {
@@ -5685,7 +5531,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:05.981Z",
+                          "default": "2026-10-11T15:04:21.895Z",
                           "type": "string"
                         },
                         "aboutImage": {
@@ -5811,7 +5657,7 @@
                       },
                       "publishedAt": {
                         "description": "A datetime field",
-                        "default": "2026-10-11T14:40:05.977Z",
+                        "default": "2026-10-11T15:04:21.892Z",
                         "type": "string"
                       },
                       "aboutImage": {
@@ -6194,7 +6040,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:05.928Z",
+                          "default": "2026-10-11T15:04:21.887Z",
                           "type": "string"
                         },
                         "aboutImage": {
@@ -6471,7 +6317,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:05.990Z",
+                          "default": "2026-10-11T15:04:21.926Z",
                           "type": "string"
                         },
                         "aboutImage": {
@@ -6597,7 +6443,7 @@
                       },
                       "publishedAt": {
                         "description": "A datetime field",
-                        "default": "2026-10-11T14:40:05.987Z",
+                        "default": "2026-10-11T15:04:21.899Z",
                         "type": "string"
                       },
                       "aboutImage": {
@@ -6873,7 +6719,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:06.001Z",
+                          "default": "2026-10-11T15:04:21.930Z",
                           "type": "string"
                         },
                         "aboutImage": {
@@ -7288,7 +7134,7 @@
                           },
                           "publishedAt": {
                             "description": "A datetime field",
-                            "default": "2026-10-11T14:40:06.027Z",
+                            "default": "2026-10-11T15:04:21.938Z",
                             "type": "string"
                           },
                           "identity": {
@@ -7519,7 +7365,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:06.056Z",
+                          "default": "2026-10-11T15:04:21.950Z",
                           "type": "string"
                         },
                         "identity": {
@@ -7611,7 +7457,7 @@
                       },
                       "publishedAt": {
                         "description": "A datetime field",
-                        "default": "2026-10-11T14:40:06.054Z",
+                        "default": "2026-10-11T15:04:21.948Z",
                         "type": "string"
                       },
                       "identity": {
@@ -7945,7 +7791,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:06.050Z",
+                          "default": "2026-10-11T15:04:21.944Z",
                           "type": "string"
                         },
                         "identity": {
@@ -8187,7 +8033,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:06.066Z",
+                          "default": "2026-10-11T15:04:21.958Z",
                           "type": "string"
                         },
                         "identity": {
@@ -8279,7 +8125,7 @@
                       },
                       "publishedAt": {
                         "description": "A datetime field",
-                        "default": "2026-10-11T14:40:06.064Z",
+                        "default": "2026-10-11T15:04:21.955Z",
                         "type": "string"
                       },
                       "identity": {
@@ -8517,7 +8363,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:06.125Z",
+                          "default": "2026-10-11T15:04:21.963Z",
                           "type": "string"
                         },
                         "identity": {
@@ -8914,7 +8760,7 @@
                           },
                           "publishedAt": {
                             "description": "A datetime field",
-                            "default": "2026-10-11T14:40:06.133Z",
+                            "default": "2026-10-11T15:04:21.972Z",
                             "type": "string"
                           },
                           "file": {
@@ -9128,7 +8974,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:06.153Z",
+                          "default": "2026-10-11T15:04:21.983Z",
                           "type": "string"
                         },
                         "file": {
@@ -9203,7 +9049,7 @@
                       },
                       "publishedAt": {
                         "description": "A datetime field",
-                        "default": "2026-10-11T14:40:06.152Z",
+                        "default": "2026-10-11T15:04:21.982Z",
                         "type": "string"
                       },
                       "file": {
@@ -9516,7 +9362,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:06.144Z",
+                          "default": "2026-10-11T15:04:21.978Z",
                           "type": "string"
                         },
                         "file": {
@@ -9741,7 +9587,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:06.162Z",
+                          "default": "2026-10-11T15:04:21.989Z",
                           "type": "string"
                         },
                         "file": {
@@ -9816,7 +9662,7 @@
                       },
                       "publishedAt": {
                         "description": "A datetime field",
-                        "default": "2026-10-11T14:40:06.157Z",
+                        "default": "2026-10-11T15:04:21.986Z",
                         "type": "string"
                       },
                       "file": {
@@ -10039,7 +9885,7 @@
                         },
                         "publishedAt": {
                           "description": "A datetime field",
-                          "default": "2026-10-11T14:40:06.165Z",
+                          "default": "2026-10-11T15:04:21.997Z",
                           "type": "string"
                         },
                         "file": {

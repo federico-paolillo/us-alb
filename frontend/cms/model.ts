@@ -110,12 +110,6 @@ export interface BoardMemberDto {
   bio: string;
   portrait?: ImageDto;
 }
-export interface FacilityDto {
-  name: string;
-  summary: string;
-  address: string;
-  image?: ImageDto;
-}
 export type SportProgramGroup =
   | "youth-football"
   | "competitive-football"
@@ -133,11 +127,6 @@ export interface ScheduleDto {
   days: string;
   time: string;
   venue: string;
-}
-export interface VenueDto {
-  name: string;
-  address: string;
-  details: string;
 }
 export interface FeatureDto {
   eyebrow?: string;
@@ -199,7 +188,6 @@ export interface AboutPageDto {
   timeline: TimelineEntryDto[];
   values: ValueDto[];
   boardMembers: BoardMemberDto[];
-  facilities: FacilityDto[];
   documentEyebrow: string;
   documentTitle: string;
   documentIntroduction: string;
@@ -212,7 +200,6 @@ export interface ActivityPageDto {
   heroImage: ImageDto;
   programs: SportProgramDto[];
   schedules: ScheduleDto[];
-  venues: VenueDto[];
   openTeamFeature: FeatureDto;
   athleticsFeature: FeatureDto;
   registrationIntroduction: string;

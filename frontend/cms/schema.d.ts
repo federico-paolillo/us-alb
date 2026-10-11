@@ -723,7 +723,7 @@ export interface components {
       updatedAt?: string;
       /**
        * @description A datetime field
-       * @default 2026-10-11T14:21:49.078Z
+       * @default 2026-10-11T15:04:21.750Z
        */
       publishedAt: string;
       related: unknown;
@@ -751,16 +751,6 @@ export interface components {
       bio: string;
       /** @description A media field */
       portrait?: components["schemas"]["PluginUploadFileDocument"];
-    };
-    ContentFacilityEntry: {
-      /** @description A string field */
-      name: string;
-      /** @description A text field */
-      summary: string;
-      /** @description A string field */
-      address: string;
-      /** @description A media field */
-      image?: components["schemas"]["PluginUploadFileDocument"];
     };
     ContentSportProgramEntry: {
       /**
@@ -790,14 +780,6 @@ export interface components {
       time: string;
       /** @description A string field */
       venue: string;
-    };
-    ContentVenueEntry: {
-      /** @description A string field */
-      name: string;
-      /** @description A string field */
-      address: string;
-      /** @description A text field */
-      details: string;
     };
     ContentFeatureEntry: {
       /** @description A string field */
@@ -892,20 +874,8 @@ export interface operations {
         )[];
         populate?:
           | "*"
-          | (
-              | "heroImage"
-              | "timeline"
-              | "values"
-              | "boardMembers"
-              | "facilities"
-            )
-          | (
-              | "heroImage"
-              | "timeline"
-              | "values"
-              | "boardMembers"
-              | "facilities"
-            )[];
+          | ("heroImage" | "timeline" | "values" | "boardMembers")
+          | ("heroImage" | "timeline" | "values" | "boardMembers")[];
         filters?: {
           [key: string]: unknown;
         };
@@ -961,7 +931,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.072Z
+               * @default 2026-10-11T15:04:21.741Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -972,8 +942,6 @@ export interface operations {
               values: components["schemas"]["ContentValueEntry"][];
               /** @description A component field */
               boardMembers: components["schemas"]["ContentBoardMemberEntry"][];
-              /** @description A component field */
-              facilities: components["schemas"]["ContentFacilityEntry"][];
             };
           };
         };
@@ -1032,20 +1000,8 @@ export interface operations {
         )[];
         populate?:
           | "*"
-          | (
-              | "heroImage"
-              | "timeline"
-              | "values"
-              | "boardMembers"
-              | "facilities"
-            )
-          | (
-              | "heroImage"
-              | "timeline"
-              | "values"
-              | "boardMembers"
-              | "facilities"
-            )[];
+          | ("heroImage" | "timeline" | "values" | "boardMembers")
+          | ("heroImage" | "timeline" | "values" | "boardMembers")[];
         status?: "draft" | "published";
         publicationFilter?:
           | "never-published"
@@ -1082,7 +1038,7 @@ export interface operations {
             documentIntroduction?: string;
             /**
              * @description A datetime field
-             * @default 2026-10-11T14:21:49.088Z
+             * @default 2026-10-11T15:04:21.764Z
              */
             publishedAt?: string;
             /** @description A media field */
@@ -1093,8 +1049,6 @@ export interface operations {
             values?: unknown[];
             /** @description A component field */
             boardMembers?: unknown[];
-            /** @description A component field */
-            facilities?: unknown[];
           };
         };
       };
@@ -1134,7 +1088,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.091Z
+               * @default 2026-10-11T15:04:21.768Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1145,8 +1099,6 @@ export interface operations {
               values: components["schemas"]["ContentValueEntry"][];
               /** @description A component field */
               boardMembers: components["schemas"]["ContentBoardMemberEntry"][];
-              /** @description A component field */
-              facilities: components["schemas"]["ContentFacilityEntry"][];
             };
           };
         };
@@ -1205,20 +1157,8 @@ export interface operations {
         )[];
         populate?:
           | "*"
-          | (
-              | "heroImage"
-              | "timeline"
-              | "values"
-              | "boardMembers"
-              | "facilities"
-            )
-          | (
-              | "heroImage"
-              | "timeline"
-              | "values"
-              | "boardMembers"
-              | "facilities"
-            )[];
+          | ("heroImage" | "timeline" | "values" | "boardMembers")
+          | ("heroImage" | "timeline" | "values" | "boardMembers")[];
         status?: "draft" | "published";
         publicationFilter?:
           | "never-published"
@@ -1271,7 +1211,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.095Z
+               * @default 2026-10-11T15:04:21.773Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1282,8 +1222,6 @@ export interface operations {
               values: components["schemas"]["ContentValueEntry"][];
               /** @description A component field */
               boardMembers: components["schemas"]["ContentBoardMemberEntry"][];
-              /** @description A component field */
-              facilities: components["schemas"]["ContentFacilityEntry"][];
             };
           };
         };
@@ -1343,7 +1281,6 @@ export interface operations {
               | "heroImage"
               | "programs"
               | "schedules"
-              | "venues"
               | "openTeamFeature"
               | "athleticsFeature"
               | "registrationSteps"
@@ -1352,7 +1289,6 @@ export interface operations {
               | "heroImage"
               | "programs"
               | "schedules"
-              | "venues"
               | "openTeamFeature"
               | "athleticsFeature"
               | "registrationSteps"
@@ -1406,7 +1342,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.101Z
+               * @default 2026-10-11T15:04:21.782Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1415,8 +1351,6 @@ export interface operations {
               programs: components["schemas"]["ContentSportProgramEntry"][];
               /** @description A component field */
               schedules: components["schemas"]["ContentScheduleEntry"][];
-              /** @description A component field */
-              venues: components["schemas"]["ContentVenueEntry"][];
               /** @description A component field */
               openTeamFeature: components["schemas"]["ContentFeatureEntry"];
               /** @description A component field */
@@ -1482,7 +1416,6 @@ export interface operations {
               | "heroImage"
               | "programs"
               | "schedules"
-              | "venues"
               | "openTeamFeature"
               | "athleticsFeature"
               | "registrationSteps"
@@ -1491,7 +1424,6 @@ export interface operations {
               | "heroImage"
               | "programs"
               | "schedules"
-              | "venues"
               | "openTeamFeature"
               | "athleticsFeature"
               | "registrationSteps"
@@ -1526,7 +1458,7 @@ export interface operations {
             registrationIntroduction?: string;
             /**
              * @description A datetime field
-             * @default 2026-10-11T14:21:49.112Z
+             * @default 2026-10-11T15:04:21.800Z
              */
             publishedAt?: string;
             /** @description A media field */
@@ -1535,8 +1467,6 @@ export interface operations {
             programs?: unknown[];
             /** @description A component field */
             schedules?: unknown[];
-            /** @description A component field */
-            venues?: unknown[];
             /** @description A component field */
             openTeamFeature?: unknown;
             /** @description A component field */
@@ -1576,7 +1506,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.115Z
+               * @default 2026-10-11T15:04:21.803Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1585,8 +1515,6 @@ export interface operations {
               programs: components["schemas"]["ContentSportProgramEntry"][];
               /** @description A component field */
               schedules: components["schemas"]["ContentScheduleEntry"][];
-              /** @description A component field */
-              venues: components["schemas"]["ContentVenueEntry"][];
               /** @description A component field */
               openTeamFeature: components["schemas"]["ContentFeatureEntry"];
               /** @description A component field */
@@ -1652,7 +1580,6 @@ export interface operations {
               | "heroImage"
               | "programs"
               | "schedules"
-              | "venues"
               | "openTeamFeature"
               | "athleticsFeature"
               | "registrationSteps"
@@ -1661,7 +1588,6 @@ export interface operations {
               | "heroImage"
               | "programs"
               | "schedules"
-              | "venues"
               | "openTeamFeature"
               | "athleticsFeature"
               | "registrationSteps"
@@ -1712,7 +1638,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.120Z
+               * @default 2026-10-11T15:04:21.808Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1721,8 +1647,6 @@ export interface operations {
               programs: components["schemas"]["ContentSportProgramEntry"][];
               /** @description A component field */
               schedules: components["schemas"]["ContentScheduleEntry"][];
-              /** @description A component field */
-              venues: components["schemas"]["ContentVenueEntry"][];
               /** @description A component field */
               openTeamFeature: components["schemas"]["ContentFeatureEntry"];
               /** @description A component field */
@@ -1896,7 +1820,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.129Z
+               * @default 2026-10-11T15:04:21.817Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -2006,7 +1930,7 @@ export interface operations {
             summary: string;
             /**
              * @description A datetime field
-             * @default 2026-10-11T14:21:49.141Z
+             * @default 2026-10-11T15:04:21.829Z
              */
             publishedAt: string;
             /** @description A component field */
@@ -2059,7 +1983,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.143Z
+               * @default 2026-10-11T15:04:21.832Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -2227,7 +2151,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.135Z
+               * @default 2026-10-11T15:04:21.824Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -2339,7 +2263,7 @@ export interface operations {
             summary?: string;
             /**
              * @description A datetime field
-             * @default 2026-10-11T14:21:49.147Z
+             * @default 2026-10-11T15:04:21.840Z
              */
             publishedAt?: string;
             /** @description A component field */
@@ -2392,7 +2316,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.149Z
+               * @default 2026-10-11T15:04:21.845Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -2523,7 +2447,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.153Z
+               * @default 2026-10-11T15:04:21.850Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -2649,7 +2573,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.158Z
+               * @default 2026-10-11T15:04:21.857Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -2764,7 +2688,7 @@ export interface operations {
             contactIntroduction?: string;
             /**
              * @description A datetime field
-             * @default 2026-10-11T14:21:49.167Z
+             * @default 2026-10-11T15:04:21.867Z
              */
             publishedAt?: string;
             /** @description A media field */
@@ -2812,7 +2736,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.170Z
+               * @default 2026-10-11T15:04:21.870Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -2943,7 +2867,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.176Z
+               * @default 2026-10-11T15:04:21.874Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -3125,7 +3049,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.184Z
+               * @default 2026-10-11T15:04:21.882Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -3243,7 +3167,7 @@ export interface operations {
             showOnActivity: ("0" | "1" | "t" | "true" | "f" | "false") | null;
             /**
              * @description A datetime field
-             * @default 2026-10-11T14:21:49.223Z
+             * @default 2026-10-11T15:04:21.892Z
              */
             publishedAt: string;
             /** @description A media field */
@@ -3303,7 +3227,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.227Z
+               * @default 2026-10-11T15:04:21.895Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -3475,7 +3399,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.216Z
+               * @default 2026-10-11T15:04:21.887Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -3595,7 +3519,7 @@ export interface operations {
             showOnActivity?: ("0" | "1" | "t" | "true" | "f" | "false") | null;
             /**
              * @description A datetime field
-             * @default 2026-10-11T14:21:49.234Z
+             * @default 2026-10-11T15:04:21.899Z
              */
             publishedAt?: string;
             /** @description A media field */
@@ -3655,7 +3579,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.238Z
+               * @default 2026-10-11T15:04:21.926Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -3794,7 +3718,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.244Z
+               * @default 2026-10-11T15:04:21.930Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -3946,7 +3870,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.252Z
+               * @default 2026-10-11T15:04:21.938Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -4046,7 +3970,7 @@ export interface operations {
             featured: ("0" | "1" | "t" | "true" | "f" | "false") | null;
             /**
              * @description A datetime field
-             * @default 2026-10-11T14:21:49.263Z
+             * @default 2026-10-11T15:04:21.948Z
              */
             publishedAt: string;
             /** @description A component field */
@@ -4091,7 +4015,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.264Z
+               * @default 2026-10-11T15:04:21.950Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -4239,7 +4163,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.259Z
+               * @default 2026-10-11T15:04:21.944Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -4341,7 +4265,7 @@ export interface operations {
             featured?: ("0" | "1" | "t" | "true" | "f" | "false") | null;
             /**
              * @description A datetime field
-             * @default 2026-10-11T14:21:49.272Z
+             * @default 2026-10-11T15:04:21.955Z
              */
             publishedAt?: string;
             /** @description A component field */
@@ -4386,7 +4310,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.274Z
+               * @default 2026-10-11T15:04:21.958Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -4507,7 +4431,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.280Z
+               * @default 2026-10-11T15:04:21.963Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -4651,7 +4575,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.293Z
+               * @default 2026-10-11T15:04:21.972Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -4743,7 +4667,7 @@ export interface operations {
             displayOrder: number;
             /**
              * @description A datetime field
-             * @default 2026-10-11T14:21:49.314Z
+             * @default 2026-10-11T15:04:21.982Z
              */
             publishedAt: string;
             /** @description A media field */
@@ -4784,7 +4708,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.317Z
+               * @default 2026-10-11T15:04:21.983Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -4922,7 +4846,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.304Z
+               * @default 2026-10-11T15:04:21.978Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -5016,7 +4940,7 @@ export interface operations {
             displayOrder?: number;
             /**
              * @description A datetime field
-             * @default 2026-10-11T14:21:49.357Z
+             * @default 2026-10-11T15:04:21.986Z
              */
             publishedAt?: string;
             /** @description A media field */
@@ -5057,7 +4981,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.359Z
+               * @default 2026-10-11T15:04:21.989Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -5170,7 +5094,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-11T14:21:49.368Z
+               * @default 2026-10-11T15:04:21.997Z
                */
               publishedAt: string;
               /** @description A media field */

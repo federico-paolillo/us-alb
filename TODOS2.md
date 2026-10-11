@@ -42,7 +42,7 @@ earlier `PLAN.md` and `TODOS.md` alone.
   registration links targeting `/#contatti`. Check semantic addresses,
   keyboard focus, and long email rendering without adding a form or map.
 
-- [ ] **04 — Reuse the shared locations on About and Activity**
+- [x] **04 — Reuse the shared locations on About and Activity**
 
   Switch both pages to the cached Location DTOs and their respective visibility
   switches. Preserve their existing presentation, request-time `await io()`

@@ -81,27 +81,6 @@ export interface ContentContactMethod extends Struct.ComponentSchema {
   };
 }
 
-export interface ContentFacility extends Struct.ComponentSchema {
-  collectionName: 'components_content_facilities';
-  info: {
-    displayName: 'Facility';
-  };
-  attributes: {
-    address: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 240;
-      }>;
-    image: Schema.Attribute.Media<'images'>;
-    name: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 160;
-      }>;
-    summary: Schema.Attribute.Text & Schema.Attribute.Required;
-  };
-}
-
 export interface ContentFeature extends Struct.ComponentSchema {
   collectionName: 'components_content_features';
   info: {
@@ -272,26 +251,6 @@ export interface ContentValue extends Struct.ComponentSchema {
   };
 }
 
-export interface ContentVenue extends Struct.ComponentSchema {
-  collectionName: 'components_content_venues';
-  info: {
-    displayName: 'Venue';
-  };
-  attributes: {
-    address: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 240;
-      }>;
-    details: Schema.Attribute.Text & Schema.Attribute.Required;
-    name: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 160;
-      }>;
-  };
-}
-
 export interface IdentitySlug extends Struct.ComponentSchema {
   collectionName: 'components_identity_slugs';
   info: {
@@ -320,7 +279,6 @@ declare module '@strapi/strapi' {
       'content.board-member': ContentBoardMember;
       'content.call-to-action': ContentCallToAction;
       'content.contact-method': ContentContactMethod;
-      'content.facility': ContentFacility;
       'content.feature': ContentFeature;
       'content.institutional-quote': ContentInstitutionalQuote;
       'content.metric': ContentMetric;
@@ -329,7 +287,6 @@ declare module '@strapi/strapi' {
       'content.sport-program': ContentSportProgram;
       'content.timeline-entry': ContentTimelineEntry;
       'content.value': ContentValue;
-      'content.venue': ContentVenue;
       'identity.slug': IdentitySlug;
     }
   }
