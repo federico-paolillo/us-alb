@@ -111,9 +111,9 @@ institutional quote, and required repeatable metrics and activity teasers with
 at least one item each. Optional contact content consists of `contactHeading`,
 capped at 160 characters, multi-line `contactIntroduction`, and repeatable
 `contactMethods` owned by the club rather than by a particular location. Its
-frontend DTO is `HomePageDto` with discriminant `pageType: "home"`. The new
-contact fields are not carried into that DTO until a later task. Preview
-targets `/`.
+frontend DTO is `HomePageDto` with discriminant `pageType: "home"`; it carries
+the optional contact heading and introduction plus validated club-wide contact
+methods. Preview targets `/`.
 
 ### About Page
 
@@ -153,7 +153,8 @@ Location is additive at this stage. About's required repeatable `facilities`
 still uses `content.facility`, Activity's required repeatable `venues` still
 uses `content.venue`, and schedule `venue` remains required free text. Those
 embedded models continue to supply the current frontend through task 04; the
-Location collection is not yet read by the frontend and has no Public role
+Location collection now has a status-aware `LocationDto` list read in the CMS
+pipeline, but no page presents or filters that list yet. It has no Public role
 permission in this task.
 
 ### News
@@ -194,6 +195,13 @@ The public cached reads are `getHomePage`, `getAboutPage`, `getActivityPage`,
 `getNewsBySlug`, `listNews`, `listCalendarEntries`, and
 `listOfficialDocuments`. Single-document pages dispatch through `CmsPageDto`
 and `PageSwitch`; `/notizie` renders its three collections directly.
+
+`ContactMethodDto` owns trimmed display values and mapper-created `tel:` or
+`mailto:` links. Published Home and Location payloads fail mapping when a
+contact row is incomplete or unsafe. Draft payloads omit only invalid contact
+rows while retaining valid siblings; they do not invent replacement contact
+content. `listLocations` selects draft or published status and caches the
+shared collection under the `locations` tag for webhook invalidation.
 
 Draft Mode selects draft or published status for the three singleton reads,
 news details, calendar entries, and official documents. `listNews` is always

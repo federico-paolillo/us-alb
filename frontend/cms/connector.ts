@@ -4,6 +4,7 @@ import {
   toActivityPageDto,
   toCalendarEntryDto,
   toHomePageDto,
+  toLocationDto,
   toNewsDto,
   toNewsListItemDto,
   toOfficialDocumentDto,
@@ -13,6 +14,7 @@ import type {
   ActivityPageDto,
   CalendarEntryDto,
   HomePageDto,
+  LocationDto,
   NewsDto,
   NewsListItemDto,
   OfficialDocumentDto,
@@ -32,6 +34,7 @@ export interface CmsConnector {
   listOfficialDocuments(
     status: ContentStatus,
   ): Promise<Result<OfficialDocumentDto[]>>;
+  listLocations(status: ContentStatus): Promise<Result<LocationDto[]>>;
 }
 
 export function makeCmsConnector(
@@ -66,6 +69,10 @@ export function makeCmsConnector(
     listOfficialDocuments: (status) =>
       mapList(client.listOfficialDocuments(status), (data) =>
         toOfficialDocumentDto(data, mediaBaseUrl, status),
+      ),
+    listLocations: (status) =>
+      mapList(client.listLocations(status), (data) =>
+        toLocationDto(data, mediaBaseUrl, status),
       ),
   };
   return Object.freeze(connector);

@@ -3,6 +3,7 @@ import type {
   ActivityPageDto,
   CalendarEntryDto,
   HomePageDto,
+  LocationDto,
   NewsDto,
   NewsListItemDto,
   OfficialDocumentDto,
@@ -95,6 +96,18 @@ async function listOfficialDocumentsCached(
   cacheLife("days");
   cacheTag("official-documents");
   return listOrThrow(await deps.connector.listOfficialDocuments(status));
+}
+
+export async function listLocations(): Promise<LocationDto[]> {
+  return listLocationsCached(await contentStatus());
+}
+async function listLocationsCached(
+  status: ContentStatus,
+): Promise<LocationDto[]> {
+  "use cache";
+  cacheLife("days");
+  cacheTag("locations");
+  return listOrThrow(await deps.connector.listLocations(status));
 }
 
 function valueOrThrow<T>(result: Result<T>): T | null {

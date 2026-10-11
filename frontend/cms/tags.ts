@@ -9,6 +9,7 @@ const tagsByModel = {
   "activity-page": { collection: "activity-page", item: null },
   "calendar-entry": { collection: "calendar-entries", item: null },
   "official-document": { collection: "official-documents", item: null },
+  location: { collection: "locations", item: null },
 } as const;
 
 export function tagsForWebhook(payload: WebhookPayload): string[] {

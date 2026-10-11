@@ -19,7 +19,7 @@ earlier `PLAN.md` and `TODOS.md` alone.
   an empty database and applicable builds and checks pass. Do not change the
   project's build tooling for this feature. Update TYPES.md as necessary.
 
-- [ ] **02 — Carry contacts and locations through the CMS data pipeline**
+- [x] **02 — Carry contacts and locations through the CMS data pipeline**
 
   Populate Home methods and query published or draft locations with image and
   methods, ordered by display order then name. Add DTOs, mapper validation and

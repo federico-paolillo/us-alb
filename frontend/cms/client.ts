@@ -26,6 +26,9 @@ export type CalendarEntryListData = CalendarEntryData[];
 export type OfficialDocumentData =
   paths["/official-documents"]["get"]["responses"][200]["content"]["application/json"]["data"][number];
 export type OfficialDocumentListData = OfficialDocumentData[];
+export type LocationData =
+  paths["/locations"]["get"]["responses"][200]["content"]["application/json"]["data"][number];
+export type LocationListData = LocationData[];
 
 const LIST_PAGE_SIZE = 100;
 
@@ -41,6 +44,7 @@ export interface CmsClient {
   listOfficialDocuments(
     status: ContentStatus,
   ): Promise<Result<OfficialDocumentListData>>;
+  listLocations(status: ContentStatus): Promise<Result<LocationListData>>;
 }
 
 export function makeCmsClient(
@@ -83,6 +87,7 @@ export function makeCmsClient(
     listNews: () => listNews(rawClient),
     listCalendarEntries: (status) => listCalendarEntries(rawClient, status),
     listOfficialDocuments: (status) => listOfficialDocuments(rawClient, status),
+    listLocations: (status) => listLocations(rawClient, status),
   };
   return Object.freeze(client);
 }
@@ -92,6 +97,7 @@ const homePopulate = {
   metrics: true,
   institutionalQuote: true,
   activityTeasers: { populate: { image: true } },
+  contactMethods: true,
 };
 const aboutPopulate = {
   heroImage: true,
@@ -190,6 +196,24 @@ function listOfficialDocuments(
       },
     }),
     { resource: "official-documents" },
+  );
+}
+
+function listLocations(
+  rawClient: Client<paths>,
+  status: ContentStatus,
+): Promise<Result<LocationListData>> {
+  return toResult(
+    rawClient.GET("/locations", {
+      params: {
+        query: listQuery(
+          { aboutImage: true, contactMethods: true },
+          ["displayOrder:asc", "name:asc"],
+          status,
+        ),
+      },
+    }),
+    { resource: "locations" },
   );
 }
 

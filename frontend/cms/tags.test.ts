@@ -18,6 +18,7 @@ describe("tagsForWebhook", () => {
     ["activity-page", ["activity-page"]],
     ["calendar-entry", ["calendar-entries"]],
     ["official-document", ["official-documents"]],
+    ["location", ["locations"]],
   ])("maps %s", (model, tags) => {
     expect(tagsForWebhook(payload(model as string))).toEqual(tags);
   });

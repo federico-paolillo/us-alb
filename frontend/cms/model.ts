@@ -155,6 +155,26 @@ export interface CallToActionDto {
   label: string;
   url: string;
 }
+export type ContactMethodKind = "phone" | "email";
+export interface ContactMethodDto {
+  kind: ContactMethodKind;
+  label: string;
+  value: string;
+  href: `tel:${string}` | `mailto:${string}`;
+}
+export interface LocationDto {
+  documentId: string;
+  name: string;
+  address: string;
+  aboutSummary?: string;
+  aboutImage?: ImageDto;
+  activityDetails?: string;
+  contactMethods: ContactMethodDto[];
+  displayOrder: number;
+  showOnHome: boolean;
+  showOnAbout: boolean;
+  showOnActivity: boolean;
+}
 
 export interface HomePageDto {
   pageType: "home";
@@ -165,6 +185,9 @@ export interface HomePageDto {
   metrics: MetricDto[];
   institutionalQuote: InstitutionalQuoteDto;
   activityTeasers: ActivityTeaserDto[];
+  contactHeading?: string;
+  contactIntroduction?: string;
+  contactMethods: ContactMethodDto[];
 }
 export interface AboutPageDto {
   pageType: "about";

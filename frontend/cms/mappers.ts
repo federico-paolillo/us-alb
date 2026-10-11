@@ -3,6 +3,7 @@ import type {
   ActivityPageData,
   CalendarEntryData,
   HomePageData,
+  LocationData,
   NewsData,
   OfficialDocumentData,
 } from "@cmsjs/cms/client";
@@ -15,6 +16,8 @@ import type {
   BoardMemberDto,
   CalendarEntryDto,
   CallToActionDto,
+  ContactMethodDto,
+  ContactMethodKind,
   FacilityDto,
   FeatureDto,
   FileDto,
@@ -24,6 +27,7 @@ import type {
   ImageFormatDto,
   InlineDto,
   InstitutionalQuoteDto,
+  LocationDto,
   MetricDto,
   NewsDto,
   NewsListItemDto,
@@ -109,6 +113,161 @@ function requiredBoolean(
   const value = node[field];
   if (typeof value === "boolean") return value;
   problems.push(`expected boolean at ${path}.${field}`);
+}
+
+function draftDefaultBoolean(
+  node: Node,
+  field: string,
+  path: string,
+  problems: string[],
+  status: ContentStatus,
+): boolean | undefined {
+  if (status === "draft" && node[field] == null) return false;
+  return requiredBoolean(node, field, path, problems);
+}
+
+function nonNegativeInteger(
+  node: Node,
+  field: string,
+  path: string,
+  problems: string[],
+  status: ContentStatus,
+): number | undefined {
+  if (status === "draft" && node[field] == null) return 0;
+  const value = requiredNumber(node, field, path, problems);
+  if (value !== undefined && (!Number.isInteger(value) || value < 0)) {
+    problems.push(`expected non-negative integer at ${path}.${field}`);
+    return;
+  }
+  return value;
+}
+
+function contactField(
+  node: Node,
+  field: "label" | "value",
+  path: string,
+  maxLength: number,
+  problems: string[],
+): string | undefined {
+  const value = node[field];
+  if (typeof value !== "string") {
+    problems.push(`expected string at ${path}.${field}`);
+    return;
+  }
+  if (field === "value" && /[\r\n]/.test(value)) {
+    problems.push(`expected single-line value at ${path}.${field}`);
+    return;
+  }
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    problems.push(`expected non-blank string at ${path}.${field}`);
+    return;
+  }
+  if (trimmed.length > maxLength) {
+    problems.push(
+      `expected at most ${maxLength} characters at ${path}.${field}`,
+    );
+    return;
+  }
+  return trimmed;
+}
+
+function phoneHref(
+  value: string,
+  path: string,
+  problems: string[],
+): `tel:${string}` | undefined {
+  if (!/^\+?[0-9 \t().-]+$/.test(value)) {
+    problems.push(`expected safe phone number at ${path}`);
+    return;
+  }
+  const normalized = value.replace(/[ \t().-]/g, "");
+  if (!/^\+?[0-9]{3,15}$/.test(normalized)) {
+    problems.push(`expected phone number with 3 to 15 digits at ${path}`);
+    return;
+  }
+  return `tel:${normalized}`;
+}
+
+function emailHref(
+  value: string,
+  path: string,
+  problems: string[],
+): `mailto:${string}` | undefined {
+  const parts = value.split("@");
+  if (parts.length !== 2) {
+    problems.push(`expected safe email address at ${path}`);
+    return;
+  }
+  const [local = "", domain = ""] = parts;
+  const validLocal =
+    /^[A-Za-z0-9.!$'*+_~-]+$/.test(local) &&
+    !local.startsWith(".") &&
+    !local.endsWith(".") &&
+    !local.includes("..");
+  const validDomain = domain
+    .split(".")
+    .every((label) => /^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$/.test(label));
+  if (!validLocal || !validDomain) {
+    problems.push(`expected safe email address at ${path}`);
+    return;
+  }
+  return `mailto:${value}`;
+}
+
+function contactMethod(
+  value: unknown,
+  path: string,
+  problems: string[],
+): ContactMethodDto | undefined {
+  const node = object(value, path, problems);
+  if (!node) return;
+  const kind = node.kind;
+  if (kind !== "phone" && kind !== "email") {
+    problems.push(`expected contact kind at ${path}.kind`);
+  }
+  const label = contactField(node, "label", path, 120, problems);
+  const contactValue = contactField(node, "value", path, 255, problems);
+  const href =
+    contactValue === undefined || (kind !== "phone" && kind !== "email")
+      ? undefined
+      : kind === "phone"
+        ? phoneHref(contactValue, `${path}.value`, problems)
+        : emailHref(contactValue, `${path}.value`, problems);
+  return kind === "phone" || kind === "email"
+    ? label === undefined || contactValue === undefined || href === undefined
+      ? undefined
+      : {
+          kind: kind as ContactMethodKind,
+          label,
+          value: contactValue,
+          href,
+        }
+    : undefined;
+}
+
+function contactMethods(
+  value: unknown,
+  path: string,
+  problems: string[],
+  status: ContentStatus,
+): ContactMethodDto[] | undefined {
+  if (value == null) return [];
+  if (!Array.isArray(value)) {
+    problems.push(`expected array at ${path}`);
+    return;
+  }
+  const result: ContactMethodDto[] = [];
+  for (let i = 0; i < value.length; i++) {
+    const itemProblems: string[] = [];
+    const mapped = contactMethod(value[i], `${path}[${i}]`, itemProblems);
+    if (mapped && itemProblems.length === 0) {
+      result.push(mapped);
+    } else if (status === "published") {
+      problems.push(...itemProblems);
+    }
+  }
+  return result;
 }
 
 function freezeDeep<T>(value: T): T {
@@ -603,14 +762,23 @@ export function toHomePageDto(
     );
     const eyebrow = requiredString(node, "eyebrow", "$", p, status),
       headline = requiredString(node, "headline", "$", p, status),
-      introduction = requiredString(node, "introduction", "$", p, status);
+      introduction = requiredString(node, "introduction", "$", p, status),
+      contactHeading = optionalString(node, "contactHeading", "$", p),
+      contactIntroduction = optionalString(node, "contactIntroduction", "$", p),
+      mappedContactMethods = contactMethods(
+        node.contactMethods,
+        "$.contactMethods",
+        p,
+        status,
+      );
     return !heroImage ||
       !institutionalQuote ||
       !metrics ||
       !teasers ||
       eyebrow === undefined ||
       headline === undefined ||
-      introduction === undefined
+      introduction === undefined ||
+      !mappedContactMethods
       ? undefined
       : {
           pageType: "home",
@@ -621,6 +789,71 @@ export function toHomePageDto(
           metrics,
           institutionalQuote,
           activityTeasers: teasers,
+          ...(contactHeading === undefined ? {} : { contactHeading }),
+          ...(contactIntroduction === undefined ? {} : { contactIntroduction }),
+          contactMethods: mappedContactMethods,
+        };
+  });
+}
+
+export function toLocationDto(
+  raw: LocationData,
+  mediaBaseUrl: string,
+  status: ContentStatus,
+): Result<LocationDto> {
+  return resource("location", raw, (node, p) => {
+    const documentId = requiredString(node, "documentId", "$", p);
+    if (documentId !== undefined && documentId.trim().length === 0) {
+      p.push("expected non-blank string at $.documentId");
+    }
+    const name = requiredString(node, "name", "$", p, status),
+      address = requiredString(node, "address", "$", p, status),
+      aboutSummary = optionalString(node, "aboutSummary", "$", p),
+      aboutImage = optionalImage(
+        node.aboutImage,
+        "$.aboutImage",
+        p,
+        mediaBaseUrl,
+      ),
+      activityDetails = optionalString(node, "activityDetails", "$", p),
+      mappedContactMethods = contactMethods(
+        node.contactMethods,
+        "$.contactMethods",
+        p,
+        status,
+      ),
+      displayOrder = nonNegativeInteger(node, "displayOrder", "$", p, status),
+      showOnHome = draftDefaultBoolean(node, "showOnHome", "$", p, status),
+      showOnAbout = draftDefaultBoolean(node, "showOnAbout", "$", p, status),
+      showOnActivity = draftDefaultBoolean(
+        node,
+        "showOnActivity",
+        "$",
+        p,
+        status,
+      );
+    return documentId === undefined ||
+      documentId.trim().length === 0 ||
+      name === undefined ||
+      address === undefined ||
+      !mappedContactMethods ||
+      displayOrder === undefined ||
+      showOnHome === undefined ||
+      showOnAbout === undefined ||
+      showOnActivity === undefined
+      ? undefined
+      : {
+          documentId,
+          name,
+          address,
+          ...(aboutSummary === undefined ? {} : { aboutSummary }),
+          ...(aboutImage === undefined ? {} : { aboutImage }),
+          ...(activityDetails === undefined ? {} : { activityDetails }),
+          contactMethods: mappedContactMethods,
+          displayOrder,
+          showOnHome,
+          showOnAbout,
+          showOnActivity,
         };
   });
 }
