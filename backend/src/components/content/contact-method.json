@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_content_contact_methods",
+  "info": {
+    "displayName": "Contact Method"
+  },
+  "options": {},
+  "attributes": {
+    "kind": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "phone",
+        "email"
+      ]
+    },
+    "label": {
+      "type": "string",
+      "maxLength": 120,
+      "required": true
+    },
+    "value": {
+      "type": "string",
+      "maxLength": 255,
+      "required": true
+    }
+  },
+  "config": {}
+}

@@ -13,13 +13,13 @@
   "attributes": {
     "eyebrow": {
       "type": "string",
-      "required": true,
-      "maxLength": 80
+      "maxLength": 80,
+      "required": true
     },
     "headline": {
       "type": "string",
-      "required": true,
-      "maxLength": 200
+      "maxLength": 200,
+      "required": true
     },
     "introduction": {
       "type": "text",
@@ -52,6 +52,18 @@
       "repeatable": true,
       "required": true,
       "min": 1
+    },
+    "contactHeading": {
+      "type": "string",
+      "maxLength": 160
+    },
+    "contactIntroduction": {
+      "type": "text"
+    },
+    "contactMethods": {
+      "type": "component",
+      "component": "content.contact-method",
+      "repeatable": true
     }
   }
 }

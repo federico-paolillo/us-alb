@@ -1,6 +1,6 @@
 # U.S. Albatese content contract
 
-All six editorial content types use Strapi Draft & Publish. Required repeatable
+All seven editorial content types use Strapi Draft & Publish. Required repeatable
 components contain at least one item. Images are single image assets; files are
 single file assets. Presentation, placeholder media, seeded content, and sample
 documents belong to later tasks.
@@ -30,6 +30,12 @@ Home uses exactly one required quote.
 `content.activity-teaser` has an optional `eyebrow` capped at 80 characters,
 required `title` capped at 160, required multi-line `summary`, and an optional
 single image. Home uses a required repeatable list of activity teasers.
+
+### Content / Contact Method
+
+`content.contact-method` has required `kind`, `label`, and `value` fields.
+`kind` is either `phone` or `email`; `label` is capped at 120 characters and
+`value` at 255. Home and Location use optional repeatable contact-method lists.
 
 ### Content / Timeline Entry
 
@@ -102,8 +108,12 @@ action.
 required `eyebrow` capped at 80 characters, required `headline` capped at 200,
 required multi-line `introduction`, one required hero image, one required
 institutional quote, and required repeatable metrics and activity teasers with
-at least one item each. Its frontend DTO is `HomePageDto` with discriminant
-`pageType: "home"`. Preview targets `/`.
+at least one item each. Optional contact content consists of `contactHeading`,
+capped at 160 characters, multi-line `contactIntroduction`, and repeatable
+`contactMethods` owned by the club rather than by a particular location. Its
+frontend DTO is `HomePageDto` with discriminant `pageType: "home"`. The new
+contact fields are not carried into that DTO until a later task. Preview
+targets `/`.
 
 ### About Page
 
@@ -127,6 +137,24 @@ repeatable components with at least one item each. The open-team and athletics
 features are each required single components; `registrationIntroduction` is
 required multi-line text. Its frontend DTO is `ActivityPageDto` with
 discriminant `pageType: "activity"`. Preview targets `/attivita`.
+
+### Location
+
+`location` is a collection type for shared club locations. It has required
+`name` capped at 160 characters and required `address` capped at 240. Optional
+page-specific material consists of multi-line `aboutSummary`, one About image,
+and multi-line `activityDetails`; `contactMethods` is an optional repeatable
+list for methods belonging to that location. Required integer `displayOrder`
+defaults to zero and cannot be negative. Required `showOnHome`, `showOnAbout`,
+and `showOnActivity` switches each default to `false`, so a new location is not
+shown until an editor opts it into a page.
+
+Location is additive at this stage. About's required repeatable `facilities`
+still uses `content.facility`, Activity's required repeatable `venues` still
+uses `content.venue`, and schedule `venue` remains required free text. Those
+embedded models continue to supply the current frontend through task 04; the
+Location collection is not yet read by the frontend and has no Public role
+permission in this task.
 
 ### News
 

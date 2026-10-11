@@ -84,6 +84,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/locations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["location/get/locations"];
+    put?: never;
+    post: operations["location/post/locations"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/locations/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["location/get/locations_by_id"];
+    put: operations["location/put/locations_by_id"];
+    post?: never;
+    delete: operations["location/delete/locations_by_id"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/news": {
     parameters: {
       query?: never;
@@ -691,7 +723,7 @@ export interface components {
       updatedAt?: string;
       /**
        * @description A datetime field
-       * @default 2026-10-08T23:37:35.807Z
+       * @default 2026-10-11T13:56:40.285Z
        */
       publishedAt: string;
       related: unknown;
@@ -817,6 +849,17 @@ export interface components {
       /** @description A media field */
       image?: components["schemas"]["PluginUploadFileDocument"];
     };
+    ContentContactMethodEntry: {
+      /**
+       * @description An enum field
+       * @enum {string}
+       */
+      kind: "phone" | "email";
+      /** @description A string field */
+      label: string;
+      /** @description A string field */
+      value: string;
+    };
     IdentitySlugEntry: {
       /** @description A string field */
       slug: string;
@@ -918,7 +961,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.795Z
+               * @default 2026-10-11T13:56:40.279Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1039,7 +1082,7 @@ export interface operations {
             documentIntroduction?: string;
             /**
              * @description A datetime field
-             * @default 2026-10-08T23:37:35.821Z
+             * @default 2026-10-11T13:56:40.298Z
              */
             publishedAt?: string;
             /** @description A media field */
@@ -1091,7 +1134,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.824Z
+               * @default 2026-10-11T13:56:40.301Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1228,7 +1271,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.829Z
+               * @default 2026-10-11T13:56:40.304Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1363,7 +1406,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.837Z
+               * @default 2026-10-11T13:56:40.311Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1483,7 +1526,7 @@ export interface operations {
             registrationIntroduction?: string;
             /**
              * @description A datetime field
-             * @default 2026-10-08T23:37:35.848Z
+             * @default 2026-10-11T13:56:40.322Z
              */
             publishedAt?: string;
             /** @description A media field */
@@ -1533,7 +1576,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.851Z
+               * @default 2026-10-11T13:56:40.343Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1669,7 +1712,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.855Z
+               * @default 2026-10-11T13:56:40.348Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -1853,7 +1896,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.872Z
+               * @default 2026-10-11T13:56:40.355Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -1963,7 +2006,7 @@ export interface operations {
             summary: string;
             /**
              * @description A datetime field
-             * @default 2026-10-08T23:37:35.886Z
+             * @default 2026-10-11T13:56:40.364Z
              */
             publishedAt: string;
             /** @description A component field */
@@ -2016,7 +2059,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.890Z
+               * @default 2026-10-11T13:56:40.366Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -2184,7 +2227,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.881Z
+               * @default 2026-10-11T13:56:40.360Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -2296,7 +2339,7 @@ export interface operations {
             summary?: string;
             /**
              * @description A datetime field
-             * @default 2026-10-08T23:37:35.894Z
+             * @default 2026-10-11T13:56:40.369Z
              */
             publishedAt?: string;
             /** @description A component field */
@@ -2349,7 +2392,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.897Z
+               * @default 2026-10-11T13:56:40.371Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -2480,7 +2523,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.902Z
+               * @default 2026-10-11T13:56:40.374Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -2533,18 +2576,27 @@ export interface operations {
           | "eyebrow"
           | "headline"
           | "introduction"
+          | "contactHeading"
+          | "contactIntroduction"
           | "createdAt"
           | "updatedAt"
           | "publishedAt"
         )[];
         populate?:
           | "*"
-          | ("heroImage" | "metrics" | "institutionalQuote" | "activityTeasers")
           | (
               | "heroImage"
               | "metrics"
               | "institutionalQuote"
               | "activityTeasers"
+              | "contactMethods"
+            )
+          | (
+              | "heroImage"
+              | "metrics"
+              | "institutionalQuote"
+              | "activityTeasers"
+              | "contactMethods"
             )[];
         filters?: {
           [key: string]: unknown;
@@ -2587,13 +2639,17 @@ export interface operations {
               headline: string;
               /** @description A text field */
               introduction: string;
+              /** @description A string field */
+              contactHeading?: string;
+              /** @description A text field */
+              contactIntroduction?: string;
               /** @description A datetime field */
               createdAt?: string;
               /** @description A datetime field */
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.908Z
+               * @default 2026-10-11T13:56:40.381Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -2604,6 +2660,8 @@ export interface operations {
               institutionalQuote: components["schemas"]["ContentInstitutionalQuoteEntry"];
               /** @description A component field */
               activityTeasers: components["schemas"]["ContentActivityTeaserEntry"][];
+              /** @description A component field */
+              contactMethods?: components["schemas"]["ContentContactMethodEntry"][];
             };
           };
         };
@@ -2652,18 +2710,27 @@ export interface operations {
           | "eyebrow"
           | "headline"
           | "introduction"
+          | "contactHeading"
+          | "contactIntroduction"
           | "createdAt"
           | "updatedAt"
           | "publishedAt"
         )[];
         populate?:
           | "*"
-          | ("heroImage" | "metrics" | "institutionalQuote" | "activityTeasers")
           | (
               | "heroImage"
               | "metrics"
               | "institutionalQuote"
               | "activityTeasers"
+              | "contactMethods"
+            )
+          | (
+              | "heroImage"
+              | "metrics"
+              | "institutionalQuote"
+              | "activityTeasers"
+              | "contactMethods"
             )[];
         status?: "draft" | "published";
         publicationFilter?:
@@ -2691,9 +2758,13 @@ export interface operations {
             headline?: string;
             /** @description A text field */
             introduction?: string;
+            /** @description A string field */
+            contactHeading?: string;
+            /** @description A text field */
+            contactIntroduction?: string;
             /**
              * @description A datetime field
-             * @default 2026-10-08T23:37:35.915Z
+             * @default 2026-10-11T13:56:40.390Z
              */
             publishedAt?: string;
             /** @description A media field */
@@ -2704,6 +2775,8 @@ export interface operations {
             institutionalQuote?: unknown;
             /** @description A component field */
             activityTeasers?: unknown[];
+            /** @description A component field */
+            contactMethods?: unknown[];
           };
         };
       };
@@ -2729,13 +2802,17 @@ export interface operations {
               headline: string;
               /** @description A text field */
               introduction: string;
+              /** @description A string field */
+              contactHeading?: string;
+              /** @description A text field */
+              contactIntroduction?: string;
               /** @description A datetime field */
               createdAt?: string;
               /** @description A datetime field */
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.917Z
+               * @default 2026-10-11T13:56:40.392Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -2746,6 +2823,8 @@ export interface operations {
               institutionalQuote: components["schemas"]["ContentInstitutionalQuoteEntry"];
               /** @description A component field */
               activityTeasers: components["schemas"]["ContentActivityTeaserEntry"][];
+              /** @description A component field */
+              contactMethods?: components["schemas"]["ContentContactMethodEntry"][];
             };
           };
         };
@@ -2794,18 +2873,27 @@ export interface operations {
           | "eyebrow"
           | "headline"
           | "introduction"
+          | "contactHeading"
+          | "contactIntroduction"
           | "createdAt"
           | "updatedAt"
           | "publishedAt"
         )[];
         populate?:
           | "*"
-          | ("heroImage" | "metrics" | "institutionalQuote" | "activityTeasers")
           | (
               | "heroImage"
               | "metrics"
               | "institutionalQuote"
               | "activityTeasers"
+              | "contactMethods"
+            )
+          | (
+              | "heroImage"
+              | "metrics"
+              | "institutionalQuote"
+              | "activityTeasers"
+              | "contactMethods"
             )[];
         status?: "draft" | "published";
         publicationFilter?:
@@ -2845,13 +2933,17 @@ export interface operations {
               headline: string;
               /** @description A text field */
               introduction: string;
+              /** @description A string field */
+              contactHeading?: string;
+              /** @description A text field */
+              contactIntroduction?: string;
               /** @description A datetime field */
               createdAt?: string;
               /** @description A datetime field */
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.920Z
+               * @default 2026-10-11T13:56:40.396Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -2862,6 +2954,853 @@ export interface operations {
               institutionalQuote: components["schemas"]["ContentInstitutionalQuoteEntry"];
               /** @description A component field */
               activityTeasers: components["schemas"]["ContentActivityTeaserEntry"][];
+              /** @description A component field */
+              contactMethods?: components["schemas"]["ContentContactMethodEntry"][];
+            };
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "location/get/locations": {
+    parameters: {
+      query?: {
+        fields?: (
+          | "name"
+          | "address"
+          | "aboutSummary"
+          | "activityDetails"
+          | "displayOrder"
+          | "showOnHome"
+          | "showOnAbout"
+          | "showOnActivity"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        filters?: {
+          [key: string]: unknown;
+        };
+        _q?: string;
+        "pagination[withCount]"?: boolean;
+        "pagination[page]"?: number;
+        "pagination[pageSize]"?: number;
+        "pagination[start]"?: number;
+        "pagination[limit]"?: number;
+        sort?:
+          | (
+              | "name"
+              | "address"
+              | "aboutSummary"
+              | "activityDetails"
+              | "displayOrder"
+              | "showOnHome"
+              | "showOnAbout"
+              | "showOnActivity"
+              | "createdAt"
+              | "updatedAt"
+              | "publishedAt"
+            )
+          | (
+              | "name"
+              | "address"
+              | "aboutSummary"
+              | "activityDetails"
+              | "displayOrder"
+              | "showOnHome"
+              | "showOnAbout"
+              | "showOnActivity"
+              | "createdAt"
+              | "updatedAt"
+              | "publishedAt"
+            )[]
+          | {
+              [key: string]: "asc" | "desc";
+            }
+          | {
+              [key: string]: "asc" | "desc";
+            }[];
+        populate?:
+          | "*"
+          | ("aboutImage" | "contactMethods")
+          | ("aboutImage" | "contactMethods")[];
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /**
+               * Format: uuid
+               * @description The document ID, represented by a UUID
+               */
+              documentId: string;
+              id: string | number;
+              /** @description A string field */
+              name: string;
+              /** @description A string field */
+              address: string;
+              /** @description A text field */
+              aboutSummary?: string;
+              /** @description A text field */
+              activityDetails?: string;
+              /**
+               * @description An integer field
+               * @default 0
+               */
+              displayOrder: number;
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              showOnHome: boolean | null;
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              showOnAbout: boolean | null;
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              showOnActivity: boolean | null;
+              /** @description A datetime field */
+              createdAt?: string;
+              /** @description A datetime field */
+              updatedAt?: string;
+              /**
+               * @description A datetime field
+               * @default 2026-10-11T13:56:40.405Z
+               */
+              publishedAt: string;
+              /** @description A media field */
+              aboutImage?: components["schemas"]["PluginUploadFileDocument"];
+              /** @description A component field */
+              contactMethods?: components["schemas"]["ContentContactMethodEntry"][];
+            }[];
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "location/post/locations": {
+    parameters: {
+      query?: {
+        fields?: (
+          | "name"
+          | "address"
+          | "aboutSummary"
+          | "activityDetails"
+          | "displayOrder"
+          | "showOnHome"
+          | "showOnAbout"
+          | "showOnActivity"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        populate?:
+          | "*"
+          | ("aboutImage" | "contactMethods")
+          | ("aboutImage" | "contactMethods")[];
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": {
+          data: {
+            /** @description A string field */
+            name: string;
+            /** @description A string field */
+            address: string;
+            /** @description A text field */
+            aboutSummary?: string;
+            /** @description A text field */
+            activityDetails?: string;
+            /**
+             * @description A float field
+             * @default 0
+             */
+            displayOrder: number;
+            /**
+             * @description A boolean field
+             * @default false
+             */
+            showOnHome: ("0" | "1" | "t" | "true" | "f" | "false") | null;
+            /**
+             * @description A boolean field
+             * @default false
+             */
+            showOnAbout: ("0" | "1" | "t" | "true" | "f" | "false") | null;
+            /**
+             * @description A boolean field
+             * @default false
+             */
+            showOnActivity: ("0" | "1" | "t" | "true" | "f" | "false") | null;
+            /**
+             * @description A datetime field
+             * @default 2026-10-11T13:56:40.416Z
+             */
+            publishedAt: string;
+            /** @description A media field */
+            aboutImage?: unknown;
+            /** @description A component field */
+            contactMethods?: unknown[];
+          };
+        };
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /**
+               * Format: uuid
+               * @description The document ID, represented by a UUID
+               */
+              documentId: string;
+              id: string | number;
+              /** @description A string field */
+              name: string;
+              /** @description A string field */
+              address: string;
+              /** @description A text field */
+              aboutSummary?: string;
+              /** @description A text field */
+              activityDetails?: string;
+              /**
+               * @description An integer field
+               * @default 0
+               */
+              displayOrder: number;
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              showOnHome: boolean | null;
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              showOnAbout: boolean | null;
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              showOnActivity: boolean | null;
+              /** @description A datetime field */
+              createdAt?: string;
+              /** @description A datetime field */
+              updatedAt?: string;
+              /**
+               * @description A datetime field
+               * @default 2026-10-11T13:56:40.418Z
+               */
+              publishedAt: string;
+              /** @description A media field */
+              aboutImage?: components["schemas"]["PluginUploadFileDocument"];
+              /** @description A component field */
+              contactMethods?: components["schemas"]["ContentContactMethodEntry"][];
+            };
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "location/get/locations_by_id": {
+    parameters: {
+      query?: {
+        fields?: (
+          | "name"
+          | "address"
+          | "aboutSummary"
+          | "activityDetails"
+          | "displayOrder"
+          | "showOnHome"
+          | "showOnAbout"
+          | "showOnActivity"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        populate?:
+          | "*"
+          | ("aboutImage" | "contactMethods")
+          | ("aboutImage" | "contactMethods")[];
+        filters?: {
+          [key: string]: unknown;
+        };
+        sort?:
+          | (
+              | "name"
+              | "address"
+              | "aboutSummary"
+              | "activityDetails"
+              | "displayOrder"
+              | "showOnHome"
+              | "showOnAbout"
+              | "showOnActivity"
+              | "createdAt"
+              | "updatedAt"
+              | "publishedAt"
+            )
+          | (
+              | "name"
+              | "address"
+              | "aboutSummary"
+              | "activityDetails"
+              | "displayOrder"
+              | "showOnHome"
+              | "showOnAbout"
+              | "showOnActivity"
+              | "createdAt"
+              | "updatedAt"
+              | "publishedAt"
+            )[]
+          | {
+              [key: string]: "asc" | "desc";
+            }
+          | {
+              [key: string]: "asc" | "desc";
+            }[];
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /**
+               * Format: uuid
+               * @description The document ID, represented by a UUID
+               */
+              documentId: string;
+              id: string | number;
+              /** @description A string field */
+              name: string;
+              /** @description A string field */
+              address: string;
+              /** @description A text field */
+              aboutSummary?: string;
+              /** @description A text field */
+              activityDetails?: string;
+              /**
+               * @description An integer field
+               * @default 0
+               */
+              displayOrder: number;
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              showOnHome: boolean | null;
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              showOnAbout: boolean | null;
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              showOnActivity: boolean | null;
+              /** @description A datetime field */
+              createdAt?: string;
+              /** @description A datetime field */
+              updatedAt?: string;
+              /**
+               * @description A datetime field
+               * @default 2026-10-11T13:56:40.411Z
+               */
+              publishedAt: string;
+              /** @description A media field */
+              aboutImage?: components["schemas"]["PluginUploadFileDocument"];
+              /** @description A component field */
+              contactMethods?: components["schemas"]["ContentContactMethodEntry"][];
+            };
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "location/put/locations_by_id": {
+    parameters: {
+      query?: {
+        fields?: (
+          | "name"
+          | "address"
+          | "aboutSummary"
+          | "activityDetails"
+          | "displayOrder"
+          | "showOnHome"
+          | "showOnAbout"
+          | "showOnActivity"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        populate?:
+          | "*"
+          | ("aboutImage" | "contactMethods")
+          | ("aboutImage" | "contactMethods")[];
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": {
+          data: {
+            /** @description A string field */
+            name?: string;
+            /** @description A string field */
+            address?: string;
+            /** @description A text field */
+            aboutSummary?: string;
+            /** @description A text field */
+            activityDetails?: string;
+            /**
+             * @description A float field
+             * @default 0
+             */
+            displayOrder?: number;
+            /**
+             * @description A boolean field
+             * @default false
+             */
+            showOnHome?: ("0" | "1" | "t" | "true" | "f" | "false") | null;
+            /**
+             * @description A boolean field
+             * @default false
+             */
+            showOnAbout?: ("0" | "1" | "t" | "true" | "f" | "false") | null;
+            /**
+             * @description A boolean field
+             * @default false
+             */
+            showOnActivity?: ("0" | "1" | "t" | "true" | "f" | "false") | null;
+            /**
+             * @description A datetime field
+             * @default 2026-10-11T13:56:40.422Z
+             */
+            publishedAt?: string;
+            /** @description A media field */
+            aboutImage?: unknown;
+            /** @description A component field */
+            contactMethods?: unknown[];
+          };
+        };
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /**
+               * Format: uuid
+               * @description The document ID, represented by a UUID
+               */
+              documentId: string;
+              id: string | number;
+              /** @description A string field */
+              name: string;
+              /** @description A string field */
+              address: string;
+              /** @description A text field */
+              aboutSummary?: string;
+              /** @description A text field */
+              activityDetails?: string;
+              /**
+               * @description An integer field
+               * @default 0
+               */
+              displayOrder: number;
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              showOnHome: boolean | null;
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              showOnAbout: boolean | null;
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              showOnActivity: boolean | null;
+              /** @description A datetime field */
+              createdAt?: string;
+              /** @description A datetime field */
+              updatedAt?: string;
+              /**
+               * @description A datetime field
+               * @default 2026-10-11T13:56:40.425Z
+               */
+              publishedAt: string;
+              /** @description A media field */
+              aboutImage?: components["schemas"]["PluginUploadFileDocument"];
+              /** @description A component field */
+              contactMethods?: components["schemas"]["ContentContactMethodEntry"][];
+            };
+          };
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "location/delete/locations_by_id": {
+    parameters: {
+      query?: {
+        fields?: (
+          | "name"
+          | "address"
+          | "aboutSummary"
+          | "activityDetails"
+          | "displayOrder"
+          | "showOnHome"
+          | "showOnAbout"
+          | "showOnActivity"
+          | "createdAt"
+          | "updatedAt"
+          | "publishedAt"
+        )[];
+        populate?:
+          | "*"
+          | ("aboutImage" | "contactMethods")
+          | ("aboutImage" | "contactMethods")[];
+        filters?: {
+          [key: string]: unknown;
+        };
+        status?: "draft" | "published";
+        publicationFilter?:
+          | "never-published"
+          | "has-published-version"
+          | "modified"
+          | "unmodified"
+          | "never-published-document"
+          | "has-published-version-document"
+          | "published-without-draft"
+          | "published-with-draft";
+        hasPublishedVersion?: boolean | ("true" | "false");
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /**
+               * Format: uuid
+               * @description The document ID, represented by a UUID
+               */
+              documentId: string;
+              id: string | number;
+              /** @description A string field */
+              name: string;
+              /** @description A string field */
+              address: string;
+              /** @description A text field */
+              aboutSummary?: string;
+              /** @description A text field */
+              activityDetails?: string;
+              /**
+               * @description An integer field
+               * @default 0
+               */
+              displayOrder: number;
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              showOnHome: boolean | null;
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              showOnAbout: boolean | null;
+              /**
+               * @description A boolean field
+               * @default false
+               */
+              showOnActivity: boolean | null;
+              /** @description A datetime field */
+              createdAt?: string;
+              /** @description A datetime field */
+              updatedAt?: string;
+              /**
+               * @description A datetime field
+               * @default 2026-10-11T13:56:40.429Z
+               */
+              publishedAt: string;
+              /** @description A media field */
+              aboutImage?: components["schemas"]["PluginUploadFileDocument"];
+              /** @description A component field */
+              contactMethods?: components["schemas"]["ContentContactMethodEntry"][];
             };
           };
         };
@@ -3007,7 +3946,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.927Z
+               * @default 2026-10-11T13:56:40.436Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -3107,7 +4046,7 @@ export interface operations {
             featured: ("0" | "1" | "t" | "true" | "f" | "false") | null;
             /**
              * @description A datetime field
-             * @default 2026-10-08T23:37:35.937Z
+             * @default 2026-10-11T13:56:40.445Z
              */
             publishedAt: string;
             /** @description A component field */
@@ -3152,7 +4091,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.939Z
+               * @default 2026-10-11T13:56:40.446Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -3300,7 +4239,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.934Z
+               * @default 2026-10-11T13:56:40.442Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -3402,7 +4341,7 @@ export interface operations {
             featured?: ("0" | "1" | "t" | "true" | "f" | "false") | null;
             /**
              * @description A datetime field
-             * @default 2026-10-08T23:37:35.942Z
+             * @default 2026-10-11T13:56:40.450Z
              */
             publishedAt?: string;
             /** @description A component field */
@@ -3447,7 +4386,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.943Z
+               * @default 2026-10-11T13:56:40.451Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -3568,7 +4507,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.947Z
+               * @default 2026-10-11T13:56:40.454Z
                */
               publishedAt: string;
               /** @description A component field */
@@ -3712,7 +4651,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.953Z
+               * @default 2026-10-11T13:56:40.461Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -3804,7 +4743,7 @@ export interface operations {
             displayOrder: number;
             /**
              * @description A datetime field
-             * @default 2026-10-08T23:37:35.960Z
+             * @default 2026-10-11T13:56:40.468Z
              */
             publishedAt: string;
             /** @description A media field */
@@ -3845,7 +4784,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.961Z
+               * @default 2026-10-11T13:56:40.469Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -3983,7 +4922,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.957Z
+               * @default 2026-10-11T13:56:40.465Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -4077,7 +5016,7 @@ export interface operations {
             displayOrder?: number;
             /**
              * @description A datetime field
-             * @default 2026-10-08T23:37:35.963Z
+             * @default 2026-10-11T13:56:40.475Z
              */
             publishedAt?: string;
             /** @description A media field */
@@ -4118,7 +5057,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.965Z
+               * @default 2026-10-11T13:56:40.477Z
                */
               publishedAt: string;
               /** @description A media field */
@@ -4231,7 +5170,7 @@ export interface operations {
               updatedAt?: string;
               /**
                * @description A datetime field
-               * @default 2026-10-08T23:37:35.968Z
+               * @default 2026-10-11T13:56:40.483Z
                */
               publishedAt: string;
               /** @description A media field */

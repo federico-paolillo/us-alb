@@ -60,6 +60,27 @@ export interface ContentCallToAction extends Struct.ComponentSchema {
   };
 }
 
+export interface ContentContactMethod extends Struct.ComponentSchema {
+  collectionName: 'components_content_contact_methods';
+  info: {
+    displayName: 'Contact Method';
+  };
+  attributes: {
+    kind: Schema.Attribute.Enumeration<['phone', 'email']> &
+      Schema.Attribute.Required;
+    label: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
+    value: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+  };
+}
+
 export interface ContentFacility extends Struct.ComponentSchema {
   collectionName: 'components_content_facilities';
   info: {
@@ -298,6 +319,7 @@ declare module '@strapi/strapi' {
       'content.activity-teaser': ContentActivityTeaser;
       'content.board-member': ContentBoardMember;
       'content.call-to-action': ContentCallToAction;
+      'content.contact-method': ContentContactMethod;
       'content.facility': ContentFacility;
       'content.feature': ContentFeature;
       'content.institutional-quote': ContentInstitutionalQuote;

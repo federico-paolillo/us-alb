@@ -1,0 +1,64 @@
+{
+  "kind": "collectionType",
+  "collectionName": "locations",
+  "info": {
+    "singularName": "location",
+    "pluralName": "locations",
+    "displayName": "Location"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "maxLength": 160,
+      "required": true
+    },
+    "address": {
+      "type": "string",
+      "maxLength": 240,
+      "required": true
+    },
+    "aboutSummary": {
+      "type": "text"
+    },
+    "aboutImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "activityDetails": {
+      "type": "text"
+    },
+    "contactMethods": {
+      "type": "component",
+      "component": "content.contact-method",
+      "repeatable": true
+    },
+    "displayOrder": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "showOnHome": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "showOnAbout": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "showOnActivity": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    }
+  }
+}

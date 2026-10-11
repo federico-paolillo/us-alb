@@ -701,6 +701,12 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
         },
         number
       >;
+    contactHeading: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+      }>;
+    contactIntroduction: Schema.Attribute.Text;
+    contactMethods: Schema.Attribute.Component<'content.contact-method', true>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -736,6 +742,65 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
         number
       >;
     publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiLocationLocation extends Struct.CollectionTypeSchema {
+  collectionName: 'locations';
+  info: {
+    displayName: 'Location';
+    pluralName: 'locations';
+    singularName: 'location';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    aboutImage: Schema.Attribute.Media<'images'>;
+    aboutSummary: Schema.Attribute.Text;
+    activityDetails: Schema.Attribute.Text;
+    address: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 240;
+      }>;
+    contactMethods: Schema.Attribute.Component<'content.contact-method', true>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    displayOrder: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::location.location'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    showOnAbout: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    showOnActivity: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    showOnHome: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1355,6 +1420,7 @@ declare module '@strapi/strapi' {
       'api::activity-page.activity-page': ApiActivityPageActivityPage;
       'api::calendar-entry.calendar-entry': ApiCalendarEntryCalendarEntry;
       'api::home-page.home-page': ApiHomePageHomePage;
+      'api::location.location': ApiLocationLocation;
       'api::news-item.news-item': ApiNewsItemNewsItem;
       'api::official-document.official-document': ApiOfficialDocumentOfficialDocument;
       'plugin::content-releases.release': PluginContentReleasesRelease;

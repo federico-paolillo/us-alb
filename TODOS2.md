@@ -6,7 +6,7 @@ validation. Run `be:openapi` and `fe:openapi` after backend or frontend changes,
 and `be:types` when backend types change, as required by `AGENTS.md`. Leave the
 earlier `PLAN.md` and `TODOS.md` alone.
 
-- [ ] **01 — Add the Strapi contact model without removing existing page fields**
+- [x] **01 — Add the Strapi contact model without removing existing page fields**
 
   Obtain the explicit confirmation required by `AGENTS.md` before changing
   content types. Through Strapi's APIs or admin UI, add the repeatable
