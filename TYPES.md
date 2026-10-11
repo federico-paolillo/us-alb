@@ -113,7 +113,10 @@ capped at 160 characters, multi-line `contactIntroduction`, and repeatable
 `contactMethods` owned by the club rather than by a particular location. Its
 frontend DTO is `HomePageDto` with discriminant `pageType: "home"`; it carries
 the optional contact heading and introduction plus validated club-wide contact
-methods. Preview targets `/`.
+methods. Home also reads the ordered Location collection, filters it only by
+`showOnHome`, and renders the editable copy, club-wide methods, and visible
+Location addresses and methods in its bottom contact section. Preview targets
+`/`.
 
 ### About Page
 
@@ -154,8 +157,10 @@ still uses `content.facility`, Activity's required repeatable `venues` still
 uses `content.venue`, and schedule `venue` remains required free text. Those
 embedded models continue to supply the current frontend through task 04; the
 Location collection now has a status-aware `LocationDto` list read in the CMS
-pipeline, but no page presents or filters that list yet. It has no Public role
-permission in this task.
+pipeline. Home filters that list by `showOnHome` and presents each visible
+Location's name, address, and contact methods; About and Activity do not consume
+it until task 04. It has no Public role permission, and demonstration archive
+content remains pending until task 05.
 
 ### News
 
@@ -193,8 +198,9 @@ file is editorially restricted to PDF; the frontend mapper enforces MIME
 
 The public cached reads are `getHomePage`, `getAboutPage`, `getActivityPage`,
 `getNewsBySlug`, `listNews`, `listCalendarEntries`, and
-`listOfficialDocuments`. Single-document pages dispatch through `CmsPageDto`
-and `PageSwitch`; `/notizie` renders its three collections directly.
+`listOfficialDocuments`, plus the status-aware `listLocations`. Single-document
+pages dispatch through `CmsPageDto` and `PageSwitch`; `/notizie` renders its
+three collections directly.
 
 `ContactMethodDto` owns trimmed display values and mapper-created `tel:` or
 `mailto:` links. Published Home and Location payloads fail mapping when a

@@ -30,7 +30,7 @@ earlier `PLAN.md` and `TODOS.md` alone.
   About/Activity data paths working until task 04; add focused frontend tests
   for query serialization, mapping, and tag selection.
 
-- [ ] **03 — Put the responsive contact section on Home**
+- [x] **03 — Put the responsive contact section on Home**
 
   Render an explicit `id="contatti"` section after the other Home content and
   before the footer, using the site's styles and editable Home copy. Show

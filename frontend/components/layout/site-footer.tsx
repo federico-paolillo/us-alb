@@ -5,13 +5,10 @@ const version = process.env.NEXT_PUBLIC_APP_VERSION ?? "development";
 
 export function SiteFooter() {
   return (
-    <footer
-      className="border-t border-outline-soft bg-inverse text-inverse-text"
-      id="contatti"
-    >
+    <footer className="border-t border-outline-soft bg-inverse text-inverse-text">
       <div className="site-container py-14 md:py-16">
         <div className="grid gap-10 md:grid-cols-12 md:gap-8">
-          <div className="md:col-span-5">
+          <div className="md:col-span-7">
             <ClubBrand inverse />
             <p className="mt-5 max-w-md text-sm leading-6 text-inverse-text/70">
               Polisportiva dilettantistica di Albate: dal 1968 lo sport è un
@@ -22,33 +19,10 @@ export function SiteFooter() {
             </p>
           </div>
 
-          <div className="md:col-span-4">
-            <h2 className="text-xs font-semibold tracking-editorial text-inverse-text uppercase">
-              Sedi e contatti
-            </h2>
-            <address className="mt-4 space-y-4 text-sm leading-6 text-inverse-text/70 not-italic">
-              <p>
-                <strong className="block font-semibold text-inverse-text">
-                  Centro Sportivo Giallonero
-                </strong>
-                Via della Comunità 68, Albate (CO)
-              </p>
-              <p>
-                <strong className="block font-semibold text-inverse-text">
-                  Cortile Sportivo dell’Oratorio
-                </strong>
-                Piazza del Gioco 7, Albate (CO)
-              </p>
-              <a
-                className="inline-block text-gold-pale underline decoration-gold-pale/40 underline-offset-4 hover:text-white"
-                href="mailto:segreteria@usalbatese.example"
-              >
-                segreteria@usalbatese.example
-              </a>
-            </address>
-          </div>
-
-          <nav aria-label="Piè di pagina" className="md:col-span-3">
+          <nav
+            aria-label="Piè di pagina"
+            className="md:col-span-5 md:justify-self-end"
+          >
             <h2 className="text-xs font-semibold tracking-editorial text-inverse-text uppercase">
               Navigazione
             </h2>
