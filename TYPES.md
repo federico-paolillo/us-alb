@@ -149,8 +149,11 @@ and filter it only by `showOnHome`, `showOnAbout`, or `showOnActivity`,
 respectively. Home presents each visible Location's name, address, and contact
 methods; About uses `aboutSummary` and `aboutImage`; Activity uses
 `activityDetails`. Schedule `venue` remains required editorial free text and is
-not resolved against Location records. Location has no Public role permission,
-and demonstration archive content remains pending until task 05.
+not resolved against Location records. Public has Location collection read
+permission through `location.find`. The demonstration archive contains two
+published shared Locations plus fictional Home and Location phone/email
+contacts; its other permission sets and existing demonstration content remain
+preserved.
 
 ### News
 

@@ -52,7 +52,7 @@ earlier `PLAN.md` and `TODOS.md` alone.
   refresh generated artifacts. Confirm the backend starts with an empty
   database and applicable frontend checks and build pass.
 
-- [ ] **05 — Rebuild and verify the demonstration archive**
+- [x] **05 — Rebuild and verify the demonstration archive**
 
   Use Strapi to turn the existing fictional About facilities and Activity venues
   into two published shared locations. Add a club-wide `.example` email and
