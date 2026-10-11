@@ -174,6 +174,9 @@ design laws or assets to reuse as-is.
 - It is important to show the value of env. var. `NEXT_PUBLIC_APP_VERSION` in
   the website footer. This information is critical to understand what version is
   being used by an user when reporting issues.
+- Use files in `design/` folder for design style, guidelines and flavor.
+  Already implemented conventions and styling takes precedence over `design/`.
+  `design/` is the inspiration `frontend/` is the authoritative implementation.
 
 ## Environment
 
