@@ -1,4 +1,7 @@
 import type { ContactMethodDto, LocationDto } from "@cmsjs/cms/model";
+import { FragmentScrollTarget } from "@cmsjs/components/shared/fragment-scroll-target";
+
+const contactSectionId = "contatti";
 
 export function ContactSection({
   heading,
@@ -26,8 +29,9 @@ export function ContactSection({
     <section
       aria-labelledby="contatti-heading"
       className="border-t border-outline-soft/50 bg-surface-lowest pt-14 pb-24 md:py-24"
-      id="contatti"
+      id={contactSectionId}
     >
+      <FragmentScrollTarget targetId={contactSectionId} />
       <div className="site-container">
         <div className="max-w-3xl">
           <p className="text-[0.6875rem] leading-4 font-bold tracking-editorial text-gold-deep uppercase">

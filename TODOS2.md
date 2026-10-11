@@ -64,7 +64,7 @@ earlier `PLAN.md` and `TODOS.md` alone.
   no administrator accounts, tokens, environment values, or webhook
   configuration. Migration of another CMS instance is outside this task.
 
-- [ ] **06 — Verify editorial updates, navigation, and release gates**
+- [x] **06 — Verify editorial updates, navigation, and release gates**
 
   Run applicable canonical backend build, generated-artifact, frontend check,
   build, and focused unit/integration validation. Publish a Home method edit
