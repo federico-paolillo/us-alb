@@ -55,7 +55,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Database 
     sqlite: {
       client: 'sqlite',
       connection: {
-        filename: path.join(__dirname, '..', '..', env('DATABASE_FILENAME', '.tmp/data.db')),
+        filename: getSqliteDatabaseFilename(env)
       },
       useNullAsDefault: true,
     },
@@ -68,5 +68,18 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Database 
     },
   };
 };
+
+const databaseFileNameSetting = "DATABASE_FILENAME";
+const databaseFileNameSettingDefault = ".tmp/data.db";
+
+function getSqliteDatabaseFilename(env: Core.Config.Shared.ConfigParams['env']): string {
+  const databaseFilenameConfigured = env(databaseFileNameSetting, databaseFileNameSettingDefault);
+
+  if (path.isAbsolute(databaseFilenameConfigured)) {
+    return databaseFilenameConfigured;
+  }
+
+  return path.join(__dirname, '..', '..', databaseFilenameConfigured);
+}
 
 export default config;

@@ -1,6 +1,6 @@
 import type { Core } from "@strapi/strapi";
 
-const WEBHOOK_NAME = "Next.js revalidation";
+const WEBHOOK_NAME = "Next revalidation";
 
 const WEBHOOK_EVENTS = [
   "entry.create",
@@ -20,6 +20,15 @@ export async function ensureNextJsWebhook(strapi: Core.Strapi): Promise<void> {
     return;
   }
 
+  const secretHeader = process.env.WEBHOOKS_SECRET_HEADER;
+  const secretValue = process.env.WEBHOOKS_SECRET_HEADER_VALUE;
+
+  if (!secretHeader?.trim() || !secretValue?.trim()) {
+    throw new Error(
+      "WEBHOOKS_SECRET_HEADER and WEBHOOKS_SECRET_HEADER_VALUE must be set when WEBHOOKS_NEXTJS_TARGET is set.",
+    );
+  }
+
   const url = new URL("/refresh", baseUrl).toString();
   const webhookStore = strapi.get("webhookStore");
 
@@ -29,7 +38,6 @@ export async function ensureNextJsWebhook(strapi: Core.Strapi): Promise<void> {
     const match = existing.find((webhook: { url: string }) => webhook.url === url);
 
     if (match) {
-      strapi.get("webhookRunner").add(match);
       return;
     }
   }
@@ -37,7 +45,7 @@ export async function ensureNextJsWebhook(strapi: Core.Strapi): Promise<void> {
   const webhook = await webhookStore.createWebhook({
     name: WEBHOOK_NAME,
     url,
-    headers: {},
+    headers: { [`x-${secretHeader}`]: secretValue },
     events: WEBHOOK_EVENTS,
   });
 
