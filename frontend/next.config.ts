@@ -14,6 +14,7 @@ const isLoopbackMediaHost = new Set(["127.0.0.1", "[::1]", "localhost"]).has(
 );
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   cacheComponents: true,
   partialPrefetching: true,
   typedRoutes: true,
