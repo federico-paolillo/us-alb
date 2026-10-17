@@ -15,14 +15,20 @@ jobs:
       - name: Prepare local configuration
         run: |
           cp backend/.env.example backend/.env
-          cp frontend/.env.example frontend/.env.development
+          cp frontend/.env.example frontend/.env
       - uses: jdx/mise-action@v5
       - name: Install backend dependencies
         run: mise exec -- npm ci --prefix backend
       - name: Install frontend dependencies
         run: mise exec -- npm ci --prefix frontend
+      - name: Generate backend types
+        run: mise run be:types
       - name: Build backend
         run: mise run be:build
+      - name: Generate OpenAPI schema
+        run: mise run be:openapi
+      - name: Generate frontend OpenAPI types
+        run: mise run fe:openapi
       - name: Build frontend
         run: mise run fe:build
       - name: Check frontend
