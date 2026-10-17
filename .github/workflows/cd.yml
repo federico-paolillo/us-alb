@@ -1,0 +1,155 @@
+name: cd
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cd-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    outputs:
+      full_sha: ${{ steps.metadata.outputs.full_sha }}
+      short_sha: ${{ steps.metadata.outputs.short_sha }}
+      image_prefix: ${{ steps.metadata.outputs.image_prefix }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate configuration and prepare image metadata
+        id: metadata
+        shell: bash
+        env:
+          CMS_MEDIA_URL: ${{ vars.CMS_MEDIA_URL }}
+          SITE_URL: ${{ vars.SITE_URL }}
+          SERVER_URL: ${{ vars.SERVER_URL }}
+          ADMIN_COOKIE_PATH: ${{ vars.ADMIN_COOKIE_PATH }}
+        run: |
+          for argument in CMS_MEDIA_URL SITE_URL SERVER_URL ADMIN_COOKIE_PATH; do
+            if [[ -z "${!argument}" ]]; then
+              printf '::error::Repository variable %s is required\n' "$argument"
+              exit 1
+            fi
+          done
+
+          full_sha=$(git rev-parse HEAD)
+          short_sha=$(git rev-parse --short HEAD)
+          {
+            printf 'full_sha=%s\n' "$full_sha"
+            printf 'short_sha=%s\n' "$short_sha"
+            printf 'image_prefix=ghcr.io/%s\n' "${GITHUB_REPOSITORY,,}"
+          } >> "$GITHUB_OUTPUT"
+
+  publish:
+    name: Publish ${{ matrix.image }}
+    needs: prepare
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: frontend
+            build_args: |
+              CMS_MEDIA_URL=${{ vars.CMS_MEDIA_URL }}
+              SITE_URL=${{ vars.SITE_URL }}
+              NEXT_PUBLIC_APP_VERSION=${{ needs.prepare.outputs.full_sha }}
+          - image: backend
+            build_args: |
+              SERVER_URL=${{ vars.SERVER_URL }}
+              ADMIN_COOKIE_PATH=${{ vars.ADMIN_COOKIE_PATH }}
+    env:
+      IMAGE_NAME: ${{ needs.prepare.outputs.image_prefix }}/${{ matrix.image }}
+      FULL_SHA: ${{ needs.prepare.outputs.full_sha }}
+      SHORT_SHA: ${{ needs.prepare.outputs.short_sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.prepare.outputs.full_sha }}
+          persist-credentials: false
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        with:
+          driver-opts: image=moby/buildkit:v0.34.0@sha256:b059f8d7226d0b326bc871af489a5dddf65e36af4d20d14251b072974d9ee87c
+          # Setting explicit flags replaces the action's insecure entitlement defaults.
+          buildkitd-flags: --oci-worker-gc=true
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and publish image
+        id: build
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: ./${{ matrix.image }}
+          platforms: linux/amd64
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:${{ env.SHORT_SHA }}
+          build-args: ${{ matrix.build_args }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ env.FULL_SHA }}
+          provenance: mode=max
+          attests: type=sbom,generator=docker/buildkit-syft-scanner:1.12.0@sha256:ae4f3b554449e7e25548e7d8ccc029d17357348e30c6e3df01b92bc93654d6a9
+      - name: Sign build provenance
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-name: ${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+          create-storage-record: false
+      - name: Extract image SBOM
+        shell: bash
+        env:
+          IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          docker buildx imagetools inspect "$IMAGE_NAME@$IMAGE_DIGEST" \
+            --format '{{ json .SBOM.SPDX }}' > "$RUNNER_TEMP/sbom.spdx.json"
+      - name: Sign image SBOM
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-name: ${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          sbom-path: ${{ runner.temp }}/sbom.spdx.json
+          push-to-registry: true
+          create-storage-record: false
+      - name: Verify published attestations
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          for predicate_type in https://slsa.dev/provenance/v1 https://spdx.dev/Document; do
+            gh attestation verify "oci://$IMAGE_NAME@$IMAGE_DIGEST" \
+              --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/cd.yml" \
+              --source-digest "$FULL_SHA" \
+              --deny-self-hosted-runners \
+              --predicate-type "$predicate_type"
+          done
+      - name: Summarize published image
+        shell: bash
+        env:
+          IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          {
+            printf '### Published image\n\n'
+            printf '| Property | Value |\n| --- | --- |\n'
+            printf '| Tag | %s:%s |\n' "$IMAGE_NAME" "$SHORT_SHA"
+            printf '| Commit | %s |\n' "$FULL_SHA"
+            printf '| Digest | %s |\n' "$IMAGE_DIGEST"
+            printf '| Immutable reference | %s@%s |\n' "$IMAGE_NAME" "$IMAGE_DIGEST"
+          } >> "$GITHUB_STEP_SUMMARY"

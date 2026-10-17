@@ -49,6 +49,11 @@ description = "Lint and type-check the frontend"
 dir = "frontend"
 run = "npm run check"
 
+[tasks."fe:test"]
+description = "Run the frontend unit tests"
+dir = "frontend"
+run = "npm test"
+
 [tasks."fe:format"]
 description = "Format the frontend with Biome"
 dir = "frontend"
