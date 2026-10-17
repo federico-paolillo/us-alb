@@ -12,7 +12,6 @@
     "typecheck": "npm run typegen && tsc --noEmit",
     "check": "npm run lint && npm run typecheck",
     "test": "vitest run",
-    "test:container": "node --test test/container-image.integration.mjs",
     "test:watch": "vitest",
     "openapi": "openapi-typescript cms/schema.json -o cms/schema.d.ts && biome format --write cms/schema.json cms/schema.d.ts"
   },

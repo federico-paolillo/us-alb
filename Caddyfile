@@ -1,0 +1,37 @@
+{
+	admin off
+	auto_https off
+	persist_config off
+
+	storage file_system {
+		root /var/lib/caddy
+	}
+
+	log {
+		output stdout
+		format console
+	}
+}
+
+http://:65102 {
+	log {
+		output stdout
+		format console
+	}
+	
+	handle_path /cms {
+		reverse_proxy backend:65101
+	}
+
+	handle_path /cms/* {
+		reverse_proxy backend:65101
+	}
+
+	handle /uploads/* {
+		reverse_proxy backend:65101
+	}
+
+	handle {
+		reverse_proxy frontend:65100
+	}
+}

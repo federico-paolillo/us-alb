@@ -9,9 +9,9 @@ if (!rawMediaUrl) {
 const mediaUrl = new URL(rawMediaUrl);
 
 const protocolWithoutColon = mediaUrl.protocol.slice(0, -1) as "http" | "https";
-const isLoopbackMediaHost = new Set(["127.0.0.1", "[::1]", "localhost"]).has(
-  mediaUrl.hostname,
-);
+const isLoopbackMediaHost =
+  new Set(["127.0.0.1", "[::1]", "localhost"]).has(mediaUrl.hostname) ||
+  mediaUrl.hostname.endsWith(".localhost");
 
 const nextConfig: NextConfig = {
   output: "standalone",

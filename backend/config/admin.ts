@@ -21,6 +21,9 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Admin => 
   return {
     auth: {
       secret: env('ADMIN_JWT_SECRET')!,
+      cookie: {
+        path: env('ADMIN_COOKIE_PATH', '/admin'),
+      },
     },
     apiToken: {
       salt: env('API_TOKEN_SALT')!,

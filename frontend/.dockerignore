@@ -15,5 +15,3 @@ pnpm-debug.log*
 .vscode
 *.pem
 .env*
-test/container
-test/container-image.integration.mjs

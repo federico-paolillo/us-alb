@@ -5,10 +5,13 @@ ENV NPM_CONFIG_LOGLEVEL=info
 
 WORKDIR /strapi
 
+ARG SERVER_URL
+ARG ADMIN_COOKIE_PATH
+
 COPY package.json      /strapi/package.json
 COPY package-lock.json /strapi/package-lock.json
 
-RUN --mount=type=cache,target=/root/.npm npm ci
+RUN --mount=type=cache,target=/root/.npm npm ci --include=dev
 
 COPY config/   /strapi/config/
 COPY database/ /strapi/database/
@@ -18,11 +21,16 @@ COPY types/    /strapi/types/
 
 COPY tsconfig.json /strapi/tsconfig.json
 COPY favicon.png   /strapi/favicon.png
+
+# Allow an optional .env file injection using Docker Secrets
+
 COPY .env.example  /strapi/.env
 
 RUN mkdir /data /config
 
-RUN npm run build
+RUN SERVER_URL="$SERVER_URL" \
+    ADMIN_COOKIE_PATH="$ADMIN_COOKIE_PATH" \
+    npm run build
 
 FROM gcr.io/distroless/nodejs24-debian13:nonroot@sha256:9eeb7f5887d0e239e78264b06f7f11d2e14be534050481803a9e4728fcdd278e
 
@@ -49,7 +57,9 @@ COPY --from=build --chown=nonroot:nonroot --chmod=755 /strapi/public/uploads /da
 
 USER nonroot
 
-VOLUME ["/data", "/tmp", "/config"]
+# Supply tmpfs mounts for /tmp
+
+VOLUME ["/data", "/config"]
 
 EXPOSE 1337
 
