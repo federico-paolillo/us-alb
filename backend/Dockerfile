@@ -5,8 +5,9 @@ ENV NPM_CONFIG_LOGLEVEL=info
 
 WORKDIR /strapi
 
-ARG SERVER_URL
-ARG ADMIN_COOKIE_PATH
+ARG SITE_URL
+ARG CMS_PUBLIC_URL=
+ARG CMS_ADMIN_COOKIE_PATH=
 
 COPY package.json      /strapi/package.json
 COPY package-lock.json /strapi/package-lock.json
@@ -28,8 +29,9 @@ COPY .env.example  /strapi/.env
 
 RUN mkdir /data /config
 
-RUN SERVER_URL="$SERVER_URL" \
-    ADMIN_COOKIE_PATH="$ADMIN_COOKIE_PATH" \
+RUN SITE_URL="$SITE_URL" \
+    CMS_PUBLIC_URL="$CMS_PUBLIC_URL" \
+    CMS_ADMIN_COOKIE_PATH="$CMS_ADMIN_COOKIE_PATH" \
     npm run build
 
 FROM gcr.io/distroless/nodejs24-debian13:nonroot@sha256:9eeb7f5887d0e239e78264b06f7f11d2e14be534050481803a9e4728fcdd278e
@@ -39,7 +41,7 @@ ENV NPM_CONFIG_LOGLEVEL=info
 ENV DATABASE_CLIENT=sqlite
 ENV DATABASE_FILENAME=/data/cmsjs-tmpl.db
 ENV HOST=0.0.0.0
-ENV PORT=1337
+ENV PORT=65101
 ENV SERVER_PUBLIC_FOLDER=/data/public
 ENV ENV_PATH=/strapi/.env
 
@@ -61,6 +63,6 @@ USER nonroot
 
 VOLUME ["/data", "/config"]
 
-EXPOSE 1337
+EXPOSE 65101
 
 CMD ["/strapi/node_modules/@strapi/strapi/bin/strapi.js", "start"]

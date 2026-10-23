@@ -11,7 +11,7 @@ export interface AppDeps {
 function makeDeps(cfg: AppConfig): AppDeps {
   return Object.freeze({
     connector: makeCmsConnector(
-      makeCmsClient(globalThis.fetch, cfg.cmsUrl.href, cfg.cmsApiToken),
+      makeCmsClient(globalThis.fetch, cfg.cmsApiUrl.href, cfg.cmsApiToken),
       cfg.cmsMediaUrl.href,
     ),
   });

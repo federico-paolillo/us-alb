@@ -1,4 +1,5 @@
 import type { Core } from '@strapi/strapi';
+import { resolvePublicUrls } from "../src/config/public-urls";
 
 declare const strapi: Core.Strapi;
 
@@ -15,14 +16,18 @@ const newsUid = 'api::news-item.news-item' as const;
 type PreviewContentType = keyof typeof previewPaths | typeof newsUid;
 
 const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Admin => {
-  const previewClientUrl = requiredUrl(env('PREVIEW_CLIENT_URL'), 'PREVIEW_CLIENT_URL');
+  const { adminCookiePath, siteUrl } = resolvePublicUrls(
+    env("SITE_URL"),
+    env("CMS_PUBLIC_URL"),
+    env("CMS_ADMIN_COOKIE_PATH"),
+  );
   const previewSecret = requiredValue(env('PREVIEW_SECRET'), 'PREVIEW_SECRET');
 
   return {
     auth: {
       secret: env('ADMIN_JWT_SECRET')!,
       cookie: {
-        path: env('ADMIN_COOKIE_PATH', '/admin'),
+        path: adminCookiePath,
       },
     },
     apiToken: {
@@ -39,7 +44,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Admin => 
     preview: {
       enabled: true,
       config: {
-        allowedOrigins: [previewClientUrl.origin],
+        allowedOrigins: [siteUrl.origin],
         async handler(uid, { documentId, status }) {
           if (!isPreviewContentType(uid) || !documentId || !isContentStatus(status)) {
             return null;
@@ -61,7 +66,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Admin => 
             path = previewPaths[uid];
           }
 
-          const previewUrl = new URL('/preview', previewClientUrl);
+          const previewUrl = new URL('/preview', siteUrl);
           previewUrl.searchParams.set('url', path);
           previewUrl.searchParams.set('secret', previewSecret);
           previewUrl.searchParams.set('status', status);
@@ -83,14 +88,6 @@ function requiredValue(value: string | undefined, name: string): string {
   }
 
   return value;
-}
-
-function requiredUrl(value: string | undefined, name: string): URL {
-  try {
-    return new URL(requiredValue(value, name));
-  } catch {
-    throw new Error(`Env. var. ${name} must be an absolute URL`);
-  }
 }
 
 function isPreviewContentType(uid: string): uid is PreviewContentType {

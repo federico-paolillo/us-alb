@@ -27,12 +27,9 @@ jobs:
         id: metadata
         shell: bash
         env:
-          CMS_MEDIA_URL: ${{ vars.CMS_MEDIA_URL }}
           SITE_URL: ${{ vars.SITE_URL }}
-          SERVER_URL: ${{ vars.SERVER_URL }}
-          ADMIN_COOKIE_PATH: ${{ vars.ADMIN_COOKIE_PATH }}
         run: |
-          for argument in CMS_MEDIA_URL SITE_URL SERVER_URL ADMIN_COOKIE_PATH; do
+          for argument in SITE_URL; do
             if [[ -z "${!argument}" ]]; then
               printf '::error::Repository variable %s is required\n' "$argument"
               exit 1
@@ -67,8 +64,9 @@ jobs:
               NEXT_PUBLIC_APP_VERSION=${{ needs.prepare.outputs.full_sha }}
           - image: backend
             build_args: |
-              SERVER_URL=${{ vars.SERVER_URL }}
-              ADMIN_COOKIE_PATH=${{ vars.ADMIN_COOKIE_PATH }}
+              SITE_URL=${{ vars.SITE_URL }}
+              CMS_PUBLIC_URL=${{ vars.CMS_PUBLIC_URL }}
+              CMS_ADMIN_COOKIE_PATH=${{ vars.CMS_ADMIN_COOKIE_PATH }}
     env:
       IMAGE_NAME: ${{ needs.prepare.outputs.image_prefix }}/${{ matrix.image }}
       FULL_SHA: ${{ needs.prepare.outputs.full_sha }}

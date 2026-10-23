@@ -2,8 +2,8 @@ FROM node:24.20.0-trixie@sha256:f7d34e58713740f9eef9092c0bd6ff10369d132f7238399a
 
 # These variables are inlined by next/image allowlist and robots.ts
 
-ARG CMS_MEDIA_URL=http://127.0.0.1:1337
-ARG SITE_URL=http://localhost:3000
+ARG CMS_MEDIA_URL=
+ARG SITE_URL=http://127.0.0.1:65100
 
 # This variable is inlined at compile time
 
@@ -18,10 +18,10 @@ RUN --mount=type=cache,target=/root/.npm npm ci --include=dev
 
 COPY . /app/
 
-RUN CMS_URL=http://127.0.0.1:65101/api \
+RUN CMS_API_URL=http://127.0.0.1:65101/api \
     CMS_MEDIA_URL="$CMS_MEDIA_URL" \
-    CMS_WEBHOOKS_SECRET_HEADER=build-validation-header \
-    CMS_WEBHOOKS_SECRET_HEADER_VALUE=build-validation-placeholder \
+    REVALIDATION_HEADER=x-build-validation-header \
+    REVALIDATION_SECRET=build-validation-placeholder \
     PREVIEW_SECRET=build-validation-placeholder \
     SITE_URL="$SITE_URL" \
     NEXT_PUBLIC_APP_VERSION="$NEXT_PUBLIC_APP_VERSION" \

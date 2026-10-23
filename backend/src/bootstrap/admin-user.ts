@@ -2,8 +2,6 @@ import type { Core } from "@strapi/strapi";
 import { resolveSecret } from "./secrets";
 
 export async function ensureDefaultAdmin(strapi: Core.Strapi): Promise<void> {
-  const user = process.env.ADMIN_USER || "admin";
-  const domain = process.env.ADMIN_DOMAIN || "example.com";
   const password = resolveSecret("ADMIN_PASSWORD");
 
   if (!password) {
@@ -19,13 +17,27 @@ export async function ensureDefaultAdmin(strapi: Core.Strapi): Promise<void> {
     return;
   }
 
-  const email = `${user}@${domain}`;
+  const { email, username } = parseAdminEmail(process.env.ADMIN_EMAIL);
 
   await userService.createFirstAdmin({
     email,
     password,
-    username: user,
+    username,
   });
 
   strapi.log.info(`Created default admin user ${email}`);
+}
+
+function parseAdminEmail(value: string | undefined): {
+  email: string;
+  username: string;
+} {
+  const email = value?.trim() || "admin@example.com";
+  const [username, domain, ...rest] = email.split("@");
+
+  if (!username || !domain || rest.length > 0) {
+    throw new Error("Env. var. ADMIN_EMAIL must be a valid email address");
+  }
+
+  return { email, username };
 }

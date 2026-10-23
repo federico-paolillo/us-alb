@@ -1,12 +1,7 @@
 import type { NextConfig } from "next";
+import { resolveCmsMediaUrl } from "./environment";
 
-const rawMediaUrl = process.env.CMS_MEDIA_URL;
-
-if (!rawMediaUrl) {
-  throw new Error(`Env. var. 'CMS_MEDIA_URL' is not set`);
-}
-
-const mediaUrl = new URL(rawMediaUrl);
+const mediaUrl = resolveCmsMediaUrl(process.env);
 
 const protocolWithoutColon = mediaUrl.protocol.slice(0, -1) as "http" | "https";
 const isLoopbackMediaHost =

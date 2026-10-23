@@ -13,24 +13,11 @@ const acceptedEvents = new Set([
 ]);
 
 export async function POST(request: Request): Promise<Response> {
-  const expectedSecretHeader = config.cmsWebhooksSecretHeader;
-  const expectedSecretValue = config.cmsWebhooksSecretHeaderValue;
+  const providedHeaderValue = request.headers.get(config.revalidationHeader);
 
-  if (!expectedSecretHeader) {
-    return new Response("Revalidation is not configured properly", {
-      status: 503,
-    });
-  }
-
-  if (!expectedSecretValue) {
-    return new Response("Revalidation is not configured properly", {
-      status: 503,
-    });
-  }
-
-  const providedHeaderValue = request.headers.get(`x-${expectedSecretHeader}`);
-
-  if (!timingSafeCompareSecret(providedHeaderValue, expectedSecretValue)) {
+  if (
+    !timingSafeCompareSecret(providedHeaderValue, config.revalidationSecret)
+  ) {
     return new Response("Unauthorized", { status: 401 });
   }
 

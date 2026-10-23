@@ -3,8 +3,9 @@ services:
     build:
       context: ./backend
       args:
-        SERVER_URL: ${SERVER_URL:?SERVER_URL is required}
-        ADMIN_COOKIE_PATH: ${ADMIN_COOKIE_PATH:?ADMIN_COOKIE_PATH is required}
+        SITE_URL: ${SITE_URL:?SITE_URL is required}
+        CMS_PUBLIC_URL: ${CMS_PUBLIC_URL:-}
+        CMS_ADMIN_COOKIE_PATH: ${CMS_ADMIN_COOKIE_PATH:-}
     environment:
       ENV_PATH: /run/secrets/backend.env
       HOST: 0.0.0.0
@@ -25,8 +26,8 @@ services:
     build:
       context: ./frontend
       args:
-        CMS_MEDIA_URL: ${CMS_MEDIA_URL:?CMS_MEDIA_URL is required}
         SITE_URL: ${SITE_URL:?SITE_URL is required}
+        CMS_MEDIA_URL: ${CMS_MEDIA_URL:-}
         NEXT_PUBLIC_APP_VERSION: ${NEXT_PUBLIC_APP_VERSION:?NEXT_PUBLIC_APP_VERSION is required}
     environment:
       HOSTNAME: 0.0.0.0
