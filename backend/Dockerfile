@@ -66,4 +66,5 @@ VOLUME ["/data", "/config"]
 EXPOSE 65101
 
 ENTRYPOINT ["/nodejs/bin/node", "/strapi/node_modules/@strapi/strapi/bin/strapi.js"]
+
 CMD ["start"]
