@@ -14,11 +14,6 @@
 }
 
 http://:65102 {
-	log {
-		output stdout
-		format console
-	}
-	
 	handle_path /cms {
 		reverse_proxy backend:65101
 	}
