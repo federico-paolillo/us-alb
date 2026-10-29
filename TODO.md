@@ -233,7 +233,8 @@ provide concrete handoff details without claiming that these activities occurred
   - Design references: “Remote artifact contract”; “Libraries and private
     coordination”; “Verification and implementation calibration.”
 
-- [ ] B07 — Implement scheduling and durable state
+- [x] B07 — Implement scheduling and durable state
+  - Plan: [ExecPlan](.agents/plans/b07-implement-scheduling-and-durable-state.md)
   - Scope: Implement the daily UTC timer, one overdue startup catch-up rather
     than missed-date replay, shared single-flight admission for scheduled and
     `SIGUSR2` requests, and small versioned JSON state files replaced atomically
