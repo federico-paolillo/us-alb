@@ -33,6 +33,7 @@ export type StagingErrorCode =
   | "capture_cancellation_failed"
   | "capture_identity_mismatch"
   | "writer_unconfirmed"
+  | "staging_recovery_mismatch"
   | "cleanup_failed";
 
 export class StagingError extends Error {

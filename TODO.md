@@ -251,7 +251,8 @@ provide concrete handoff details without claiming that these activities occurred
   - Design references: “Scheduling, state, and manual runs”; “Compose services
     and private coordination”; “Signals and ownership.”
 
-- [ ] B08 — Connect the complete backup lifecycle
+- [x] B08 — Connect the complete backup lifecycle
+  - Plan: [ExecPlan](.agents/plans/b08-connect-complete-backup-lifecycle.md)
   - Scope: Wire scheduling, destination/capacity preflight, supervisor admission,
     export/recovery confirmation, validation, publication, persistence, and
     staging cleanup into the daemon entrypoints. Define safe restart handling

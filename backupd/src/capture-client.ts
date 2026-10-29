@@ -54,6 +54,28 @@ export class CaptureClientProtocolError extends Error {
   }
 }
 
+export type CaptureAdmissionRejectionReason =
+  | "capture_busy"
+  | "identity_mismatch"
+  | "stale_window"
+  | "runtime_unavailable"
+  | "serving_unavailable"
+  | "admission_cancelled"
+  | "shutting_down";
+
+export class CaptureAdmissionRejectedError extends Error {
+  readonly code = "capture_admission_rejected" as const;
+  readonly statusCode: 409 | 503;
+  readonly reason: CaptureAdmissionRejectionReason;
+
+  constructor(statusCode: 409 | 503, reason: CaptureAdmissionRejectionReason) {
+    super("Capture admission was rejected");
+    this.name = "CaptureAdmissionRejectedError";
+    this.statusCode = statusCode;
+    this.reason = reason;
+  }
+}
+
 function record(value: unknown): Record<string, unknown> {
   if (value === null || typeof value !== "object" || Array.isArray(value)) {
     throw new CaptureClientProtocolError("Capture response is not an object");
@@ -75,6 +97,37 @@ function exactRecord(
     throw new CaptureClientProtocolError("Capture response fields are invalid");
   }
   return item;
+}
+
+function parseCaptureAdmissionRejection(
+  statusCode: number,
+  value: unknown,
+): CaptureAdmissionRejectedError {
+  const item = exactRecord(value, ["version", "error"]);
+  if (item.version !== 1 || typeof item.error !== "string") {
+    throw new CaptureClientProtocolError(
+      "Capture admission rejection is invalid",
+    );
+  }
+  const reason = item.error;
+  const valid409 =
+    reason === "capture_busy" ||
+    reason === "identity_mismatch" ||
+    reason === "stale_window";
+  const valid503 =
+    reason === "runtime_unavailable" ||
+    reason === "serving_unavailable" ||
+    reason === "admission_cancelled" ||
+    reason === "shutting_down";
+  if ((statusCode === 409 && valid409) || (statusCode === 503 && valid503)) {
+    return new CaptureAdmissionRejectedError(
+      statusCode,
+      reason as CaptureAdmissionRejectionReason,
+    );
+  }
+  throw new CaptureClientProtocolError(
+    "Capture admission rejection is invalid",
+  );
 }
 
 function uuid(value: unknown): string {
@@ -794,12 +847,20 @@ export function createCaptureClient(
         let decoder: CaptureNdjsonDecoder | undefined;
         let settled = false;
         let reconciling = false;
+        let rejectionResponse = false;
+        let rejectionExchangeClosed = false;
+        let provisionalRejection: CaptureAdmissionRejectedError | undefined;
         const settle = (callback: () => void) => {
           if (settled) return;
           settled = true;
           clearTimeout(timer);
           startOptions?.signal?.removeEventListener("abort", abort);
           callback();
+        };
+        const settleProvisionalRejection = () => {
+          if (provisionalRejection !== undefined && rejectionExchangeClosed) {
+            settle(() => reject(provisionalRejection));
+          }
         };
         const reconcileAfterLoss = () => {
           if (settled || reconciling) return;
@@ -853,6 +914,7 @@ export function createCaptureClient(
           },
           (response) => {
             if (response.statusCode !== 200) {
+              rejectionResponse = true;
               try {
                 assertMediaType(
                   response.headers["content-type"],
@@ -864,14 +926,19 @@ export function createCaptureClient(
                 return;
               }
               void consume(response, JSON_LIMIT).then(
-                () =>
-                  settle(() =>
-                    reject(
-                      new CaptureClientProtocolError(
-                        "Capture admission failed",
-                      ),
-                    ),
-                  ),
+                (body) => {
+                  try {
+                    const value = JSON.parse(decodeUtf8(body)) as unknown;
+                    const rejection = parseCaptureAdmissionRejection(
+                      response.statusCode ?? 0,
+                      value,
+                    );
+                    provisionalRejection = rejection;
+                    settleProvisionalRejection();
+                  } catch (error) {
+                    settle(() => reject(error));
+                  }
+                },
                 (error) => settle(() => reject(error)),
               );
               return;
@@ -924,8 +991,17 @@ export function createCaptureClient(
           request.destroy(
             cancellationCause(startOptions?.signal as AbortSignal),
           );
-        request.once("error", () => {
-          if (!settled) reconcileAfterLoss();
+        request.once("error", (error) => {
+          if (settled) return;
+          if (rejectionResponse) {
+            settle(() => reject(error));
+          } else {
+            reconcileAfterLoss();
+          }
+        });
+        request.once("close", () => {
+          rejectionExchangeClosed = true;
+          settleProvisionalRejection();
         });
         if (startOptions?.signal?.aborted) abort();
         else {
@@ -1007,6 +1083,7 @@ export const captureClientTestHooks = {
   parseCancellationResponse,
   sameIdentity,
   assertMediaType,
+  parseCaptureAdmissionRejection,
   createNdjsonDecoder(
     expectedIdentity: CaptureIdentity,
     expectedArchiveBasePath: string,

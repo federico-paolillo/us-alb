@@ -117,12 +117,24 @@ export interface PublishedSnapshot {
   readonly manifest: RemoteObjectEvidence;
 }
 
+export type FinalPublicationReconciliation =
+  | { readonly status: "absent" }
+  | {
+      readonly status: "archive-confirmed";
+      readonly archive: RemoteObjectEvidence;
+    }
+  | { readonly status: "published"; readonly published: PublishedSnapshot };
+
 export interface SnapshotPublisher {
   preflight(options?: { readonly signal?: AbortSignal }): Promise<void>;
   reconcile(
     request: SnapshotPublicationRequest,
     options?: { readonly signal?: AbortSignal },
   ): Promise<ReconciledSnapshot>;
+  reconcileFinal(
+    request: SnapshotPublicationRequest,
+    options: { readonly signal: AbortSignal },
+  ): Promise<FinalPublicationReconciliation>;
   publish(
     request: SnapshotPublicationRequest,
     options?: { readonly signal?: AbortSignal },
@@ -452,6 +464,115 @@ class SnapshotPublisherImplementation implements SnapshotPublisher {
       );
     } finally {
       boundary.dispose();
+    }
+  }
+
+  async reconcileFinal(
+    request: SnapshotPublicationRequest,
+    options: { readonly signal: AbortSignal },
+  ): Promise<FinalPublicationReconciliation> {
+    request = authorizeSnapshotPublicationRequest(request);
+    const deadline = this.now() + 30_000;
+    const controller = new AbortController();
+    let rejectBoundary!: (error: unknown) => void;
+    const boundaryFailure = new Promise<never>((_resolve, reject) => {
+      rejectBoundary = reject;
+    });
+    const abort = () => {
+      const error =
+        options.signal.reason ??
+        new DOMException("Operation aborted", "AbortError");
+      controller.abort(error);
+      rejectBoundary(error);
+    };
+    if (options.signal.aborted) abort();
+    else options.signal.addEventListener("abort", abort, { once: true });
+    const timer = this.setTimer(() => {
+      const error = new SnapshotPublicationError(
+        "remote_status_unknown",
+        "final-reconciliation",
+      );
+      controller.abort(error);
+      rejectBoundary(error);
+    }, 30_000);
+    const bounded = <T>(operation: Promise<T>): Promise<T> =>
+      Promise.race([operation, boundaryFailure]);
+    const requireTimeRemaining = () => {
+      if (this.now() >= deadline) {
+        throw new SnapshotPublicationError(
+          "remote_status_unknown",
+          "final-reconciliation",
+        );
+      }
+    };
+    try {
+      const [archive, manifest] = await bounded(
+        Promise.all([
+          this.store.headArchive(request, controller.signal),
+          this.store.headManifest(request, controller.signal),
+        ]),
+      );
+      requireTimeRemaining();
+      if (archive === undefined) {
+        if (manifest !== undefined) {
+          throw new SnapshotPublicationError(
+            "remote_inconsistent",
+            "final-reconciliation",
+          );
+        }
+        return { status: "absent" };
+      }
+      if (!archiveMatches(request, archive)) {
+        throw new SnapshotPublicationError(
+          "remote_collision",
+          "final-archive-reconciliation",
+        );
+      }
+      if (manifest === undefined) {
+        return { status: "archive-confirmed", archive };
+      }
+      if (!manifestMatches(request, manifest)) {
+        throw new SnapshotPublicationError(
+          "remote_collision",
+          "final-manifest-reconciliation",
+        );
+      }
+      const bytes = await bounded(
+        this.store.getManifest(request, manifest.etag, controller.signal),
+      );
+      requireTimeRemaining();
+      if (!sameBytes(bytes, request.manifestBytes)) {
+        throw new SnapshotPublicationError(
+          "remote_collision",
+          "final-manifest-reconciliation",
+        );
+      }
+      return {
+        status: "published",
+        published: {
+          status: "already-published",
+          request,
+          archive,
+          manifest,
+        },
+      };
+    } catch (error) {
+      if (options.signal.aborted) {
+        throw new SnapshotPublicationError(
+          "publication_cancelled",
+          "final-reconciliation",
+          error,
+        );
+      }
+      if (error instanceof SnapshotPublicationError) throw error;
+      throw new SnapshotPublicationError(
+        "remote_status_unknown",
+        "final-reconciliation",
+        error,
+      );
+    } finally {
+      this.clearTimer(timer);
+      options.signal.removeEventListener("abort", abort);
     }
   }
 

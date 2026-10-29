@@ -37,6 +37,7 @@ export type RunDispatchResult =
 export interface DailyScheduler {
   start(): Promise<void>;
   stop(): void;
+  waitForIdle(): Promise<void>;
   requestManual(): RunRequest<RunDispatchResult>;
   requestPendingPublication(runId: string): RunRequest<RunDispatchResult>;
 }
@@ -70,6 +71,7 @@ class DailySchedulerImplementation implements DailyScheduler {
   private readonly clearTimer: (timer: unknown) => void;
   private readonly onError: (error: unknown) => void;
   private timer: unknown;
+  private readonly activeCompletions = new Set<Promise<unknown>>();
   private armGeneration = 0;
   private started = false;
   private stopped = false;
@@ -109,44 +111,52 @@ class DailySchedulerImplementation implements DailyScheduler {
     this.admission.stop();
   }
 
-  requestManual(): RunRequest<RunDispatchResult> {
-    return this.admission.request("manual", async () => {
-      const state = await this.stateRepository.load();
-      if (state.pendingPublication !== null) {
-        return { status: "not-eligible" };
-      }
-      return this.completeAdmittedFlight(async () => {
-        return {
-          status: "finished",
-          result: await this.runLifecycle({ trigger: "manual" }),
-        };
-      });
-    });
+  async waitForIdle(): Promise<void> {
+    await Promise.all([...this.activeCompletions]);
   }
 
-  requestPendingPublication(runId: string): RunRequest<RunDispatchResult> {
-    return this.admission.request("pending-publication", async () => {
-      try {
-        const pending =
-          await this.stateRepository.claimPendingPublicationAttempt(
-            runId,
-            this.nowIso(),
-            this.policy.automaticRetryDelayMs,
-          );
+  requestManual(): RunRequest<RunDispatchResult> {
+    return this.track(
+      this.admission.request("manual", async () => {
+        const state = await this.stateRepository.load();
+        if (state.pendingPublication !== null) {
+          return { status: "not-eligible" };
+        }
         return this.completeAdmittedFlight(async () => {
           return {
             status: "finished",
-            result: await this.runLifecycle({
-              trigger: "pending-publication",
-              pendingPublication: pending,
-            }),
+            result: await this.runLifecycle({ trigger: "manual" }),
           };
         });
-      } catch (error) {
-        if (isNotEligible(error)) return { status: "not-eligible" };
-        throw error;
-      }
-    });
+      }),
+    );
+  }
+
+  requestPendingPublication(runId: string): RunRequest<RunDispatchResult> {
+    return this.track(
+      this.admission.request("pending-publication", async () => {
+        try {
+          const pending =
+            await this.stateRepository.claimPendingPublicationAttempt(
+              runId,
+              this.nowIso(),
+              this.policy.automaticRetryDelayMs,
+            );
+          return this.completeAdmittedFlight(async () => {
+            return {
+              status: "finished",
+              result: await this.runLifecycle({
+                trigger: "pending-publication",
+                pendingPublication: pending,
+              }),
+            };
+          });
+        } catch (error) {
+          if (isNotEligible(error)) return { status: "not-eligible" };
+          throw error;
+        }
+      }),
+    );
   }
 
   private async completeAdmittedFlight<T>(
@@ -236,44 +246,49 @@ class DailySchedulerImplementation implements DailyScheduler {
       "scheduled" | "startup-catch-up" | "scheduled-retry"
     >,
   ): Promise<void> {
-    const request = this.admission.request(trigger, async () => {
-      let claim: AutomaticAttemptClaim;
-      try {
-        claim = await this.stateRepository.claimAutomaticAttempt(
-          slot,
-          this.nowIso(),
-          this.policy,
-        );
-      } catch (error) {
-        if (isNotEligible(error)) return { status: "not-eligible" } as const;
-        throw error;
-      }
-      return this.completeAdmittedFlight(async () => {
-        let result: RunLifecycleResult;
+    const request = this.track(
+      this.admission.request(trigger, async () => {
+        let claim: AutomaticAttemptClaim;
         try {
-          result = await this.runLifecycle({
-            trigger,
-            automaticClaim: claim,
-          });
+          claim = await this.stateRepository.claimAutomaticAttempt(
+            slot,
+            this.nowIso(),
+            this.policy,
+          );
         } catch (error) {
-          try {
-            await this.stateRepository.finishAutomaticAttempt(claim, "failed");
-          } catch (stateError) {
-            throw new AggregateError([error, stateError]);
-          }
-          this.onError(error);
-          return {
-            status: "finished",
-            result: "retryable-failure",
-          } as const;
+          if (isNotEligible(error)) return { status: "not-eligible" } as const;
+          throw error;
         }
-        await this.stateRepository.finishAutomaticAttempt(
-          claim,
-          result === "retryable-failure" ? "failed" : "succeeded",
-        );
-        return { status: "finished", result } as const;
-      });
-    });
+        return this.completeAdmittedFlight(async () => {
+          let result: RunLifecycleResult;
+          try {
+            result = await this.runLifecycle({
+              trigger,
+              automaticClaim: claim,
+            });
+          } catch (error) {
+            try {
+              await this.stateRepository.finishAutomaticAttempt(
+                claim,
+                "failed",
+              );
+            } catch (stateError) {
+              throw new AggregateError([error, stateError]);
+            }
+            this.onError(error);
+            return {
+              status: "finished",
+              result: "retryable-failure",
+            } as const;
+          }
+          await this.stateRepository.finishAutomaticAttempt(
+            claim,
+            result === "retryable-failure" ? "failed" : "succeeded",
+          );
+          return { status: "finished", result } as const;
+        });
+      }),
+    );
     if (request.status === "skipped") {
       if (request.reason === "active") {
         await this.stateRepository.skipAutomaticRequest(slot);
@@ -326,6 +341,14 @@ class DailySchedulerImplementation implements DailyScheduler {
       this.clearTimer(this.timer);
       this.timer = undefined;
     }
+  }
+
+  private track<T>(request: RunRequest<T>): RunRequest<T> {
+    if (request.status === "skipped") return request;
+    this.activeCompletions.add(request.completion);
+    const remove = () => this.activeCompletions.delete(request.completion);
+    void request.completion.then(remove, remove);
+    return request;
   }
 
   private nowIso(): string {

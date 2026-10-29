@@ -24,6 +24,7 @@ import {
   type StagingAllocation,
 } from "../src/staging-manager.ts";
 import { StagingError, type StagingPolicy } from "../src/staging-policy.ts";
+import { fileArchive } from "./snapshot-fixture.ts";
 
 const runId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const identity: CaptureIdentity = {
@@ -405,6 +406,133 @@ test("cleanup preserves its lease on failure and retries the exact directory", a
     await assert.rejects(access(allocation.runDirectory), { code: "ENOENT" });
   } finally {
     await chmod(join(root, "runs"), 0o700).catch(() => undefined);
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("startup reopens only the exact retained archive and cleanup keeps exact ownership", async () => {
+  const root = await mkdtemp(join(tmpdir(), "b08-reopen-"));
+  const runs = join(root, "runs");
+  const runDirectory = join(runs, runId);
+  const archiveBasePath = join(runDirectory, "strapi-export");
+  const archivePath = `${archiveBasePath}.tar`;
+  try {
+    await mkdir(runDirectory, { recursive: true, mode: 0o700 });
+    await chmod(runDirectory, 0o700);
+    const archive = await fileArchive(archivePath, Buffer.from("archive"), {
+      runId,
+      capture: {
+        ...terminal({
+          runId,
+          runDirectory,
+          archiveBasePath,
+          archivePath,
+        }),
+        archiveBasePath,
+        outcome: {
+          status: "captured",
+          exportClosedAt: "2026-10-29T00:00:02.000Z",
+          servingRecoveredAt: "2026-10-29T00:00:03.000Z",
+        },
+      },
+    });
+    const manager = createStagingManager(policy(root));
+    const reopened = await manager.reopenRetainedArchive(archive);
+    assert.equal(reopened.status, "reopened");
+    if (reopened.status !== "reopened") throw new Error("expected reopen");
+    assert.deepEqual(reopened.allocation, {
+      runId,
+      runDirectory,
+      archiveBasePath,
+      archivePath,
+    });
+    await manager.cleanup(reopened.allocation);
+    await assert.rejects(access(runDirectory), { code: "ENOENT" });
+
+    const restarted = createStagingManager(policy(root));
+    await assert.rejects(
+      restarted.reopenRetainedArchive({
+        ...archive,
+        archivePath: join(root, "wrong", "strapi-export.tar"),
+      }),
+      stagingCode("staging_recovery_mismatch"),
+    );
+    assert.deepEqual(await restarted.reopenRetainedArchive(archive), {
+      status: "already-cleaned",
+      runId,
+    });
+    await restarted.assertEmptyForStartup();
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("startup never reopens a retained archive whose exact fingerprint changed", async () => {
+  const root = await mkdtemp(join(tmpdir(), "b08-reopen-changed-"));
+  const runDirectory = join(root, "runs", runId);
+  const archiveBasePath = join(runDirectory, "strapi-export");
+  const archivePath = `${archiveBasePath}.tar`;
+  try {
+    await mkdir(runDirectory, { recursive: true, mode: 0o700 });
+    await chmod(runDirectory, 0o700);
+    const archive = await fileArchive(archivePath, Buffer.from("archive"), {
+      runId,
+      capture: {
+        ...terminal({ runId, runDirectory, archiveBasePath, archivePath }),
+        archiveBasePath,
+        outcome: {
+          status: "captured",
+          exportClosedAt: "2026-10-29T00:00:02.000Z",
+          servingRecoveredAt: "2026-10-29T00:00:03.000Z",
+        },
+      },
+    });
+    await appendFile(archivePath, "changed");
+    const manager = createStagingManager(policy(root));
+    await assert.rejects(
+      manager.reopenRetainedArchive(archive),
+      stagingCode("staging_recovery_mismatch"),
+    );
+    await access(archivePath);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("startup staging classification rejects mismatches without changing residue", async () => {
+  const root = await mkdtemp(join(tmpdir(), "b08-reopen-mismatch-"));
+  const runs = join(root, "runs");
+  const runDirectory = join(runs, runId);
+  const archiveBasePath = join(runDirectory, "strapi-export");
+  const archivePath = `${archiveBasePath}.tar`;
+  try {
+    await mkdir(runDirectory, { recursive: true, mode: 0o700 });
+    await chmod(runDirectory, 0o700);
+    const archive = await fileArchive(archivePath, Buffer.from("archive"), {
+      runId,
+      capture: {
+        ...terminal({ runId, runDirectory, archiveBasePath, archivePath }),
+        archiveBasePath,
+        outcome: {
+          status: "captured",
+          exportClosedAt: "2026-10-29T00:00:02.000Z",
+          servingRecoveredAt: "2026-10-29T00:00:03.000Z",
+        },
+      },
+    });
+    await writeFile(join(runDirectory, "foreign"), "do not delete");
+    const manager = createStagingManager(policy(root));
+    await assert.rejects(
+      manager.reopenRetainedArchive(archive),
+      stagingCode("staging_recovery_mismatch"),
+    );
+    await assert.rejects(
+      manager.assertEmptyForStartup(),
+      stagingCode("staging_occupied"),
+    );
+    await access(archivePath);
+    await access(join(runDirectory, "foreign"));
+  } finally {
     await rm(root, { recursive: true, force: true });
   }
 });

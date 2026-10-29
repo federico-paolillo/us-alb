@@ -8,6 +8,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { createServer, request as httpRequest } from "node:http";
+import { createServer as createNetServer } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -20,12 +21,16 @@ import type {
   CaptureTerminalRecord,
   CaptureWindowStatus,
 } from "../../strapid/src/capture-contract.ts";
-import type { CaptureResponseObserver } from "../../strapid/src/capture-coordinator.ts";
+import {
+  CaptureAdmissionError,
+  type CaptureResponseObserver,
+} from "../../strapid/src/capture-coordinator.ts";
 import {
   type CaptureHttpCoordinator,
   startCaptureHttpServer,
 } from "../../strapid/src/capture-http.ts";
 import {
+  CaptureAdmissionRejectedError,
   CaptureClientProtocolError,
   createCaptureClient,
 } from "../src/capture-client.ts";
@@ -181,6 +186,151 @@ class FixtureCoordinator implements CaptureHttpCoordinator {
     this.disconnected = true;
   }
 }
+
+class RejectingFixtureCoordinator extends FixtureCoordinator {
+  private readonly rejections = [
+    new CaptureAdmissionError(409, "capture_busy"),
+    new CaptureAdmissionError(503, "serving_unavailable"),
+  ];
+
+  override async beginCapture(): Promise<never> {
+    throw this.rejections.shift() ?? new Error("unexpected capture request");
+  }
+}
+
+test("real Unix transport decodes exact 409 and 503 capture admission rejections", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "b08-client-rejection-"));
+  const socketPath = join(directory, "s.sock");
+  const responses = [
+    { statusCode: 409, reason: "capture_busy" },
+    { statusCode: 503, reason: "serving_unavailable" },
+  ] as const;
+  const server = await startCaptureHttpServer(
+    socketPath,
+    new RejectingFixtureCoordinator(),
+  );
+  const client = createCaptureClient({ socketPath });
+  try {
+    for (const fixture of responses) {
+      await assert.rejects(
+        client.startCapture(captureRequest()),
+        (error: unknown) =>
+          error instanceof CaptureAdmissionRejectedError &&
+          error.statusCode === fixture.statusCode &&
+          error.reason === fixture.reason,
+      );
+    }
+  } finally {
+    await server.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("trailing bytes after a declared rejection body dominate provisional admission rejection", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "b08-client-trailing-"));
+  const socketPath = join(directory, "s.sock");
+  const body = Buffer.from('{"version":1,"error":"capture_busy"}');
+  const server = createNetServer((socket) => {
+    let requestBytes = Buffer.alloc(0);
+    socket.on("data", (chunk: Buffer) => {
+      requestBytes = Buffer.concat([requestBytes, chunk]);
+      if (!requestBytes.includes(Buffer.from("\r\n\r\n"))) return;
+      socket.removeAllListeners("data");
+      socket.end(
+        Buffer.concat([
+          Buffer.from(
+            `HTTP/1.1 409 Conflict\r\nContent-Type: application/json\r\nContent-Length: ${body.length}\r\nConnection: close\r\n\r\n`,
+          ),
+          body,
+          Buffer.from("X"),
+        ]),
+      );
+    });
+  });
+  await new Promise<void>((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(socketPath, resolve);
+  });
+  const client = createCaptureClient({ socketPath });
+  try {
+    await assert.rejects(
+      client.startCapture(captureRequest()),
+      (error: unknown) => !(error instanceof CaptureAdmissionRejectedError),
+    );
+  } finally {
+    await new Promise<void>((resolve, reject) =>
+      server.close((error) =>
+        error === undefined ? resolve() : reject(error),
+      ),
+    );
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("malformed rejection transport remains ownership-ambiguous", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "b08-client-ambiguous-"));
+  const socketPath = join(directory, "s.sock");
+  const fixtures: Array<{
+    statusCode: number;
+    body: Buffer;
+    truncate?: boolean;
+  }> = [
+    {
+      statusCode: 400,
+      body: Buffer.from('{"version":1,"error":"invalid_request"}'),
+    },
+    {
+      statusCode: 409,
+      body: Buffer.from('{"version":1,"error":"capture_busy","extra":true}'),
+    },
+    { statusCode: 409, body: Buffer.from([0xff]) },
+    { statusCode: 409, body: Buffer.alloc(16 * 1024 + 1, 0x20) },
+    {
+      statusCode: 409,
+      body: Buffer.from('{"version":1,"error":"capture_busy"}'),
+      truncate: true,
+    },
+  ];
+  let requestCount = 0;
+  const server = createServer((request, response) => {
+    request.resume();
+    request.once("end", () => {
+      const fixture = fixtures[requestCount++] ?? assert.fail("extra request");
+      response.writeHead(fixture.statusCode, {
+        "Content-Type": "application/json",
+        "Content-Length": fixture.body.length + (fixture.truncate ? 1 : 0),
+        Connection: "close",
+      });
+      if (fixture.truncate) {
+        const socket = response.socket;
+        response.write(fixture.body, () => socket?.destroy());
+      } else {
+        response.end(fixture.body);
+      }
+    });
+  });
+  await new Promise<void>((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(socketPath, resolve);
+  });
+  const client = createCaptureClient({ socketPath });
+  try {
+    for (const _fixture of fixtures) {
+      await assert.rejects(
+        client.startCapture(captureRequest()),
+        (error: unknown) => !(error instanceof CaptureAdmissionRejectedError),
+      );
+    }
+    assert.equal(requestCount, fixtures.length);
+  } finally {
+    await new Promise<void>((resolve, reject) =>
+      server.close((error) =>
+        error === undefined ? resolve() : reject(error),
+      ),
+    );
+    await rm(directory, { recursive: true, force: true });
+  }
+});
 
 test("real Unix transport holds accepted/terminal records and reconciles exact identity", async () => {
   const directory = await mkdtemp(join(tmpdir(), "b04-http-"));

@@ -559,3 +559,137 @@ test("absolute deadline is rechecked after remote reads and reserve never resets
     false,
   );
 });
+
+test("final reconciliation is bounded, read-only, and independent of publication expiry", async () => {
+  const request = createSnapshotPublicationRequest(
+    fixtureArchive(),
+    fixtureAttribution,
+    fixturePolicy,
+  );
+  const afterDeadline = Date.parse(request.publicationDeadlineAt) + 1;
+
+  const absent = new ScriptedStore();
+  assert.deepEqual(
+    await createSnapshotPublisher(absent, fixturePolicy, {
+      now: () => afterDeadline,
+    }).reconcileFinal(request, { signal: new AbortController().signal }),
+    { status: "absent" },
+  );
+  assert.deepEqual(absent.events, ["head-archive", "head-manifest"]);
+
+  const archiveOnly = new ScriptedStore();
+  archiveOnly.archive = archiveEvidence(request);
+  const archiveResult = await createSnapshotPublisher(
+    archiveOnly,
+    fixturePolicy,
+    { now: () => afterDeadline },
+  ).reconcileFinal(request, { signal: new AbortController().signal });
+  assert.equal(archiveResult.status, "archive-confirmed");
+
+  const published = new ScriptedStore();
+  published.archive = archiveEvidence(request);
+  published.manifest = manifestEvidence(request);
+  published.manifestBody = request.manifestBytes;
+  const publishedResult = await createSnapshotPublisher(
+    published,
+    fixturePolicy,
+    { now: () => afterDeadline },
+  ).reconcileFinal(request, { signal: new AbortController().signal });
+  assert.equal(publishedResult.status, "published");
+  if (publishedResult.status !== "published") {
+    throw new Error("expected published final reconciliation");
+  }
+  assert.equal(publishedResult.published.status, "already-published");
+  assert.deepEqual(published.events, [
+    "head-archive",
+    "head-manifest",
+    "get-manifest",
+  ]);
+  for (const store of [absent, archiveOnly, published]) {
+    assert.equal(
+      store.events.some(
+        (event) =>
+          event.startsWith("begin-archive") || event === "put-manifest",
+      ),
+      false,
+    );
+  }
+});
+
+test("final reconciliation rejects collision and absolute timeout without mutation", async () => {
+  const request = createSnapshotPublicationRequest(
+    fixtureArchive(),
+    fixtureAttribution,
+    fixturePolicy,
+  );
+  let now = Date.parse(request.publicationDeadlineAt) + 1;
+  const collision = new ScriptedStore();
+  collision.archive = { ...archiveEvidence(request), byteLength: 1 };
+  await assert.rejects(
+    createSnapshotPublisher(collision, fixturePolicy, {
+      now: () => now,
+    }).reconcileFinal(request, { signal: new AbortController().signal }),
+    (error: unknown) =>
+      error instanceof SnapshotPublicationError &&
+      error.code === "remote_collision",
+  );
+
+  const timeout = new ScriptedStore();
+  timeout.afterHead = () => {
+    now += 30_000;
+  };
+  await assert.rejects(
+    createSnapshotPublisher(timeout, fixturePolicy, {
+      now: () => now,
+    }).reconcileFinal(request, { signal: new AbortController().signal }),
+    (error: unknown) =>
+      error instanceof SnapshotPublicationError &&
+      error.code === "remote_status_unknown",
+  );
+  assert.equal(
+    timeout.events.some(
+      (event) => event.startsWith("begin-archive") || event === "put-manifest",
+    ),
+    false,
+  );
+});
+
+test("final reconciliation rejects at its timer bound when storage ignores abort", async () => {
+  const request = createSnapshotPublicationRequest(
+    fixtureArchive(),
+    fixtureAttribution,
+    fixturePolicy,
+  );
+  const never = new Promise<RemoteObjectEvidence | undefined>(() => undefined);
+  const store: SnapshotStore = {
+    async preflight() {},
+    headArchive: async () => await never,
+    headManifest: async () => await never,
+    async getManifest() {
+      throw new Error("unexpected manifest read");
+    },
+    beginArchiveUpload() {
+      throw new Error("unexpected archive mutation");
+    },
+    async putManifest() {
+      throw new Error("unexpected manifest mutation");
+    },
+  };
+  let expire: (() => void) | undefined;
+  const result = createSnapshotPublisher(store, fixturePolicy, {
+    now: () => Date.parse(request.publicationDeadlineAt) + 1,
+    setTimer: ((callback: () => void) => {
+      expire = callback;
+      return callback as unknown as NodeJS.Timeout;
+    }) as unknown as typeof setTimeout,
+    clearTimer: () => undefined,
+  }).reconcileFinal(request, { signal: new AbortController().signal });
+  assert.notEqual(expire, undefined);
+  expire?.();
+  await assert.rejects(
+    result,
+    (error: unknown) =>
+      error instanceof SnapshotPublicationError &&
+      error.code === "remote_status_unknown",
+  );
+});

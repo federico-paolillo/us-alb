@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  CaptureAdmissionRejectedError,
   CaptureClientProtocolError,
   captureClientTestHooks,
 } from "../src/capture-client.ts";
@@ -30,6 +31,48 @@ const validBudget = {
   recoveryMs: 210_000,
   forcedConfirmationMs: 5_000,
 };
+
+test("client decodes only exact status/reason capture admission rejections", () => {
+  const valid = [
+    [409, "capture_busy"],
+    [409, "identity_mismatch"],
+    [409, "stale_window"],
+    [503, "runtime_unavailable"],
+    [503, "serving_unavailable"],
+    [503, "admission_cancelled"],
+    [503, "shutting_down"],
+  ] as const;
+  for (const [statusCode, reason] of valid) {
+    const error = captureClientTestHooks.parseCaptureAdmissionRejection(
+      statusCode,
+      { version: 1, error: reason },
+    );
+    assert.ok(error instanceof CaptureAdmissionRejectedError);
+    assert.equal(error.code, "capture_admission_rejected");
+    assert.equal(error.message, "Capture admission was rejected");
+    assert.equal(error.statusCode, statusCode);
+    assert.equal(error.reason, reason);
+  }
+
+  for (const [statusCode, body] of [
+    [409, { version: 1, error: "runtime_unavailable" }],
+    [503, { version: 1, error: "capture_busy" }],
+    [400, { version: 1, error: "invalid_request" }],
+    [404, { version: 1, error: "capture_busy" }],
+    [413, { version: 1, error: "capture_busy" }],
+    [415, { version: 1, error: "capture_busy" }],
+    [409, { version: 2, error: "capture_busy" }],
+    [409, { version: 1, error: "unknown" }],
+    [409, { version: 1, error: 1 }],
+    [409, { version: 1, error: "capture_busy", extra: true }],
+  ] as const) {
+    assert.throws(
+      () =>
+        captureClientTestHooks.parseCaptureAdmissionRejection(statusCode, body),
+      CaptureClientProtocolError,
+    );
+  }
+});
 
 function acceptedRecord() {
   return {

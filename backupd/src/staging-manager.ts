@@ -50,7 +50,18 @@ export interface ArchiveSizeWatch {
   stop(): Promise<void>;
 }
 
+export type ReopenedRetainedArchive =
+  | {
+      readonly status: "reopened";
+      readonly allocation: StagingAllocation;
+    }
+  | { readonly status: "already-cleaned"; readonly runId: string };
+
 export interface StagingManager {
+  assertEmptyForStartup(): Promise<void>;
+  reopenRetainedArchive(
+    archive: ValidatedArchive,
+  ): Promise<ReopenedRetainedArchive>;
   allocate(runId: string): Promise<StagingAllocation>;
   watchCaptureSize(
     allocation: StagingAllocation,
@@ -215,6 +226,99 @@ class StagingManagerImplementation implements StagingManager {
   constructor(policy: StagingPolicy, options: StagingManagerOptions) {
     this.policy = validateStagingPolicy(policy);
     this.options = options;
+  }
+
+  async assertEmptyForStartup(): Promise<void> {
+    if (this.allocationPending || this.activeRecord !== undefined) {
+      throw new StagingError("staging_occupied");
+    }
+    const runsDirectory = await this.ensureStagingRoot();
+    if ((await readdir(runsDirectory)).length !== 0) {
+      throw new StagingError("staging_occupied");
+    }
+  }
+
+  async reopenRetainedArchive(
+    archive: ValidatedArchive,
+  ): Promise<ReopenedRetainedArchive> {
+    if (this.allocationPending || this.activeRecord !== undefined) {
+      throw new StagingError("staging_occupied");
+    }
+    if (!UUID_PATTERN.test(archive.runId)) {
+      throw new StagingError("staging_recovery_mismatch");
+    }
+    this.allocationPending = true;
+    try {
+      const runsDirectory = await this.ensureStagingRoot();
+      const entries = await readdir(runsDirectory);
+      const runDirectory = join(runsDirectory, archive.runId);
+      const archiveBasePath = join(runDirectory, ARCHIVE_BASE_NAME);
+      const archivePath = join(runDirectory, ARCHIVE_FILE_NAME);
+      if (
+        archive.archivePath !== archivePath ||
+        archive.capture.archiveBasePath !== archiveBasePath
+      ) {
+        throw new StagingError("staging_recovery_mismatch");
+      }
+      if (entries.length === 0) {
+        return { status: "already-cleaned", runId: archive.runId };
+      }
+      if (entries.length !== 1 || entries[0] !== archive.runId) {
+        throw new StagingError("staging_recovery_mismatch");
+      }
+
+      try {
+        const directoryStat = await lstat(runDirectory, { bigint: true });
+        const resolvedDirectory = await realpath(runDirectory);
+        const archiveEntries = await readdir(runDirectory);
+        const archiveStat = await lstat(archivePath, { bigint: true });
+        const expected = archive.fileIdentity;
+        if (
+          directoryStat.isSymbolicLink() ||
+          !directoryStat.isDirectory() ||
+          (directoryStat.mode & 0o777n) !== 0o700n ||
+          dirname(resolvedDirectory) !== runsDirectory ||
+          basename(resolvedDirectory) !== archive.runId ||
+          archiveEntries.length !== 1 ||
+          archiveEntries[0] !== ARCHIVE_FILE_NAME ||
+          archiveStat.isSymbolicLink() ||
+          !archiveStat.isFile() ||
+          expected.size !== BigInt(archive.byteLength) ||
+          archiveStat.dev !== expected.device ||
+          archiveStat.ino !== expected.inode ||
+          archiveStat.size !== expected.size ||
+          archiveStat.mtimeNs !== expected.modifiedNanoseconds ||
+          archiveStat.ctimeNs !== expected.changedNanoseconds
+        ) {
+          throw new Error("Retained archive identity changed");
+        }
+        const allocation = Object.freeze({
+          runId: archive.runId,
+          runDirectory,
+          archiveBasePath,
+          archivePath,
+        });
+        const record: AllocationRecord = {
+          allocation,
+          directoryDevice: directoryStat.dev,
+          directoryInode: directoryStat.ino,
+          state: "retained",
+        };
+        this.records.set(allocation, record);
+        this.activeRecord = record;
+        return { status: "reopened", allocation };
+      } catch (error) {
+        if (
+          error instanceof StagingError &&
+          error.code === "staging_recovery_mismatch"
+        ) {
+          throw error;
+        }
+        throw new StagingError("staging_recovery_mismatch", error);
+      }
+    } finally {
+      this.allocationPending = false;
+    }
   }
 
   async allocate(runId: string): Promise<StagingAllocation> {
