@@ -153,7 +153,8 @@ provide concrete handoff details without claiming that these activities occurred
   - Design references: “Strapi-export feasibility”; “Verified current state and
     recovery coverage”; “Manual recovery procedure.”
 
-- [ ] B03 — Implement Strapi child supervision
+- [x] B03 — Implement Strapi child supervision
+  - Plan: [ExecPlan](.agents/plans/b03-implement-strapi-child-supervision.md)
   - Scope: Implement `strapid` startup and serving-child ownership using direct
     `node:child_process` invocation, graceful shutdown, bounded forced
     termination, and child plus `/_health` recovery checks. Reuse B02's runtime
