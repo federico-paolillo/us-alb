@@ -133,7 +133,8 @@ provide concrete handoff details without claiming that these activities occurred
   - Design references: “Runtime, packages, and tooling”; “Verification and
     implementation calibration.”
 
-- [ ] B02 — Prepare the compiled Strapi runtime
+- [x] B02 — Prepare the compiled Strapi runtime
+  - Plan: [ExecPlan](.agents/plans/b02-prepare-the-compiled-strapi-runtime.md)
   - Scope: Extend the existing backend image to package compiled config, source,
     schemas/components, admin bundle, migrations when present, dependencies,
     package metadata, public assets, and favicon in the application-root layout

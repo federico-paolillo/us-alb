@@ -27,12 +27,21 @@ COPY favicon.png   /strapi/favicon.png
 
 COPY .env.example  /strapi/.env
 
-RUN mkdir /data /config
-
 RUN SITE_URL="$SITE_URL" \
     CMS_PUBLIC_URL="$CMS_PUBLIC_URL" \
     CMS_ADMIN_COOKIE_PATH="$CMS_ADMIN_COOKIE_PATH" \
     npm run build
+
+RUN npm prune --omit=dev \
+    && mkdir -p /runtime/strapi/database/migrations /runtime/data /runtime/config /runtime/staging \
+    && cp -a dist/config /runtime/strapi/config \
+    && cp -a dist/src /runtime/strapi/src \
+    && cp -a dist/build /runtime/strapi/build \
+    && cp -a node_modules package.json package-lock.json public favicon.png .env /runtime/strapi/ \
+    && if [ -d dist/database/migrations ]; then \
+         cp -a dist/database/migrations/. /runtime/strapi/database/migrations/; \
+       fi \
+    && cp -a /runtime/strapi/public /runtime/data/public
 
 FROM gcr.io/distroless/nodejs24-debian13:nonroot@sha256:9eeb7f5887d0e239e78264b06f7f11d2e14be534050481803a9e4728fcdd278e
 
@@ -51,17 +60,17 @@ ENV XDG_CONFIG_HOME=/config
 
 WORKDIR /strapi
 
-COPY --from=build --chown=0:0             --chmod=555 /strapi                /strapi/
-COPY --from=build --chown=nonroot:nonroot --chmod=755 /data                  /data
-COPY --from=build --chown=nonroot:nonroot --chmod=755 /config                /config
-COPY --from=build --chown=nonroot:nonroot --chmod=755 /strapi/public         /data/public/
-COPY --from=build --chown=nonroot:nonroot --chmod=755 /strapi/public/uploads /data/public/uploads/
+COPY --from=build --chown=0:0 --chmod=755 /usr/local/bin/node /nodejs/bin/node
+COPY --from=build --chown=0:0 /runtime/strapi /strapi
+COPY --from=build --chown=nonroot:nonroot /runtime/data /data
+COPY --from=build --chown=nonroot:nonroot /runtime/config /config
+COPY --from=build --chown=nonroot:nonroot /runtime/staging /staging
 
 USER nonroot
 
 # Supply tmpfs mounts for /tmp
 
-VOLUME ["/data", "/config"]
+VOLUME ["/data", "/config", "/staging"]
 
 EXPOSE 65101
 
