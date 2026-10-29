@@ -116,7 +116,8 @@ provide concrete handoff details without claiming that these activities occurred
 
 ## Ordered tasks
 
-- [ ] B01 — Establish daemon packages and tooling
+- [x] B01 — Establish daemon packages and tooling
+  - Plan: [ExecPlan](.agents/plans/b01-establish-daemon-packages-and-tooling.md)
   - Scope: Create separate private npm packages in `backupd/` and `strapid/`,
     each with a committed lockfile, ESM TypeScript, and direct `.ts` execution.
     Use the exact project Node version from root `mise.toml` (currently

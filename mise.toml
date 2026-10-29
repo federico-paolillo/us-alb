@@ -21,6 +21,31 @@ description = "Run the Strapi 5 backend"
 dir = "backend"
 run = "npm run dev"
 
+[tasks."backupd:lint"]
+description = "Lint backupd with Biome"
+dir = "backupd"
+run = "npm run lint"
+
+[tasks."backupd:format"]
+description = "Format backupd with Biome"
+dir = "backupd"
+run = "npm run format"
+
+[tasks."backupd:typecheck"]
+description = "Type-check backupd"
+dir = "backupd"
+run = "npm run typecheck"
+
+[tasks."backupd:check"]
+description = "Lint and type-check backupd"
+dir = "backupd"
+run = "npm run check"
+
+[tasks."backupd:test"]
+description = "Run backupd native tests"
+dir = "backupd"
+run = "npm test"
+
 [tasks."fe:build"]
 description = "Build the Next.js frontend"
 dir = "frontend"
@@ -60,6 +85,31 @@ run = "npm run format"
 description = "Run the Next.js frontend"
 dir = "frontend"
 run = "npm run dev"
+
+[tasks."strapid:lint"]
+description = "Lint strapid with Biome"
+dir = "strapid"
+run = "npm run lint"
+
+[tasks."strapid:format"]
+description = "Format strapid with Biome"
+dir = "strapid"
+run = "npm run format"
+
+[tasks."strapid:typecheck"]
+description = "Type-check strapid"
+dir = "strapid"
+run = "npm run typecheck"
+
+[tasks."strapid:check"]
+description = "Lint and type-check strapid"
+dir = "strapid"
+run = "npm run check"
+
+[tasks."strapid:test"]
+description = "Run strapid native tests"
+dir = "strapid"
+run = "npm test"
 
 [tasks."dev"]
 run = [
