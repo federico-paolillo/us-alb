@@ -211,7 +211,8 @@ provide concrete handoff details without claiming that these activities occurred
   - Design references: “Snapshot format”; “Strapi-export feasibility”; lifecycle
     steps “Validate and upload” and “Record completion and clean staging.”
 
-- [ ] B06 — Publish completed snapshots to object storage
+- [x] B06 — Publish completed snapshots to object storage
+  - Plan: [ExecPlan](.agents/plans/b06-publish-completed-snapshots-to-object-storage.md)
   - Scope: Use official AWS SDK v3 `@aws-sdk/client-s3` and
     `@aws-sdk/lib-storage` for destination preflight, streaming upload,
     cancellation, and remote confirmation. Define unique snapshot keys and a
