@@ -1,4 +1,12 @@
-import { mkdir, mkdtemp, rm, symlink } from "node:fs/promises";
+import { constants } from "node:fs";
+import {
+  access,
+  mkdir,
+  mkdtemp,
+  readFile,
+  rm,
+  symlink,
+} from "node:fs/promises";
 import { isAbsolute, join, relative } from "node:path";
 
 export const STRAPI_APPLICATION_ROOT = "/strapi";
@@ -41,6 +49,21 @@ export interface StrapiCliInvocation {
   readonly environment: NodeJS.ProcessEnv;
 }
 
+export type CaptureRuntimeInspection =
+  | {
+      readonly ready: true;
+      readonly nodeVersion: string;
+      readonly strapiVersion: string;
+    }
+  | {
+      readonly ready: false;
+      readonly reason: "configuration_invalid" | "runtime_unavailable";
+    };
+
+export interface CaptureRuntimeInspector {
+  inspect(request: StrapiWorkspaceRequest): Promise<CaptureRuntimeInspection>;
+}
+
 function assertStagingPath(filePath: string): void {
   if (!isAbsolute(filePath)) {
     throw new Error("Strapi data-transfer file path must be absolute");
@@ -81,6 +104,67 @@ function assertAbsoluteEnvironmentPaths(environment: NodeJS.ProcessEnv): void {
   }
 }
 
+export function validateStrapiWorkspaceRequest(
+  request: StrapiWorkspaceRequest,
+): void {
+  const operationArguments = request.arguments ?? [];
+  const environment = { ...process.env, ...request.environment };
+  assertStagingPath(request.filePath);
+  assertNoFileArgument(operationArguments);
+  assertAbsoluteEnvironmentPaths(environment);
+}
+
+interface StrapiPackageMetadata {
+  readonly version?: unknown;
+}
+
+export function createCaptureRuntimeInspector(): CaptureRuntimeInspector {
+  return {
+    async inspect(
+      request: StrapiWorkspaceRequest,
+    ): Promise<CaptureRuntimeInspection> {
+      try {
+        validateStrapiWorkspaceRequest(request);
+      } catch {
+        return { ready: false, reason: "configuration_invalid" };
+      }
+
+      try {
+        await mkdir(STRAPI_WORKSPACE_PARENT, { recursive: true });
+        await Promise.all([
+          access(STRAPI_NODE_EXECUTABLE, constants.X_OK),
+          access(STRAPI_CLI, constants.R_OK),
+          access(STRAPI_APPLICATION_ROOT, constants.R_OK),
+          access(STRAPI_WORKSPACE_PARENT, constants.R_OK | constants.W_OK),
+          access(STRAPI_STAGING_ROOT, constants.R_OK | constants.W_OK),
+        ]);
+        const metadata = JSON.parse(
+          await readFile(
+            join(
+              STRAPI_APPLICATION_ROOT,
+              "node_modules/@strapi/strapi/package.json",
+            ),
+            "utf8",
+          ),
+        ) as StrapiPackageMetadata;
+        if (
+          typeof metadata.version !== "string" ||
+          !/^[!-~]{1,64}$/.test(metadata.version)
+        ) {
+          throw new Error("Strapi version metadata is invalid");
+        }
+        return {
+          ready: true,
+          nodeVersion: process.version,
+          strapiVersion: metadata.version,
+        };
+      } catch {
+        return { ready: false, reason: "runtime_unavailable" };
+      }
+    },
+  };
+}
+
 async function createApplicationLinks(workspace: string): Promise<void> {
   await Promise.all(
     APPLICATION_ENTRIES.map((entry) =>
@@ -102,10 +186,7 @@ async function runInStrapiDataTransferWorkspace<T>(
 ): Promise<T> {
   const operationArguments = request.arguments ?? [];
   const environment = { ...process.env, ...request.environment };
-
-  assertStagingPath(request.filePath);
-  assertNoFileArgument(operationArguments);
-  assertAbsoluteEnvironmentPaths(environment);
+  validateStrapiWorkspaceRequest(request);
 
   await mkdir(STRAPI_WORKSPACE_PARENT, { recursive: true });
   const workspace = await mkdtemp(

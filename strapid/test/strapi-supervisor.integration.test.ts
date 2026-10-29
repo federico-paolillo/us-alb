@@ -675,3 +675,28 @@ test("retains an unconfirmed export workspace until later close and group absenc
     await closeServer(health.server);
   }
 });
+
+test("serving readiness confirmation preserves the exact active generation", async () => {
+  const health = await healthServer();
+  const servingEvents = new EventCollector();
+  const exportEvents = new EventCollector();
+  const supervisor = createSupervisor(servingEvents, exportEvents, () => ({
+    mode: "exit",
+    arguments: ["0"],
+  }));
+  try {
+    const options = servingOptions(health.endpoint);
+    await supervisor.startServing(options);
+    const before = supervisor.snapshot();
+    await supervisor.confirmServingReady(options.health);
+    assert.deepEqual(supervisor.snapshot(), before);
+    await supervisor.stopServing(TERMINATION);
+    await assert.rejects(
+      supervisor.confirmServingReady(options.health),
+      LifecycleConflictError,
+    );
+  } finally {
+    await shutdownIfNeeded(supervisor);
+    await closeServer(health.server);
+  }
+});

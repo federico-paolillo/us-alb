@@ -8,6 +8,7 @@ import {
   STRAPI_CLI,
   STRAPI_NODE_EXECUTABLE,
   strapiRuntimeTestHooks,
+  validateStrapiWorkspaceRequest,
   withStrapiDataTransferWorkspace,
 } from "../src/strapi-runtime.ts";
 
@@ -30,6 +31,24 @@ function absoluteEnvironment(): NodeJS.ProcessEnv {
     SERVER_PUBLIC_FOLDER: "/data/public",
   };
 }
+
+test("process-free capture preflight reuses the B02 request policy", () => {
+  assert.doesNotThrow(() =>
+    validateStrapiWorkspaceRequest({
+      operation: "export",
+      filePath: "/staging/b04-preflight/export",
+      arguments: ["--no-encrypt", "--no-compress"],
+      environment: absoluteEnvironment(),
+    }),
+  );
+  assert.throws(() =>
+    validateStrapiWorkspaceRequest({
+      operation: "export",
+      filePath: "/tmp/export",
+      environment: absoluteEnvironment(),
+    }),
+  );
+});
 
 test("creates a writable linked workspace until child closure is confirmed", async () => {
   const callbackStarted = Promise.withResolvers<void>();

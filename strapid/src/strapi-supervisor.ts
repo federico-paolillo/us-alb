@@ -278,6 +278,21 @@ export class StrapiSupervisor {
     return this.servingLoss.promise;
   }
 
+  async confirmServingReady(
+    health: ServingHealthPolicy,
+    signal?: AbortSignal,
+  ): Promise<void> {
+    if (this.state !== "serving") {
+      throw new LifecycleConflictError(this.state, "serving-health-confirmed");
+    }
+    const child = this.requireActive("serving");
+    const generation = this.generation;
+    await waitForServingHealth(child, health, signal);
+    if (!this.isCurrent(generation, child, "serving")) {
+      throw new LifecycleConflictError(this.state, "serving-health-confirmed");
+    }
+  }
+
   async stopServing(
     termination: ProcessTerminationBounds,
   ): Promise<ServingStopResult> {

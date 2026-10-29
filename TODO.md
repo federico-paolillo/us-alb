@@ -170,7 +170,8 @@ provide concrete handoff details without claiming that these activities occurred
   - Design references: “Libraries and private coordination”; “Compose services
     and private coordination”; “Proposed lifecycle and container boundaries.”
 
-- [ ] B04 — Implement bounded capture coordination
+- [x] B04 — Implement bounded capture coordination
+  - Plan: [ExecPlan](.agents/plans/b04-implement-bounded-capture-coordination.md)
   - Scope: Implement private `node:http` JSON coordination over a Unix socket,
     with capture admission, status reconciliation, supervisor-instance and
     capture-window identities, and a response held open through recovery.
