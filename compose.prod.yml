@@ -1,0 +1,63 @@
+services:
+  backend:
+    image: ghcr.io/federico-paolillo/us-alb/backend:sha256-e401e1fd0809198c70c07038ad74255e9b8d0e10cb5e67768d7a33cc00fe70ec
+    environment:
+      ENV_PATH: /run/secrets/backend.env
+      HOST: 0.0.0.0
+      PORT: 65101
+    secrets:
+      - source: app_env
+        target: backend.env
+    read_only: true
+    volumes:
+      - backend_data:/data
+      - backend_config:/config
+    tmpfs:
+      - /tmp:mode=1777
+    networks:
+      - app
+
+  frontend:
+    image: ghcr.io/federico-paolillo/us-alb/frontend:sha256-e2fc156b37d38994cc90f2d2386b3f7c162e6937293f5ef5c4de261437777b1a
+    environment:
+      HOSTNAME: 0.0.0.0
+      PORT: 65100
+    depends_on:
+      - backend
+    secrets:
+      - source: app_env
+        target: frontend.env
+    read_only: true
+    tmpfs:
+      - /app/.next/cache:mode=1777
+      - /tmp:mode=1777
+    networks:
+      - app
+
+  gateway:
+    image: caddy:2-alpine
+    depends_on:
+      - backend
+      - frontend
+    ports:
+      - 127.0.0.1:65102:65102
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    tmpfs:
+      - /var/lib/caddy:mode=1777
+    networks:
+      app:
+        aliases:
+          - us-alb.localhost
+
+secrets:
+  app_env:
+    file: ./.env
+
+volumes:
+  backend_data:
+  backend_config:
+
+networks:
+  app:
+    driver: bridge
