@@ -192,7 +192,8 @@ provide concrete handoff details without claiming that these activities occurred
   - Design references: “Libraries and private coordination”; “Snapshot format”;
     “Proposed lifecycle and container boundaries.”
 
-- [ ] B05 — Validate archives and manage staging
+- [x] B05 — Validate archives and manage staging
+  - Plan: [ExecPlan](.agents/plans/b05-validate-archives-and-manage-staging.md)
   - Scope: Implement run-specific staging allocation, free-space admission,
     archive-size enforcement during capture through the supervisor's writer
     ownership, and safe cleanup. Stream tar inspection with the `tar` package;
