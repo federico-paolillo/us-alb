@@ -354,7 +354,8 @@ provide concrete handoff details without claiming that these activities occurred
   - Design references: “Runtime, packages, and tooling”; “Recommendation and
     agreed requirements”; “Remote artifact contract.”
 
-- [ ] B13 — Complete the implementation audit and operator handoff
+- [x] B13 — Complete the implementation audit and operator handoff
+  - Plan: [ExecPlan](.agents/plans/b13-complete-the-implementation-audit-and-operator-handoff.md)
   - Scope: Reconcile all BACKUP.md requirements against completed implementation,
     focused validation evidence, and the explicit external prerequisites. Fix
     remaining repository gaps within this task and validate affected areas;
