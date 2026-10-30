@@ -334,7 +334,8 @@ provide concrete handoff details without claiming that these activities occurred
   - Design references: “Compose services and private coordination”; “Signals
     and ownership”; “Availability and alerts.”
 
-- [ ] B12 — Extend CI and release delivery
+- [x] B12 — Extend CI and release delivery
+  - Plan: [ExecPlan](.agents/plans/b12-extend-ci-and-release-delivery.md)
   - Scope: Extend existing CI with reproducible daemon installation and
     non-mutating checks/tests. Update image build contexts for embedded
     `strapid`, add `backupd` to the existing publication workflow, and ensure

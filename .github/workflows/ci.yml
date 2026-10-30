@@ -21,6 +21,10 @@ jobs:
         run: mise exec -- npm ci --prefix backend
       - name: Install frontend dependencies
         run: mise exec -- npm ci --prefix frontend
+      - name: Install backupd dependencies
+        run: mise exec -- npm ci --prefix backupd
+      - name: Install strapid dependencies
+        run: mise exec -- npm ci --prefix strapid
       - name: Generate backend types
         run: mise run be:types
       - name: Build backend
@@ -35,3 +39,11 @@ jobs:
         run: mise run fe:check
       - name: Test frontend
         run: mise run fe:test
+      - name: Check backupd
+        run: mise run backupd:check
+      - name: Test backupd
+        run: mise run backupd:test
+      - name: Check strapid
+        run: mise run strapid:check
+      - name: Test strapid
+        run: mise run strapid:test

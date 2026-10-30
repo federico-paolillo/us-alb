@@ -58,15 +58,26 @@ jobs:
       matrix:
         include:
           - image: frontend
+            build_contexts: ""
             build_args: |
               CMS_MEDIA_URL=${{ vars.CMS_MEDIA_URL }}
               SITE_URL=${{ vars.SITE_URL }}
               NEXT_PUBLIC_APP_VERSION=${{ needs.prepare.outputs.full_sha }}
           - image: backend
+            build_contexts: |
+              strapid=./strapid
             build_args: |
+              APPLICATION_SOURCE_URL=${{ github.server_url }}/${{ github.repository }}
+              APPLICATION_GIT_REVISION=${{ needs.prepare.outputs.full_sha }}
               SITE_URL=${{ vars.SITE_URL }}
               CMS_PUBLIC_URL=${{ vars.CMS_PUBLIC_URL }}
               CMS_ADMIN_COOKIE_PATH=${{ vars.CMS_ADMIN_COOKIE_PATH }}
+          - image: backupd
+            build_contexts: |
+              strapid=./strapid
+            build_args: |
+              APPLICATION_SOURCE_URL=${{ github.server_url }}/${{ github.repository }}
+              APPLICATION_GIT_REVISION=${{ needs.prepare.outputs.full_sha }}
     env:
       IMAGE_NAME: ${{ needs.prepare.outputs.image_prefix }}/${{ matrix.image }}
       FULL_SHA: ${{ needs.prepare.outputs.full_sha }}
@@ -93,6 +104,7 @@ jobs:
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ./${{ matrix.image }}
+          build-contexts: ${{ matrix.build_contexts }}
           platforms: linux/amd64
           push: true
           tags: ${{ env.IMAGE_NAME }}:${{ env.SHORT_SHA }}
@@ -150,4 +162,67 @@ jobs:
             printf '| Commit | %s |\n' "$FULL_SHA"
             printf '| Digest | %s |\n' "$IMAGE_DIGEST"
             printf '| Immutable reference | %s@%s |\n' "$IMAGE_NAME" "$IMAGE_DIGEST"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  delivery:
+    needs: [prepare, publish]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.prepare.outputs.full_sha }}
+          persist-credentials: false
+      - name: Assemble deployment artifact
+        shell: bash
+        env:
+          FULL_SHA: ${{ needs.prepare.outputs.full_sha }}
+          SHORT_SHA: ${{ needs.prepare.outputs.short_sha }}
+        run: |
+          archive="$RUNNER_TEMP/us-alb-deployment-$SHORT_SHA.tar.gz"
+          git archive \
+            --format=tar.gz \
+            --prefix=us-alb-deployment/ \
+            --output="$archive" \
+            "$FULL_SHA" \
+            .env.example \
+            Caddyfile \
+            compose.prod.yml \
+            otel-config.yml
+
+          mapfile -t members < <(tar -tzf "$archive")
+          expected=(
+            us-alb-deployment/
+            us-alb-deployment/.env.example
+            us-alb-deployment/Caddyfile
+            us-alb-deployment/compose.prod.yml
+            us-alb-deployment/otel-config.yml
+          )
+          if [[ "${members[*]}" != "${expected[*]}" ]]; then
+            printf '::error::Deployment artifact member set is not exact\n'
+            exit 1
+          fi
+      - name: Upload deployment artifact
+        id: deployment
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          path: ${{ runner.temp }}/us-alb-deployment-${{ needs.prepare.outputs.short_sha }}.tar.gz
+          if-no-files-found: error
+          retention-days: 30
+          archive: false
+      - name: Summarize deployment artifact
+        shell: bash
+        env:
+          FULL_SHA: ${{ needs.prepare.outputs.full_sha }}
+          ARTIFACT_URL: ${{ steps.deployment.outputs.artifact-url }}
+          ARTIFACT_DIGEST: ${{ steps.deployment.outputs.artifact-digest }}
+        run: |
+          {
+            printf '### Deployment artifact\n\n'
+            printf '| Property | Value |\n| --- | --- |\n'
+            printf '| Commit | %s |\n' "$FULL_SHA"
+            printf '| Artifact | %s |\n' "$ARTIFACT_URL"
+            printf '| Digest | %s |\n' "$ARTIFACT_DIGEST"
+            printf '| Files | `.env.example`, `Caddyfile`, `compose.prod.yml`, `otel-config.yml` |\n'
           } >> "$GITHUB_STEP_SUMMARY"
