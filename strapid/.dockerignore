@@ -1,0 +1,11 @@
+node_modules/
+test/
+coverage/
+dist/
+build/
+out/
+*.log
+*.tsbuildinfo
+.env*
+biome.json
+tsconfig.json

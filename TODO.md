@@ -293,7 +293,8 @@ provide concrete handoff details without claiming that these activities occurred
     Strapi prose or duplicate existing lifecycle tests.
   - Design references: “Signals and ownership”; “Availability and alerts.”
 
-- [ ] B10 — Integrate containers and service-specific configuration
+- [x] B10 — Integrate containers and service-specific configuration
+  - Plan: [ExecPlan](.agents/plans/b10-integrate-containers-and-service-specific-configuration.md)
   - Scope: Package `backupd`, embed `strapid` in the backend image, and wire
     Compose services, restart policies, release metadata, and project-scoped
     state/staging/socket volumes. Source configuration from the single local

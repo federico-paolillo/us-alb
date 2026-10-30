@@ -33,17 +33,38 @@ RUN SITE_URL="$SITE_URL" \
     npm run build
 
 RUN npm prune --omit=dev \
-    && mkdir -p /runtime/strapi/database/migrations /runtime/data /runtime/config /runtime/staging \
+    && mkdir -p /runtime/strapi/database/migrations /runtime/data /runtime/config /runtime/staging /runtime/coordination \
     && cp -a dist/config /runtime/strapi/config \
     && cp -a dist/src /runtime/strapi/src \
     && cp -a dist/build /runtime/strapi/build \
-    && cp -a node_modules package.json package-lock.json public favicon.png .env /runtime/strapi/ \
+    && cp -a node_modules package.json package-lock.json public favicon.png /runtime/strapi/ \
+    && : > /runtime/strapi/.env \
     && if [ -d dist/database/migrations ]; then \
          cp -a dist/database/migrations/. /runtime/strapi/database/migrations/; \
        fi \
     && cp -a /runtime/strapi/public /runtime/data/public
 
+FROM node:24.20.0-trixie@sha256:f7d34e58713740f9eef9092c0bd6ff10369d132f7238399a4b270f16d47fa608 AS strapid-build
+
+ENV NODE_ENV=production
+ENV NPM_CONFIG_LOGLEVEL=info
+
+WORKDIR /strapid
+
+COPY --from=strapid package.json      /strapid/package.json
+COPY --from=strapid package-lock.json /strapid/package-lock.json
+
+RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev
+
+COPY --from=strapid src/ /strapid/src/
+
 FROM gcr.io/distroless/nodejs24-debian13:nonroot@sha256:9eeb7f5887d0e239e78264b06f7f11d2e14be534050481803a9e4728fcdd278e
+
+ARG APPLICATION_SOURCE_URL
+ARG APPLICATION_GIT_REVISION
+
+LABEL org.opencontainers.image.source="${APPLICATION_SOURCE_URL}"
+LABEL org.opencontainers.image.revision="${APPLICATION_GIT_REVISION}"
 
 ENV NODE_ENV=production
 ENV NPM_CONFIG_LOGLEVEL=info
@@ -65,15 +86,15 @@ COPY --from=build --chown=0:0 /runtime/strapi /strapi
 COPY --from=build --chown=nonroot:nonroot /runtime/data /data
 COPY --from=build --chown=nonroot:nonroot /runtime/config /config
 COPY --from=build --chown=nonroot:nonroot /runtime/staging /staging
+COPY --from=build --chown=nonroot:nonroot /runtime/coordination /coordination
+COPY --from=strapid-build --chown=0:0 /strapid /strapid-daemon
 
 USER nonroot
 
 # Supply tmpfs mounts for /tmp
 
-VOLUME ["/data", "/config", "/staging"]
+VOLUME ["/data", "/config", "/staging", "/coordination"]
 
 EXPOSE 65101
 
-ENTRYPOINT ["/nodejs/bin/node", "/strapi/node_modules/@strapi/strapi/bin/strapi.js"]
-
-CMD ["start"]
+ENTRYPOINT ["/nodejs/bin/node", "/strapid-daemon/src/main.ts"]

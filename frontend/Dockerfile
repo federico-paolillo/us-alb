@@ -35,10 +35,6 @@ RUN cp -R .next/static .next/standalone/.next/static
 
 RUN mkdir -p .next/standalone/.next/cache
 
-# Allow an optional frontend.env file injected via Docker Secrets to stand in place of server .env
-
-RUN ln -s /run/secrets/frontend.env .next/standalone/.env
-
 FROM gcr.io/distroless/nodejs24-debian13:nonroot@sha256:9eeb7f5887d0e239e78264b06f7f11d2e14be534050481803a9e4728fcdd278e
 
 ENV NODE_ENV=production
@@ -50,6 +46,7 @@ WORKDIR /app
 
 # Supply tmpfs mounts for /app/.next/cache and /tmp
 
+COPY --from=build --chown=0:0 --chmod=755 /usr/local/bin/node /nodejs/bin/node
 COPY --from=build --chown=0:0 --chmod=555 /app/.next/standalone /app
 
 USER nonroot

@@ -1,33 +1,117 @@
 services:
   backend:
-    image: ghcr.io/federico-paolillo/us-alb/backend:sha256-e401e1fd0809198c70c07038ad74255e9b8d0e10cb5e67768d7a33cc00fe70ec
+    image: ${BACKEND_IMAGE_REPOSITORY:?BACKEND_IMAGE_REPOSITORY is required}@${APPLICATION_IMAGE_DIGEST:?APPLICATION_IMAGE_DIGEST is required}
     environment:
-      ENV_PATH: /run/secrets/backend.env
       HOST: 0.0.0.0
       PORT: 65101
-    secrets:
-      - source: app_env
-        target: backend.env
+      SITE_URL: ${SITE_URL:?SITE_URL is required}
+      CMS_PUBLIC_URL: ${CMS_PUBLIC_URL:-}
+      CMS_ADMIN_COOKIE_PATH: ${CMS_ADMIN_COOKIE_PATH:-}
+      REVALIDATION_HEADER: ${REVALIDATION_HEADER:?REVALIDATION_HEADER is required}
+      REVALIDATION_SECRET: ${REVALIDATION_SECRET:?REVALIDATION_SECRET is required}
+      PREVIEW_SECRET: ${PREVIEW_SECRET:?PREVIEW_SECRET is required}
+      APP_KEYS: ${APP_KEYS:?APP_KEYS is required}
+      API_TOKEN_SALT: ${API_TOKEN_SALT:?API_TOKEN_SALT is required}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:?ADMIN_JWT_SECRET is required}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT:?TRANSFER_TOKEN_SALT is required}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?ENCRYPTION_KEY is required}
+      FRONTEND_INTERNAL_URL: ${FRONTEND_INTERNAL_URL:?FRONTEND_INTERNAL_URL is required}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?ADMIN_EMAIL is required}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}
+      STRAPID_RELEASE_ID: ${APPLICATION_GIT_REVISION:?APPLICATION_GIT_REVISION is required}
+      STRAPID_SOURCE_VOLUME_ID: ${STRAPI_SOURCE_IDENTITY:?STRAPI_SOURCE_IDENTITY is required}
+      STRAPID_TELEMETRY_ENVIRONMENT: ${DEPLOYMENT_ENVIRONMENT:?DEPLOYMENT_ENVIRONMENT is required}
+      STRAPID_COORDINATION_SOCKET_PATH: /coordination/strapid.sock
+      STRAPID_CAPTURE_WINDOW_SECONDS: ${STRAPID_CAPTURE_WINDOW_SECONDS:-900}
+      STRAPID_SERVING_SHUTDOWN_SECONDS: ${STRAPID_SERVING_SHUTDOWN_SECONDS:-60}
+      STRAPID_EXPORT_SECONDS: ${STRAPID_EXPORT_SECONDS:-600}
+      STRAPID_EXPORT_TERMINATION_SECONDS: ${STRAPID_EXPORT_TERMINATION_SECONDS:-30}
+      STRAPID_RECOVERY_SECONDS: ${STRAPID_RECOVERY_SECONDS:-210}
+      STRAPID_FORCE_CONFIRMATION_SECONDS: ${STRAPID_FORCE_CONFIRMATION_SECONDS:-5}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:65103
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+    healthcheck:
+      test:
+        - CMD
+        - /nodejs/bin/node
+        - -e
+        - >-
+          fetch("http://127.0.0.1:65101/_health", { signal: AbortSignal.timeout(2000) })
+          .then((response) => { if (!response.ok) process.exit(1); })
+          .catch(() => process.exit(1));
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 120s
     read_only: true
+    restart: unless-stopped
+    stop_grace_period: 45s
     volumes:
       - backend_data:/data
       - backend_config:/config
+      - backup_staging:/staging
+      - backup_coordination:/coordination
+    tmpfs:
+      - /tmp:mode=1777
+    networks:
+      - app
+
+  backupd:
+    image: ${BACKUPD_IMAGE:?BACKUPD_IMAGE is required}
+    environment:
+      BACKUPD_COORDINATION_SOCKET_PATH: /coordination/strapid.sock
+      BACKUPD_SCHEDULE_UTC: ${BACKUPD_SCHEDULE_UTC:-03:00}
+      BACKUPD_AUTOMATIC_RETRY_DELAY_SECONDS: ${BACKUPD_AUTOMATIC_RETRY_DELAY_SECONDS:-900}
+      BACKUPD_AUTOMATIC_MAX_ATTEMPTS: ${BACKUPD_AUTOMATIC_MAX_ATTEMPTS:-2}
+      BACKUPD_STAGING_MIN_FREE_BYTES: ${BACKUPD_STAGING_MIN_FREE_BYTES:-107374182400}
+      BACKUPD_ARCHIVE_MAX_BYTES: ${BACKUPD_ARCHIVE_MAX_BYTES:-80530636800}
+      BACKUPD_PUBLICATION_WINDOW_SECONDS: ${BACKUPD_PUBLICATION_WINDOW_SECONDS:-21600}
+      BACKUPD_UPLOAD_CONCURRENCY: ${BACKUPD_UPLOAD_CONCURRENCY:-4}
+      BACKUPD_S3_MAX_ATTEMPTS: ${BACKUPD_S3_MAX_ATTEMPTS:-3}
+      BACKUPD_SHUTDOWN_TIMEOUT_SECONDS: ${BACKUPD_SHUTDOWN_TIMEOUT_SECONDS:-30}
+      BACKUPD_S3_ENDPOINT: ${BACKUPD_S3_ENDPOINT:?BACKUPD_S3_ENDPOINT is required}
+      BACKUPD_S3_REGION: ${BACKUPD_S3_REGION:?BACKUPD_S3_REGION is required}
+      BACKUPD_S3_BUCKET: ${BACKUPD_S3_BUCKET:?BACKUPD_S3_BUCKET is required}
+      BACKUPD_S3_ACCESS_KEY_ID: ${BACKUPD_S3_ACCESS_KEY_ID:?BACKUPD_S3_ACCESS_KEY_ID is required}
+      BACKUPD_S3_SECRET_ACCESS_KEY: ${BACKUPD_S3_SECRET_ACCESS_KEY:?BACKUPD_S3_SECRET_ACCESS_KEY is required}
+      BACKUPD_SNAPSHOT_SITE: ${BACKUPD_SNAPSHOT_SITE:?BACKUPD_SNAPSHOT_SITE is required}
+      BACKUPD_SNAPSHOT_ENVIRONMENT: ${DEPLOYMENT_ENVIRONMENT:?DEPLOYMENT_ENVIRONMENT is required}
+      BACKUPD_APPLICATION_IMAGE_DIGEST: ${APPLICATION_IMAGE_DIGEST:?APPLICATION_IMAGE_DIGEST is required}
+      BACKUPD_GIT_REVISION: ${APPLICATION_GIT_REVISION:?APPLICATION_GIT_REVISION is required}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:65103
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+    depends_on:
+      backend:
+        condition: service_healthy
+    read_only: true
+    restart: unless-stopped
+    stop_grace_period: 45s
+    volumes:
+      - backup_state:/state
+      - backup_staging:/staging
+      - backup_coordination:/coordination
     tmpfs:
       - /tmp:mode=1777
     networks:
       - app
 
   frontend:
-    image: ghcr.io/federico-paolillo/us-alb/frontend:sha256-e2fc156b37d38994cc90f2d2386b3f7c162e6937293f5ef5c4de261437777b1a
+    image: ${FRONTEND_IMAGE:?FRONTEND_IMAGE is required}
     environment:
       HOSTNAME: 0.0.0.0
       PORT: 65100
+      SITE_URL: ${SITE_URL:?SITE_URL is required}
+      CMS_API_URL: ${CMS_API_URL:?CMS_API_URL is required}
+      CMS_MEDIA_URL: ${CMS_MEDIA_URL:-}
+      CMS_API_TOKEN: ${CMS_API_TOKEN:-}
+      REVALIDATION_HEADER: ${REVALIDATION_HEADER:?REVALIDATION_HEADER is required}
+      REVALIDATION_SECRET: ${REVALIDATION_SECRET:?REVALIDATION_SECRET is required}
+      PREVIEW_SECRET: ${PREVIEW_SECRET:?PREVIEW_SECRET is required}
     depends_on:
       - backend
-    secrets:
-      - source: app_env
-        target: frontend.env
     read_only: true
+    restart: unless-stopped
     tmpfs:
       - /app/.next/cache:mode=1777
       - /tmp:mode=1777
@@ -41,6 +125,7 @@ services:
       - frontend
     ports:
       - 127.0.0.1:65102:65102
+    restart: unless-stopped
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
     tmpfs:
@@ -50,13 +135,12 @@ services:
         aliases:
           - us-alb.localhost
 
-secrets:
-  app_env:
-    file: ./.env
-
 volumes:
   backend_data:
   backend_config:
+  backup_state:
+  backup_staging:
+  backup_coordination:
 
 networks:
   app:
