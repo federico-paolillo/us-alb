@@ -45,6 +45,10 @@ export interface CaptureClientOptions {
   readonly socketPath: string;
   readonly requestTimeoutMs?: number;
   readonly captureTimeoutMs?: number;
+  readonly traceHeaders?: () => {
+    readonly traceparent?: string;
+    readonly tracestate?: string;
+  };
 }
 
 export class CaptureClientProtocolError extends Error {
@@ -730,6 +734,32 @@ function cancellationCause(signal: AbortSignal): Error {
     : new DOMException("Operation aborted", "AbortError");
 }
 
+function validatedTraceHeaders(
+  source:
+    | { readonly traceparent?: string; readonly tracestate?: string }
+    | undefined,
+): { readonly traceparent?: string; readonly tracestate?: string } {
+  if (
+    source === undefined ||
+    typeof source.traceparent !== "string" ||
+    !/^00-(?!0{32})[0-9a-f]{32}-(?!0{16})[0-9a-f]{16}-0[01]$/.test(
+      source.traceparent,
+    )
+  ) {
+    return {};
+  }
+  const state = source.tracestate;
+  return {
+    traceparent: source.traceparent,
+    ...(typeof state === "string" &&
+    Buffer.byteLength(state) <= 512 &&
+    /^[\x20-\x7e]*$/.test(state) &&
+    !state.includes(",,")
+      ? { tracestate: state }
+      : {}),
+  };
+}
+
 export function createCaptureClient(
   options: CaptureClientOptions,
 ): CaptureClient {
@@ -844,6 +874,15 @@ export function createCaptureClient(
       };
       return await new Promise((resolve, reject) => {
         const bytes = Buffer.from(JSON.stringify(captureRequest));
+        let requestTraceHeaders: {
+          readonly traceparent?: string;
+          readonly tracestate?: string;
+        } = {};
+        try {
+          requestTraceHeaders = validatedTraceHeaders(options.traceHeaders?.());
+        } catch {
+          requestTraceHeaders = {};
+        }
         let decoder: CaptureNdjsonDecoder | undefined;
         let settled = false;
         let reconciling = false;
@@ -910,6 +949,7 @@ export function createCaptureClient(
               Connection: "close",
               "Content-Type": "application/json",
               "Content-Length": bytes.length,
+              ...requestTraceHeaders,
             },
           },
           (response) => {

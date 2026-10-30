@@ -43,6 +43,16 @@ export interface CaptureHttpServer {
   close(): Promise<void>;
 }
 
+export interface CaptureHttpServerOptions {
+  readonly runCapture?: <Result>(
+    headers: {
+      readonly traceparent?: string;
+      readonly tracestate?: string;
+    },
+    operation: () => Promise<Result>,
+  ) => Promise<Result>;
+}
+
 function json(
   response: ServerResponse,
   statusCode: number,
@@ -164,6 +174,7 @@ async function prepareSocketPath(socketPath: string): Promise<void> {
 export async function startCaptureHttpServer(
   socketPath: string,
   coordinator: CaptureHttpCoordinator | CaptureCoordinator,
+  options: CaptureHttpServerOptions = {},
 ): Promise<CaptureHttpServer> {
   if (!isAbsolute(socketPath)) {
     throw new Error("Coordination socket path must be absolute");
@@ -282,34 +293,43 @@ export async function startCaptureHttpServer(
       });
       response.setTimeout(0);
       response.socket?.setTimeout(0);
-      await coordinator.beginCapture(
-        captureRequest,
-        {
-          async accepted(record) {
-            if (!response.headersSent) {
-              response.writeHead(200, {
-                "Cache-Control": "no-store",
-                Connection: "close",
-                "Content-Type": "application/x-ndjson",
-              });
-            }
-            await writeLine(response, record);
+      const operation = () =>
+        coordinator.beginCapture(
+          captureRequest,
+          {
+            async accepted(record) {
+              if (!response.headersSent) {
+                response.writeHead(200, {
+                  "Cache-Control": "no-store",
+                  Connection: "close",
+                  "Content-Type": "application/x-ndjson",
+                });
+              }
+              await writeLine(response, record);
+            },
+            async terminal(record) {
+              terminalAttempted = true;
+              if (!response.headersSent) {
+                response.writeHead(200, {
+                  "Cache-Control": "no-store",
+                  Connection: "close",
+                  "Content-Type": "application/x-ndjson",
+                });
+              }
+              await writeLine(response, record);
+              response.end();
+            },
           },
-          async terminal(record) {
-            terminalAttempted = true;
-            if (!response.headersSent) {
-              response.writeHead(200, {
-                "Cache-Control": "no-store",
-                Connection: "close",
-                "Content-Type": "application/x-ndjson",
-              });
-            }
-            await writeLine(response, record);
-            response.end();
-          },
-        },
-        admission.signal,
-      );
+          admission.signal,
+        );
+      const traceparent = request.headers.traceparent;
+      const tracestate = request.headers.tracestate;
+      const traceHeaders = {
+        ...(typeof traceparent === "string" ? { traceparent } : {}),
+        ...(typeof tracestate === "string" ? { tracestate } : {}),
+      };
+      if (options.runCapture === undefined) await operation();
+      else await options.runCapture(traceHeaders, operation);
       return;
     }
 

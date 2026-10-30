@@ -66,6 +66,25 @@ switch (mode) {
     });
     break;
   }
+  case "diagnostic-tail": {
+    const descendant = spawn(
+      process.execPath,
+      [
+        fileURLToPath(import.meta.url),
+        "diagnostic-tail-descendant",
+        String(numericArgument(3)),
+      ],
+      {
+        detached: false,
+        stdio: ["ignore", "inherit", "inherit", "ipc"],
+      },
+    );
+    descendant.once("message", () => {
+      writeEvent("descendant", { pid: descendant.pid });
+      process.exit(0);
+    });
+    break;
+  }
   case "tail-descendant": {
     expireAfter();
     let closed = false;
@@ -84,6 +103,26 @@ switch (mode) {
     setTimeout(() => {
       closeTail();
     }, numericArgument(3));
+    break;
+  }
+  case "diagnostic-tail-descendant": {
+    expireAfter();
+    process.stderr.write("WA");
+    process.stderr.write(
+      "RN token=fixture-secret-value-0123456789abcdef\nunfamiliar exporter status\n",
+    );
+    let closed = false;
+    const closeTail = () => {
+      if (closed) return;
+      closed = true;
+      process.stdout.write(
+        `${JSON.stringify({ event: "tail-closed", pid: process.pid })}\n`,
+        () => process.exit(0),
+      );
+    };
+    process.once("SIGTERM", closeTail);
+    process.send?.({ event: "ready" });
+    setTimeout(closeTail, numericArgument(3));
     break;
   }
   case "idle-graceful": {

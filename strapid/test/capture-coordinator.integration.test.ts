@@ -7,6 +7,11 @@ import { fileURLToPath } from "node:url";
 
 import type { CaptureRequest } from "../src/capture-contract.ts";
 import { CaptureCoordinator } from "../src/capture-coordinator.ts";
+import {
+  createExportOutputSession,
+  type ExportAttention,
+  type ExportDiagnosticRecord,
+} from "../src/export-output.ts";
 import type {
   ChildCommand,
   ProcessTerminationBounds,
@@ -27,11 +32,11 @@ const TERMINATION: ProcessTerminationBounds = {
   pollIntervalMs: 10,
 };
 const BUDGET = {
-  totalWindowMs: 3_000,
+  totalWindowMs: 5_900,
   servingShutdownMs: 500,
-  exportExecutionMs: 700,
+  exportExecutionMs: 2_500,
   exporterTerminationMs: 500,
-  recoveryMs: 1_300,
+  recoveryMs: 2_400,
   forcedConfirmationMs: 100,
 };
 
@@ -125,6 +130,9 @@ function request(supervisorInstanceId: string): CaptureRequest {
 function coordinator(
   supervisor: StrapiSupervisor,
   endpoint: string,
+  createOutputSession?: ConstructorParameters<
+    typeof CaptureCoordinator
+  >[0]["createOutputSession"],
 ): CaptureCoordinator {
   return new CaptureCoordinator({
     supervisor,
@@ -153,6 +161,7 @@ function coordinator(
       SERVER_PUBLIC_FOLDER: "/data/public",
     },
     retryIntervalMs: 20,
+    ...(createOutputSession === undefined ? {} : { createOutputSession }),
   });
 }
 
@@ -168,6 +177,8 @@ test("clean capture closes output/workspace before captured and recovers serving
   const exporting = new Events();
   let invocation: StrapiCliInvocation | undefined;
   let workspace = "";
+  const diagnostics: ExportDiagnosticRecord[] = [];
+  const attention: ExportAttention[] = [];
   const supervisor = strapiSupervisorTestHooks.create({
     createServingCommand: () =>
       command("serving", "idle-graceful", {
@@ -179,7 +190,7 @@ test("clean capture closes output/workspace before captured and recovers serving
       workspace = candidate.cwd;
       return command(
         "export",
-        "tail",
+        "diagnostic-tail",
         {
           onStdout: (chunk) => {
             exporting.consume(chunk);
@@ -192,7 +203,12 @@ test("clean capture closes output/workspace before captured and recovers serving
       );
     },
   });
-  const capture = coordinator(supervisor, health.endpoint);
+  const capture = coordinator(supervisor, health.endpoint, () =>
+    createExportOutputSession({
+      onRecord: (record) => diagnostics.push(record),
+      onAttention: (event) => attention.push(event),
+    }),
+  );
   const ordering: string[] = [];
   try {
     await supervisor.startServing({
@@ -232,6 +248,17 @@ test("clean capture closes output/workspace before captured and recovers serving
       "--no-encrypt",
       "--no-compress",
     ]);
+    assert.deepEqual(attention, [{ category: "warning" }]);
+    assert.equal(
+      diagnostics.some((record) =>
+        record.message.includes("unfamiliar exporter status"),
+      ),
+      true,
+    );
+    assert.equal(
+      JSON.stringify(diagnostics).includes("fixture-secret-value"),
+      false,
+    );
   } finally {
     await shutdown(supervisor);
     await closeServer(health.server);

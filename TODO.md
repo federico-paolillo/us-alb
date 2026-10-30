@@ -272,7 +272,8 @@ provide concrete handoff details without claiming that these activities occurred
   - Design references: “Proposed lifecycle and container boundaries”; “Remote
     artifact contract”; “Scheduling, state, and manual runs.”
 
-- [ ] B09 — Instrument backup and supervisor outcomes
+- [x] B09 — Instrument backup and supervisor outcomes
+  - Plan: [ExecPlan](.agents/plans/b09-instrument-backup-and-supervisor-outcomes.md)
   - Scope: Use official OpenTelemetry SDKs/exporters for correlated run/phase
     traces, structured lifecycle logs, independent supervisor recovery evidence,
     heartbeat, persisted freshness, and bounded outcome/duration metrics.

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { performance } from "node:perf_hooks";
 import test from "node:test";
 
 import type {
@@ -37,6 +38,7 @@ import type {
 import { StagingError } from "../src/staging-policy.ts";
 import type { StateRepository } from "../src/state-repository.ts";
 import { createStateRepository } from "../src/state-repository.ts";
+import type { BackupTelemetry } from "../src/telemetry.ts";
 import { fixtureAttribution, fixturePolicy } from "./snapshot-fixture.ts";
 
 type Signal = "SIGTERM" | "SIGINT" | "SIGUSR2";
@@ -156,6 +158,17 @@ function config(shutdownTimeoutMs = 1_000): BackupDaemonConfig {
   };
 }
 
+function noTelemetry(): BackupTelemetry {
+  return {
+    observer: {},
+    onEvent: () => undefined,
+    runInContext: async (_request, operation) => await operation(),
+    traceHeaders: () => ({}),
+    startFreshness: () => undefined,
+    close: async () => undefined,
+  };
+}
+
 function readyStatus(): CaptureServiceStatus {
   return {
     version: 1,
@@ -251,12 +264,20 @@ function cancellableCapture(): {
   return { client, counts };
 }
 
-async function waitFor(condition: () => boolean): Promise<void> {
-  for (let attempt = 0; attempt < 1_000; attempt += 1) {
+async function waitFor(
+  condition: () => boolean,
+  description: string,
+  timeoutMs = 1_000,
+): Promise<void> {
+  const started = performance.now();
+  const deadline = started + timeoutMs;
+  while (performance.now() < deadline) {
     if (condition()) return;
-    await new Promise<void>((resolve) => setImmediate(resolve));
+    await new Promise<void>((resolve) => setTimeout(resolve, 1));
   }
-  throw new Error("condition was not reached");
+  throw new Error(
+    `Timed out after ${Math.round(performance.now() - started)}ms waiting for ${description}`,
+  );
 }
 
 test("main coalesces manual admission and performs bounded safe signal shutdown", async () => {
@@ -280,18 +301,31 @@ test("main coalesces manual admission and performs bounded safe signal shutdown"
     snapshotPublisher: publisher,
     stateRepository,
   };
+  let telemetryClosed = 0;
+  const telemetry: BackupTelemetry = {
+    ...noTelemetry(),
+    async close() {
+      assert.equal(staging.cleanupCount, 1);
+      telemetryClosed += 1;
+    },
+  };
   try {
     const running = runBackupDaemon({
       config: daemonConfig,
       dependencies,
+      telemetry,
       signalHost: signals,
       forcedExit: (code) => forced.push(code),
     });
-    await waitFor(() => signals.count("SIGUSR2") === 1);
+    await waitFor(
+      () => signals.count("SIGUSR2") === 1,
+      "manual signal admission",
+    );
     signals.emit("SIGUSR2");
     signals.emit("SIGUSR2");
     await waitFor(
       () => capture.counts.starts === 1 && staging.watchCount === 1,
+      "one accepted capture and size watcher",
     );
     signals.emit("SIGTERM");
     assert.equal(await running, 0);
@@ -304,11 +338,141 @@ test("main coalesces manual admission and performs bounded safe signal shutdown"
     assert.equal(staging.cleanupCount, 1);
     assert.equal(publisher.preflightCount, 1);
     assert.deepEqual(forced, []);
+    assert.equal(telemetryClosed, 1);
     assert.equal(signals.count("SIGUSR2"), 0);
     assert.equal(signals.count("SIGTERM"), 0);
     assert.equal(signals.count("SIGINT"), 0);
     assert.equal((await stateRepository.load()).schedule.retry, null);
   } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("throwing reporting cannot replace rejected shutdown or leak late failures", async () => {
+  const root = await mkdtemp(join(tmpdir(), "b09-main-scheduler-rejection-"));
+  const daemonConfig = config();
+  const baseRepository = createStateRepository({
+    stateRoot: root,
+    publicationPolicy: fixturePolicy,
+  });
+  await baseRepository.skipAutomaticRequest(
+    latestDueSlot(new Date().toISOString(), daemonConfig.schedule),
+  );
+  const deferredRead =
+    Promise.withResolvers<Awaited<ReturnType<StateRepository["load"]>>>();
+  let manualRequested = false;
+  let manualLoadCount = 0;
+  const stateRepository = new Proxy(baseRepository, {
+    get(target, property, receiver) {
+      if (property === "load") {
+        return async () => {
+          if (manualRequested) {
+            manualLoadCount += 1;
+            if (manualLoadCount === 2) return await deferredRead.promise;
+          }
+          return await target.load();
+        };
+      }
+      const value = Reflect.get(target, property, receiver) as unknown;
+      return typeof value === "function" ? value.bind(target) : value;
+    },
+  });
+  const staging = new MainStaging();
+  const signals = new ControlledSignalHost();
+  const errors: unknown[] = [];
+  const closeDeadlines: number[] = [];
+  const schedulerFailure = new Error("controlled scheduler completion failure");
+  const telemetryFailure = new Error("controlled telemetry close failure");
+  const reporterFailure = new Error("controlled error reporter failure");
+  const unhandled: unknown[] = [];
+  const uncaught: unknown[] = [];
+  const unhandledListener = (error: unknown) => unhandled.push(error);
+  const uncaughtListener = (error: unknown) => uncaught.push(error);
+  const initialUnhandledListeners = process.listenerCount("unhandledRejection");
+  const initialUncaughtListeners = process.listenerCount(
+    "uncaughtExceptionMonitor",
+  );
+  process.on("unhandledRejection", unhandledListener);
+  process.on("uncaughtExceptionMonitor", uncaughtListener);
+  const telemetry: BackupTelemetry = {
+    ...noTelemetry(),
+    async close(deadline) {
+      closeDeadlines.push(deadline);
+      throw telemetryFailure;
+    },
+  };
+  const captureClient: CaptureClient = {
+    async getStatus() {
+      return readyStatus();
+    },
+    async startCapture() {
+      throw new CaptureAdmissionRejectedError(503, "serving_unavailable");
+    },
+    async reconcile() {
+      throw new Error("unexpected reconciliation");
+    },
+    async cancel() {
+      throw new Error("rejected admission must not be cancelled");
+    },
+  };
+  let running: Promise<number> | undefined;
+  try {
+    running = runBackupDaemon({
+      config: daemonConfig,
+      dependencies: {
+        captureClient,
+        stagingManager: staging,
+        snapshotPublisher: new PreflightOnlyPublisher(),
+        stateRepository,
+      },
+      telemetry,
+      signalHost: signals,
+      forcedExit: () => assert.fail("must not force exit"),
+      onError(error) {
+        errors.push(error);
+        throw reporterFailure;
+      },
+    });
+    await waitFor(
+      () => signals.count("SIGUSR2") === 1,
+      "manual signal admission",
+    );
+    manualRequested = true;
+    signals.emit("SIGUSR2");
+    await waitFor(
+      () => staging.cleanupCount === 1 && manualLoadCount === 2,
+      "scheduler completion state read",
+    );
+    const shutdownStartedAt = Date.now();
+    signals.emit("SIGTERM");
+    deferredRead.reject(schedulerFailure);
+
+    assert.equal(await running, 1);
+    assert.equal(closeDeadlines.length, 1);
+    assert.ok((closeDeadlines[0] as number) > shutdownStartedAt);
+    assert.ok(
+      (closeDeadlines[0] as number) <=
+        shutdownStartedAt + daemonConfig.shutdownTimeoutMs,
+    );
+    assert.equal(errors.includes(schedulerFailure), true);
+    assert.equal(errors.includes(telemetryFailure), true);
+    await new Promise<void>((resolve) => setTimeout(resolve, 25));
+    assert.deepEqual(unhandled, []);
+    assert.deepEqual(uncaught, []);
+  } finally {
+    signals.emit("SIGTERM");
+    deferredRead.reject(schedulerFailure);
+    await running?.catch(() => undefined);
+    process.off("unhandledRejection", unhandledListener);
+    process.off("uncaughtExceptionMonitor", uncaughtListener);
+    assert.equal(
+      process.listenerCount("unhandledRejection"),
+      initialUnhandledListeners,
+    );
+    assert.equal(
+      process.listenerCount("uncaughtExceptionMonitor"),
+      initialUncaughtListeners,
+    );
     await rm(root, { recursive: true, force: true });
   }
 });
@@ -375,12 +539,13 @@ test("graceful shutdown waits for invalidated allocation cleanup and automatic r
         snapshotPublisher: new PreflightOnlyPublisher(),
         stateRepository,
       },
+      telemetry: noTelemetry(),
       signalHost: signals,
       forcedExit: (code) => forced.push(code),
     }).finally(() => {
       settled = true;
     });
-    await waitFor(() => staging.allocateCount === 1);
+    await waitFor(() => staging.allocateCount === 1, "paused allocation");
     signals.emit("SIGTERM");
     allocationGate.resolve();
     await finishEntered.promise;
@@ -439,11 +604,15 @@ test("unsafe allocation rejection during shutdown fails the daemon without clean
         snapshotPublisher: new PreflightOnlyPublisher(),
         stateRepository,
       },
+      telemetry: noTelemetry(),
       signalHost: signals,
       forcedExit: (code) => forced.push(code),
       onError: (error) => errors.push(error),
     });
-    await waitFor(() => staging.allocateCount === 1);
+    await waitFor(
+      () => staging.allocateCount === 1,
+      "unsafe paused allocation",
+    );
     signals.emit("SIGTERM");
     allocationGate.reject(allocationFailure);
     assert.equal(await running, 1);
@@ -502,13 +671,20 @@ test("definite admission rejection creates automatic retry debt but no manual de
           snapshotPublisher: publisher,
           stateRepository,
         },
+        telemetry: noTelemetry(),
         signalHost: signals,
         forcedExit: () => assert.fail("must not force exit"),
       });
-      await waitFor(() => signals.count("SIGUSR2") === 1);
+      await waitFor(
+        () => signals.count("SIGUSR2") === 1,
+        "manual signal admission",
+      );
       if (trigger === "manual") {
         signals.emit("SIGUSR2");
-        await waitFor(() => staging.cleanupCount === 1);
+        await waitFor(
+          () => staging.cleanupCount === 1,
+          "rejected admission cleanup",
+        );
       }
       const state = await stateRepository.load();
       if (trigger === "automatic") {
@@ -583,6 +759,7 @@ test("main invokes the forced-exit boundary when owned work cannot settle", asyn
         snapshotPublisher: new PreflightOnlyPublisher(),
         stateRepository,
       },
+      telemetry: noTelemetry(),
       signalHost: signals,
       forcedExit: (code) => forced.push(code),
       setTimer: (callback) => {
@@ -591,9 +768,15 @@ test("main invokes the forced-exit boundary when owned work cannot settle", asyn
       },
       clearTimer: () => undefined,
     });
-    await waitFor(() => signals.count("SIGUSR2") === 1);
+    await waitFor(
+      () => signals.count("SIGUSR2") === 1,
+      "manual signal admission",
+    );
     signals.emit("SIGUSR2");
-    await waitFor(() => starts === 1 && staging.watchCount === 1);
+    await waitFor(
+      () => starts === 1 && staging.watchCount === 1,
+      "unsettled capture ownership",
+    );
     signals.emit("SIGTERM");
     assert.notEqual(shutdownTimer, undefined);
     shutdownTimer?.();

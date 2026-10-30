@@ -90,6 +90,43 @@ export interface BackupDaemonEvent {
   readonly classification?: string;
 }
 
+export type BackupObservedPhase =
+  | "preflight"
+  | "capture"
+  | "validation"
+  | "publication"
+  | "cleanup"
+  | "state";
+
+export type ObservedOutcome =
+  | "succeeded"
+  | "failed"
+  | "cancelled"
+  | "pending"
+  | "expired";
+
+export interface BackupLifecycleObserver {
+  runStarted(event: {
+    readonly trigger: RunLifecycleRequest["trigger"];
+    readonly runId?: string;
+  }): void;
+  runIdentified(event: {
+    readonly runId: string;
+    readonly captureWindowId?: string;
+  }): void;
+  phaseStarted(event: { readonly phase: BackupObservedPhase }): void;
+  phaseFinished(event: {
+    readonly phase: BackupObservedPhase;
+    readonly outcome: ObservedOutcome;
+    readonly failureCode?: BackupDaemonEventCode;
+  }): void;
+  freshnessConfirmed(event: { readonly capturedAt: string }): void;
+  runFinished(event: {
+    readonly outcome: RunLifecycleResult;
+    readonly failureCode?: BackupDaemonEventCode;
+  }): void;
+}
+
 export class BackupDaemonError extends Error {
   readonly code: BackupDaemonEventCode;
   readonly event: BackupDaemonEvent;
@@ -127,6 +164,7 @@ export interface BackupLifecycleCoordinatorOptions {
   readonly clearTimer?: (timer: unknown) => void;
   readonly onEvent?: (event: BackupDaemonEvent) => void;
   readonly onError?: (error: unknown) => void;
+  readonly observer?: Partial<BackupLifecycleObserver>;
 }
 
 interface ActiveCapture {
@@ -222,6 +260,7 @@ export class BackupLifecycleCoordinator {
   private readonly clearTimer: (timer: unknown) => void;
   private readonly onEvent: (event: BackupDaemonEvent) => void;
   private readonly onError: (error: unknown) => void;
+  private readonly observer: Partial<BackupLifecycleObserver>;
   private readonly stopController = new AbortController();
   private captureAdmissionGeneration = 0;
   private current: Promise<RunLifecycleResult> | undefined;
@@ -237,6 +276,8 @@ export class BackupLifecycleCoordinator {
   private stopped = false;
   private failureRecorded = false;
   private lifecycleState: BackupLifecycleState = "starting";
+  private observedPhase: BackupObservedPhase | undefined;
+  private lastFailureCode: BackupDaemonEventCode | undefined;
 
   constructor(options: BackupLifecycleCoordinatorOptions) {
     this.captureClient = options.captureClient;
@@ -254,6 +295,7 @@ export class BackupLifecycleCoordinator {
       options.clearTimer ?? ((timer) => clearTimeout(timer as NodeJS.Timeout));
     this.onEvent = options.onEvent ?? (() => undefined);
     this.onError = options.onError ?? (() => undefined);
+    this.observer = options.observer ?? {};
   }
 
   get state(): BackupLifecycleState {
@@ -326,6 +368,16 @@ export class BackupLifecycleCoordinator {
     ) {
       return Promise.resolve("terminal-failure");
     }
+    this.lastFailureCode = undefined;
+    this.observedPhase = undefined;
+    const resumedRunId = request.pendingPublication?.request.archive.runId;
+    this.observe("runStarted", {
+      trigger: request.trigger,
+      ...(resumedRunId === undefined ? {} : { runId: resumedRunId }),
+    });
+    if (resumedRunId !== undefined) {
+      this.observe("runIdentified", { runId: resumedRunId });
+    }
     const captureGeneration = isPending
       ? undefined
       : ++this.captureAdmissionGeneration;
@@ -335,9 +387,34 @@ export class BackupLifecycleCoordinator {
       linked.controller.signal,
       captureGeneration,
     )
+      .then((result) => {
+        this.finishObservedPhase(
+          result === "completed"
+            ? "succeeded"
+            : result === "publication-pending"
+              ? "pending"
+              : result === "retryable-failure" && this.stopped
+                ? "cancelled"
+                : "failed",
+          this.lastFailureCode,
+        );
+        this.observe("runFinished", {
+          outcome: result,
+          ...(this.lastFailureCode === undefined
+            ? {}
+            : { failureCode: this.lastFailureCode }),
+        });
+        return result;
+      })
       .catch((error: unknown) => {
         this.transition("failed");
         this.onError(error);
+        this.observe("runFinished", {
+          outcome: "terminal-failure",
+          ...(this.lastFailureCode === undefined
+            ? {}
+            : { failureCode: this.lastFailureCode }),
+        });
         return "terminal-failure" as const;
       })
       .finally(() => {
@@ -467,6 +544,7 @@ export class BackupLifecycleCoordinator {
   ): Promise<RunLifecycleResult> {
     const runId = this.uuid();
     const captureWindowId = this.uuid();
+    this.observe("runIdentified", { runId, captureWindowId });
     this.transition("preflighting");
     if (!this.captureAdmissionIsCurrent(generation, signal)) {
       return "retryable-failure";
@@ -783,6 +861,7 @@ export class BackupLifecycleCoordinator {
     this.retainedAllocation = allocation;
     this.retainedRunId = runId;
     this.transition("pending-publication");
+    this.startObservedPhase("state");
     try {
       await this.stateRepository.setPendingPublication(
         publicationRequest,
@@ -802,9 +881,11 @@ export class BackupLifecycleCoordinator {
           runId,
           captureWindowId,
         });
+        this.finishObservedPhase("failed", "state-transition-failed");
         return "terminal-failure";
       }
     }
+    this.finishObservedPhase("succeeded");
     return await this.publishPending(
       publicationRequest,
       signal,
@@ -880,6 +961,7 @@ export class BackupLifecycleCoordinator {
         });
         return "terminal-failure";
       }
+      this.finishObservedPhase("pending");
       this.transition("pending-publication");
       this.emit({
         code: "publication-pending",
@@ -915,6 +997,7 @@ export class BackupLifecycleCoordinator {
       this.retainedAllocation = undefined;
     }
     try {
+      this.startObservedPhase("state");
       await this.stateRepository.recordPublishedSnapshot(
         request.archive.runId,
         published,
@@ -932,9 +1015,14 @@ export class BackupLifecycleCoordinator {
           trigger,
           runId: request.archive.runId,
         });
+        this.finishObservedPhase("failed", "state-transition-failed");
         return "terminal-failure";
       }
     }
+    this.finishObservedPhase("succeeded");
+    this.observe("freshnessConfirmed", {
+      capturedAt: request.manifest.capture.capturedAt,
+    });
     this.retainedRunId = undefined;
     this.transition("idle");
     return "completed";
@@ -1270,12 +1358,76 @@ export class BackupLifecycleCoordinator {
     ) {
       return;
     }
+    const nextPhase = this.phaseForState(next);
+    if (this.observedPhase !== nextPhase) {
+      this.finishObservedPhase(
+        next === "failed"
+          ? "failed"
+          : next === "stopping" || next === "stopped"
+            ? "cancelled"
+            : "succeeded",
+        next === "failed" ? this.lastFailureCode : undefined,
+      );
+      if (nextPhase !== undefined) {
+        this.observedPhase = nextPhase;
+        this.observe("phaseStarted", { phase: nextPhase });
+      }
+    }
     if (next === "failed") this.failureRecorded = true;
     this.lifecycleState = next;
   }
 
   private emit(event: BackupDaemonEvent): void {
+    if (event.code !== "publication-pending") {
+      this.lastFailureCode = event.code;
+    }
     this.onEvent(Object.freeze({ ...event }));
+  }
+
+  private phaseForState(
+    state: BackupLifecycleState,
+  ): BackupObservedPhase | undefined {
+    if (state === "preflighting") return "preflight";
+    if (state === "capturing") return "capture";
+    if (state === "validating") return "validation";
+    if (state === "publishing") return "publication";
+    if (state === "cleaning") return "cleanup";
+    return undefined;
+  }
+
+  private finishObservedPhase(
+    outcome: ObservedOutcome,
+    failureCode?: BackupDaemonEventCode,
+  ): void {
+    const phase = this.observedPhase;
+    if (phase === undefined) return;
+    this.observedPhase = undefined;
+    this.observe("phaseFinished", {
+      phase,
+      outcome,
+      ...(failureCode === undefined ? {} : { failureCode }),
+    });
+  }
+
+  private startObservedPhase(phase: BackupObservedPhase): void {
+    if (this.observedPhase === phase) return;
+    this.finishObservedPhase("succeeded");
+    this.observedPhase = phase;
+    this.observe("phaseStarted", { phase });
+  }
+
+  private observe<Method extends keyof BackupLifecycleObserver>(
+    method: Method,
+    event: Parameters<BackupLifecycleObserver[Method]>[0],
+  ): void {
+    try {
+      const observer = this.observer[method] as
+        | ((value: typeof event) => void)
+        | undefined;
+      observer?.(event);
+    } catch {
+      // Telemetry is an observer and cannot affect lifecycle authority.
+    }
   }
 
   private failure(

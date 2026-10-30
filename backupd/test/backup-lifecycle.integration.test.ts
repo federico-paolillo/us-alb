@@ -36,6 +36,7 @@ import type {
   RemoteObjectEvidence,
   SnapshotPublisher,
 } from "../src/snapshot-publisher.ts";
+import { SnapshotPublicationError } from "../src/snapshot-publisher.ts";
 import type {
   ArchiveSizeWatch,
   ReopenedRetainedArchive,
@@ -235,6 +236,7 @@ class RecordingPublisher implements SnapshotPublisher {
   publishCount = 0;
   finalResult: FinalPublicationReconciliation | undefined;
   finalMode: "absent" | "archive-confirmed" | "published" | undefined;
+  publishFailure: Error | undefined;
 
   constructor(events: string[]) {
     this.events = events;
@@ -274,6 +276,7 @@ class RecordingPublisher implements SnapshotPublisher {
     request: SnapshotPublicationRequest,
   ): Promise<PublishedSnapshot> {
     this.publishCount += 1;
+    if (this.publishFailure !== undefined) throw this.publishFailure;
     this.events.push("remote-archive-confirmed");
     const remote = evidence(request);
     this.events.push("manifest-confirmed");
@@ -368,6 +371,11 @@ test("fresh lifecycle preserves outage, durability, cleanup, and freshness order
       }),
       uuid: () => ids.shift() ?? assert.fail("unexpected UUID"),
       now: () => now,
+      observer: {
+        freshnessConfirmed() {
+          events.push("freshness-observed");
+        },
+      },
     });
     await coordinator.classifyStartup();
     assert.equal(
@@ -389,11 +397,71 @@ test("fresh lifecycle preserves outage, durability, cleanup, and freshness order
       "manifest-confirmed",
       "staging-cleaned",
       "freshness-recorded",
+      "freshness-observed",
     ]);
     assert.equal(staging.watchCount, 1);
     const state = await repository.load();
     assert.equal(state.pendingPublication, null);
     assert.equal(state.lastCompletedSnapshot?.runId, runId);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("recoverable publication failure finishes its phase once as pending", async () => {
+  const root = await mkdtemp(join(tmpdir(), "b09-lifecycle-pending-phase-"));
+  const events: string[] = [];
+  const phases: Array<{
+    readonly phase: string;
+    readonly outcome: string;
+  }> = [];
+  const runs: string[] = [];
+  const publisher = new RecordingPublisher(events);
+  publisher.publishFailure = new SnapshotPublicationError(
+    "archive_upload_failed",
+    "archive-upload",
+  );
+  const ids = [runId, captureWindowId];
+  try {
+    const coordinator = createBackupLifecycleCoordinator({
+      captureClient: directCapture(events),
+      stagingManager: new RecordingStaging(events),
+      snapshotPublisher: publisher,
+      stateRepository: await repositoryFixture(root),
+      schedulePolicy: parseSchedulePolicy({}),
+      publicationConfig,
+      dispatchPendingPublication: () => ({
+        status: "skipped",
+        reason: "not-ready",
+      }),
+      uuid: () => ids.shift() ?? assert.fail("unexpected UUID"),
+      now: () => now,
+      setTimer: (callback) => callback,
+      clearTimer: () => undefined,
+      observer: {
+        phaseFinished(event) {
+          phases.push(event);
+        },
+        runFinished(event) {
+          runs.push(event.outcome);
+        },
+      },
+    });
+    await coordinator.classifyStartup();
+    assert.equal(
+      await coordinator.runLifecycle(
+        { trigger: "manual" },
+        new AbortController().signal,
+      ),
+      "publication-pending",
+    );
+    assert.equal(coordinator.state, "pending-publication");
+    assert.deepEqual(
+      phases.filter((event) => event.phase === "publication"),
+      [{ phase: "publication", outcome: "pending" }],
+    );
+    assert.deepEqual(runs, ["publication-pending"]);
+    coordinator.stop();
   } finally {
     await rm(root, { recursive: true, force: true });
   }

@@ -26,6 +26,7 @@ import {
   createStateRepository,
   type StateRepository,
 } from "./state-repository.ts";
+import { type BackupTelemetry, createBackupTelemetry } from "./telemetry.ts";
 
 type DaemonSignal = "SIGTERM" | "SIGINT" | "SIGUSR2";
 type SignalListener = () => void;
@@ -46,6 +47,7 @@ export interface RunBackupDaemonOptions {
   readonly environment?: NodeJS.ProcessEnv;
   readonly config?: BackupDaemonConfig;
   readonly dependencies?: BackupDaemonDependencies;
+  readonly telemetry?: BackupTelemetry;
   readonly signalHost?: BackupDaemonSignalHost;
   readonly forcedExit?: (code: number) => void;
   readonly onError?: (error: unknown) => void;
@@ -55,10 +57,14 @@ export interface RunBackupDaemonOptions {
 
 function createDependencies(
   config: BackupDaemonConfig,
+  telemetry: BackupTelemetry,
 ): BackupDaemonDependencies {
   const store = createS3SnapshotStore(config.publication.storage);
   return {
-    captureClient: createCaptureClient(config.captureClient),
+    captureClient: createCaptureClient({
+      ...config.captureClient,
+      traceHeaders: () => telemetry.traceHeaders(),
+    }),
     stagingManager: createStagingManager(config.staging),
     snapshotPublisher: createSnapshotPublisher(
       store,
@@ -83,10 +89,25 @@ export async function runBackupDaemon(
   const config =
     options.config ??
     parseBackupDaemonConfig(options.environment ?? process.env);
-  const dependencies = options.dependencies ?? createDependencies(config);
+  const telemetry =
+    options.telemetry ??
+    createBackupTelemetry({
+      environment: options.environment ?? process.env,
+      serviceVersion: config.publication.attribution.gitRevision,
+      deploymentEnvironment: config.publication.attribution.environment,
+    });
+  const dependencies =
+    options.dependencies ?? createDependencies(config, telemetry);
   const signalHost = options.signalHost ?? process;
   const forcedExit = options.forcedExit ?? ((code) => process.exit(code));
   const onError = options.onError ?? (() => undefined);
+  const safeReport = (error: unknown): void => {
+    try {
+      onError(error);
+    } catch {
+      // Reporting is observational and cannot alter daemon authority.
+    }
+  };
   const setTimer =
     options.setTimer ?? ((callback, delay) => setTimeout(callback, delay));
   const clearTimer =
@@ -98,6 +119,7 @@ export async function runBackupDaemon(
   let manualInstalled = false;
   let stopping = false;
   let shutdownPromise: Promise<number> | undefined;
+  let shutdownDeadline: number | undefined;
   let resolveTermination!: () => void;
   const termination = new Promise<void>((resolve) => {
     resolveTermination = resolve;
@@ -116,20 +138,24 @@ export async function runBackupDaemon(
     schedulePolicy: config.schedule,
     publicationConfig: config.publication,
     dispatchPendingPublication: dispatchPending,
-    onError,
+    onError: safeReport,
+    onEvent: (event) => telemetry.onEvent(event),
+    observer: telemetry.observer,
   });
   scheduler = createDailyScheduler({
     policy: config.schedule,
     stateRepository: dependencies.stateRepository,
     runLifecycle: (request) =>
-      coordinator.runLifecycle(request, daemonController.signal),
-    onError,
+      telemetry.runInContext(request, () =>
+        coordinator.runLifecycle(request, daemonController.signal),
+      ),
+    onError: safeReport,
   });
 
   const manualSignal = () => {
     const request = scheduler.requestManual();
     if (request.status === "started") {
-      void request.completion.catch(onError);
+      void request.completion.catch(safeReport);
     }
   };
   const removeManual = () => {
@@ -140,6 +166,10 @@ export async function runBackupDaemon(
 
   const finishShutdown = (): Promise<number> => {
     if (shutdownPromise !== undefined) return shutdownPromise;
+    if (shutdownDeadline === undefined) {
+      shutdownDeadline = Date.now() + config.shutdownTimeoutMs;
+    }
+    const deadline = shutdownDeadline;
     shutdownPromise = new Promise<number>((resolve) => {
       let settled = false;
       const finish = (code: number) => {
@@ -148,22 +178,36 @@ export async function runBackupDaemon(
         clearTimer(timer);
         resolve(code);
       };
-      const timer = setTimer(() => {
-        if (settled) return;
-        settled = true;
-        forcedExit(1);
-        resolve(1);
-      }, config.shutdownTimeoutMs);
-      void Promise.all([
-        coordinator.waitForIdle(),
-        scheduler.waitForIdle(),
-      ]).then(
-        () => finish(coordinator.hasTerminalFailure ? 1 : 0),
-        (error) => {
-          onError(error);
-          finish(1);
+      const timer = setTimer(
+        () => {
+          if (settled) return;
+          settled = true;
+          forcedExit(1);
+          resolve(1);
         },
+        Math.max(0, deadline - Date.now()),
       );
+      void Promise.all([coordinator.waitForIdle(), scheduler.waitForIdle()])
+        .then(
+          () => (coordinator.hasTerminalFailure ? 1 : 0),
+          (error) => {
+            safeReport(error);
+            return 1;
+          },
+        )
+        .then(async (code) => {
+          try {
+            await telemetry.close(deadline - 100);
+          } catch (error) {
+            safeReport(error);
+          }
+          finish(code);
+        })
+        .catch((error) => {
+          // Only an unexpected shutdown-coordination defect can reach here.
+          safeReport(error);
+          finish(1);
+        });
     });
     return shutdownPromise;
   };
@@ -171,6 +215,7 @@ export async function runBackupDaemon(
   const terminate = () => {
     if (stopping) return;
     stopping = true;
+    shutdownDeadline = Date.now() + config.shutdownTimeoutMs;
     removeManual();
     scheduler.stop();
     coordinator.stop();
@@ -183,6 +228,7 @@ export async function runBackupDaemon(
   signalHost.on("SIGINT", terminate);
   try {
     try {
+      telemetry.startFreshness(dependencies.stateRepository);
       await coordinator.classifyStartup();
       if (stopping) return await finishShutdown();
       await scheduler.start();
@@ -192,7 +238,7 @@ export async function runBackupDaemon(
       signalHost.on("SIGUSR2", manualSignal);
       manualInstalled = true;
     } catch (error) {
-      onError(error);
+      safeReport(error);
       terminate();
       return await finishShutdown().then(() => 1);
     }

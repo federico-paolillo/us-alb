@@ -10,7 +10,11 @@ import { CaptureCoordinator } from "../src/capture-coordinator.ts";
 import type { CaptureHttpServer } from "../src/capture-http.ts";
 import { superviseStrapi } from "../src/main.ts";
 import type { ChildCommand } from "../src/process-group.ts";
-import { strapiSupervisorTestHooks } from "../src/strapi-supervisor.ts";
+import {
+  type StrapiSupervisor,
+  type SupervisorObserver,
+  strapiSupervisorTestHooks,
+} from "../src/strapi-supervisor.ts";
 
 const HARNESS = fileURLToPath(
   new URL("../fixtures/supervisor-main.ts", import.meta.url),
@@ -141,6 +145,131 @@ async function closeHealthServer(server: Server): Promise<void> {
   server.closeAllConnections();
   await new Promise<void>((resolve) => server.close(() => resolve()));
 }
+
+function unexpectedRecoverySupervisor(
+  recovery: "succeeded" | "failed" | "cancelled",
+): {
+  readonly supervisor: StrapiSupervisor;
+  readonly recoveryEntered: Promise<void>;
+} {
+  let servingStarts = 0;
+  let lossDelivered = false;
+  const recoveryEntered = Promise.withResolvers<void>();
+  const recoveryGate = Promise.withResolvers<void>();
+  const supervisor = {
+    async startServing() {
+      servingStarts += 1;
+      if (servingStarts === 1) return;
+      recoveryEntered.resolve();
+      if (recovery === "failed") throw new Error("controlled recovery failure");
+      if (recovery === "cancelled") await recoveryGate.promise;
+    },
+    async waitForServingLoss() {
+      if (!lossDelivered) {
+        lossDelivered = true;
+        return {
+          status: "recovery-required" as const,
+          close: { status: "exited" as const, exitCode: 1 },
+        };
+      }
+      return await new Promise<never>(() => undefined);
+    },
+    async shutdown() {
+      if (recovery === "cancelled") {
+        recoveryGate.reject(new Error("controlled shutdown cancellation"));
+      }
+    },
+  } as unknown as StrapiSupervisor;
+  return { supervisor, recoveryEntered: recoveryEntered.promise };
+}
+
+function recoveryObserver(
+  events: string[],
+  onStarted?: () => void,
+): Partial<SupervisorObserver> {
+  return {
+    recoveryStarted(event) {
+      events.push(`started:${event.source}`);
+      onStarted?.();
+    },
+    recoveryFinished(event) {
+      events.push(`finished:${event.source}:${event.outcome}`);
+    },
+  };
+}
+
+test("unexpected serving recovery observes one successful terminal outcome", async () => {
+  const controlled = unexpectedRecoverySupervisor("succeeded");
+  const shutdown = Promise.withResolvers<void>();
+  const events: string[] = [];
+  let ready = 0;
+  await superviseStrapi({
+    supervisor: controlled.supervisor,
+    health: {
+      endpoint: "http://127.0.0.1:1/_health",
+      startupTimeoutMs: 1,
+      requestTimeoutMs: 1,
+      retryIntervalMs: 1,
+    },
+    termination: CAPTURE_TERMINATION,
+    observer: recoveryObserver(events),
+    testShutdownRequested: shutdown.promise,
+    onServingReady() {
+      ready += 1;
+      if (ready === 2) shutdown.resolve();
+    },
+  });
+  assert.deepEqual(events, [
+    "started:unexpected-serving-loss",
+    "finished:unexpected-serving-loss:succeeded",
+  ]);
+});
+
+test("unexpected serving recovery observes one failed terminal outcome", async () => {
+  const controlled = unexpectedRecoverySupervisor("failed");
+  const events: string[] = [];
+  await assert.rejects(
+    superviseStrapi({
+      supervisor: controlled.supervisor,
+      health: {
+        endpoint: "http://127.0.0.1:1/_health",
+        startupTimeoutMs: 1,
+        requestTimeoutMs: 1,
+        retryIntervalMs: 1,
+      },
+      termination: CAPTURE_TERMINATION,
+      observer: recoveryObserver(events),
+    }),
+    /controlled recovery failure/,
+  );
+  assert.deepEqual(events, [
+    "started:unexpected-serving-loss",
+    "finished:unexpected-serving-loss:failed",
+  ]);
+});
+
+test("unexpected serving recovery observes one cancelled terminal outcome", async () => {
+  const controlled = unexpectedRecoverySupervisor("cancelled");
+  const shutdown = Promise.withResolvers<void>();
+  const events: string[] = [];
+  await superviseStrapi({
+    supervisor: controlled.supervisor,
+    health: {
+      endpoint: "http://127.0.0.1:1/_health",
+      startupTimeoutMs: 1,
+      requestTimeoutMs: 1,
+      retryIntervalMs: 1,
+    },
+    termination: CAPTURE_TERMINATION,
+    observer: recoveryObserver(events, () => shutdown.resolve()),
+    testShutdownRequested: shutdown.promise,
+  });
+  await controlled.recoveryEntered;
+  assert.deepEqual(events, [
+    "started:unexpected-serving-loss",
+    "finished:unexpected-serving-loss:cancelled",
+  ]);
+});
 
 function fixtureCommand(
   role: ChildCommand["role"],

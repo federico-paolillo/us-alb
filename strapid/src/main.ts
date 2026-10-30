@@ -15,7 +15,9 @@ import { createCaptureRuntimeInspector } from "./strapi-runtime.ts";
 import {
   createStrapiSupervisor,
   type StrapiSupervisor,
+  type SupervisorObserver,
 } from "./strapi-supervisor.ts";
+import { createStrapidTelemetry } from "./telemetry.ts";
 
 const NORMAL_TERMINATION: ProcessTerminationBounds = {
   gracefulTimeoutMs: 30_000,
@@ -36,6 +38,22 @@ export interface SupervisorMainOptions {
     | undefined
   >;
   readonly testShutdownRequested?: Promise<void>;
+  readonly observer?: Partial<SupervisorObserver>;
+}
+
+function observe<Method extends keyof SupervisorObserver>(
+  observer: Partial<SupervisorObserver> | undefined,
+  method: Method,
+  event: Parameters<SupervisorObserver[Method]>[0],
+): void {
+  try {
+    const callback = observer?.[method] as
+      | ((value: typeof event) => void)
+      | undefined;
+    callback?.(event);
+  } catch {
+    // Supervisor recovery never depends on telemetry observers.
+  }
 }
 
 function parsePort(raw: string | undefined): number {
@@ -131,24 +149,55 @@ export async function superviseStrapi(
         return;
       }
       if (outcome.type === "capture") {
+        observe(options.observer, "recoveryStarted", { source: "capture" });
         const terminal = await outcome.cycle.terminal;
         if (terminal.outcome.status === "supervisor-shutdown") {
+          observe(options.observer, "recoveryFinished", {
+            source: "capture",
+            outcome: "cancelled",
+          });
           await shutdownPromise;
           return;
         }
         if (terminal.outcome.status === "recovery-failed") {
+          observe(options.observer, "recoveryFinished", {
+            source: "capture",
+            outcome: terminal.outcome.reason.includes("ownership_unconfirmed")
+              ? "ownership-unconfirmed"
+              : "failed",
+          });
           requestShutdown();
           await shutdownPromise;
           throw new Error("Capture recovery failed");
         }
+        observe(options.observer, "recoveryFinished", {
+          source: "capture",
+          outcome: "succeeded",
+        });
         options.onServingReady?.();
         continue;
       }
+      observe(options.observer, "recoveryStarted", {
+        source: "unexpected-serving-loss",
+      });
+      let recoveryFinished = false;
+      const finishUnexpectedRecovery = (
+        outcome: "succeeded" | "failed" | "cancelled",
+      ) => {
+        if (recoveryFinished) return;
+        recoveryFinished = true;
+        observe(options.observer, "recoveryFinished", {
+          source: "unexpected-serving-loss",
+          outcome,
+        });
+      };
       if (outcome.loss.status === "recovery-failed") {
+        finishUnexpectedRecovery("failed");
         throw outcome.loss.cause;
       }
 
       if (shuttingDown) {
+        finishUnexpectedRecovery("cancelled");
         await shutdownPromise;
         return;
       }
@@ -159,15 +208,19 @@ export async function superviseStrapi(
         });
       } catch (error) {
         if (!shuttingDown) {
+          finishUnexpectedRecovery("failed");
           throw error;
         }
+        finishUnexpectedRecovery("cancelled");
         await shutdownPromise;
         return;
       }
       if (shuttingDown) {
+        finishUnexpectedRecovery("cancelled");
         await shutdownPromise;
         return;
       }
+      finishUnexpectedRecovery("succeeded");
       options.onServingReady?.();
     }
   } finally {
@@ -179,51 +232,61 @@ export async function superviseStrapi(
 async function main(): Promise<void> {
   const port = parsePort(process.env.PORT);
   const supervisor = createStrapiSupervisor();
-  await superviseStrapi({
-    supervisor,
-    health: {
-      endpoint: `http://127.0.0.1:${port}/_health`,
-      startupTimeoutMs: 120_000,
-      requestTimeoutMs: 2_000,
-      retryIntervalMs: 500,
-    },
-    termination: NORMAL_TERMINATION,
-    startCaptureCoordination: async () => {
-      let budget = DEFAULT_CAPTURE_BUDGET;
-      let captureConfigurationValid = true;
-      try {
-        budget = parseCaptureBudget(process.env);
-      } catch {
-        captureConfigurationValid = false;
-      }
-      const coordinator = new CaptureCoordinator({
-        supervisor,
-        runtimeInspector: createCaptureRuntimeInspector(),
-        budget,
-        releaseId: captureConfigurationValid
-          ? (process.env.STRAPID_RELEASE_ID ?? "")
-          : "",
-        sourceVolumeId: process.env.STRAPID_SOURCE_VOLUME_ID ?? "",
-        servingHealth: {
-          endpoint: `http://127.0.0.1:${port}/_health`,
-          startupTimeoutMs: 10_000,
-          requestTimeoutMs: 2_000,
-          retryIntervalMs: 500,
-        },
-        exportEnvironment: { ...process.env },
-      });
-      try {
-        const server = await startCaptureHttpServer(
-          process.env.STRAPID_COORDINATION_SOCKET_PATH ??
-            "/coordination/strapid.sock",
-          coordinator,
-        );
-        return { coordinator, server };
-      } catch {
-        return undefined;
-      }
-    },
-  });
+  const telemetry = createStrapidTelemetry();
+  try {
+    await superviseStrapi({
+      supervisor,
+      observer: telemetry.supervisorObserver,
+      health: {
+        endpoint: `http://127.0.0.1:${port}/_health`,
+        startupTimeoutMs: 120_000,
+        requestTimeoutMs: 2_000,
+        retryIntervalMs: 500,
+      },
+      termination: NORMAL_TERMINATION,
+      startCaptureCoordination: async () => {
+        let budget = DEFAULT_CAPTURE_BUDGET;
+        let captureConfigurationValid = true;
+        try {
+          budget = parseCaptureBudget(process.env);
+        } catch {
+          captureConfigurationValid = false;
+        }
+        const coordinator = new CaptureCoordinator({
+          supervisor,
+          runtimeInspector: createCaptureRuntimeInspector(),
+          budget,
+          releaseId: captureConfigurationValid
+            ? (process.env.STRAPID_RELEASE_ID ?? "")
+            : "",
+          sourceVolumeId: process.env.STRAPID_SOURCE_VOLUME_ID ?? "",
+          servingHealth: {
+            endpoint: `http://127.0.0.1:${port}/_health`,
+            startupTimeoutMs: 10_000,
+            requestTimeoutMs: 2_000,
+            retryIntervalMs: 500,
+          },
+          exportEnvironment: { ...process.env },
+          createOutputSession: (identity) =>
+            telemetry.createOutputSession(identity),
+          observer: telemetry.captureObserver,
+        });
+        try {
+          const server = await startCaptureHttpServer(
+            process.env.STRAPID_COORDINATION_SOCKET_PATH ??
+              "/coordination/strapid.sock",
+            coordinator,
+            { runCapture: telemetry.runCapture },
+          );
+          return { coordinator, server };
+        } catch {
+          return undefined;
+        }
+      },
+    });
+  } finally {
+    await telemetry.close(Date.now() + 5_000);
+  }
 }
 
 const entrypoint = process.argv[1];

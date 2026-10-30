@@ -372,6 +372,44 @@ test("real Unix transport holds accepted/terminal records and reconciles exact i
   }
 });
 
+test("real Unix capture transports only validated W3C trace context", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "b09-trace-context-"));
+  const socketPath = join(directory, "s.sock");
+  const observed: Array<{
+    readonly traceparent?: string;
+    readonly tracestate?: string;
+  }> = [];
+  const server = await startCaptureHttpServer(
+    socketPath,
+    new FixtureCoordinator(),
+    {
+      async runCapture(headers, operation) {
+        observed.push(headers);
+        return await operation();
+      },
+    },
+  );
+  const client = createCaptureClient({
+    socketPath,
+    traceHeaders: () => ({
+      traceparent: "00-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bbbbbbbbbbbbbbbb-01",
+      tracestate: "vendor=value",
+    }),
+  });
+  try {
+    await client.startCapture(captureRequest());
+    assert.deepEqual(observed, [
+      {
+        traceparent: "00-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bbbbbbbbbbbbbbbb-01",
+        tracestate: "vendor=value",
+      },
+    ]);
+  } finally {
+    await server.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 test("abrupt Unix transport loss rejects a terminal followed by partial trailing data", async () => {
   const directory = await mkdtemp(join(tmpdir(), "b04-client-loss-"));
   const socketPath = join(directory, "s.sock");

@@ -44,6 +44,36 @@ export interface CaptureCycle {
   readonly terminal: Promise<CaptureTerminalRecord>;
 }
 
+export type CaptureObservedPhase =
+  | "preflight"
+  | "stop-serving"
+  | "export"
+  | "recover-serving";
+
+export type CaptureObservedOutcome = "succeeded" | "failed" | "cancelled";
+
+export interface CaptureCoordinatorObserver {
+  admitted(event: { readonly identity: CaptureIdentity }): void;
+  phaseStarted(event: { readonly phase: CaptureObservedPhase }): void;
+  phaseFinished(event: {
+    readonly phase: CaptureObservedPhase;
+    readonly outcome: CaptureObservedOutcome;
+  }): void;
+  outputClosed(event: { readonly identity: CaptureIdentity }): void;
+  terminal(event: {
+    readonly identity: CaptureIdentity;
+    readonly outcome: CaptureTerminalOutcome;
+  }): void;
+}
+
+export interface CaptureOutputSession {
+  readonly output: {
+    readonly onStdout: (chunk: Uint8Array) => void;
+    readonly onStderr: (chunk: Uint8Array) => void;
+  };
+  close(): void;
+}
+
 export class CaptureAdmissionError extends Error {
   readonly statusCode: 409 | 503;
   readonly code:
@@ -88,6 +118,10 @@ export interface CaptureCoordinatorOptions {
     readonly onStdout: (chunk: Uint8Array) => void;
     readonly onStderr: (chunk: Uint8Array) => void;
   };
+  readonly createOutputSession?: (
+    identity: CaptureIdentity,
+  ) => CaptureOutputSession;
+  readonly observer?: Partial<CaptureCoordinatorObserver>;
 }
 
 export interface CaptureSupervisor {
@@ -129,6 +163,9 @@ interface ActiveWindow {
   acceptedAt?: string;
   invalidReason?: CaptureInvalidReason;
   terminal?: CaptureTerminalRecord;
+  outputSession: CaptureOutputSession;
+  outputSessionClosed?: boolean;
+  observedPhase?: CaptureObservedPhase;
 }
 
 function abortReason(signal: AbortSignal): unknown {
@@ -208,6 +245,7 @@ export class CaptureCoordinator {
   private cycleWaiter = Promise.withResolvers<CaptureCycle>();
   private readonly options: CaptureCoordinatorOptions;
   private readonly configurationValid: boolean;
+  private readonly observer: Partial<CaptureCoordinatorObserver>;
 
   constructor(options: CaptureCoordinatorOptions) {
     this.options = options;
@@ -230,6 +268,7 @@ export class CaptureCoordinator {
       onStdout: () => undefined,
       onStderr: () => undefined,
     };
+    this.observer = options.observer ?? {};
   }
 
   async getServiceStatus(signal?: AbortSignal): Promise<CaptureServiceStatus> {
@@ -276,6 +315,7 @@ export class CaptureCoordinator {
     admissionSignal: AbortSignal,
   ): Promise<CaptureTerminalRecord> {
     this.reserveAdmission(request);
+    this.observe("phaseStarted", { phase: "preflight" });
     return this.executeCapture(request, observer, admissionSignal);
   }
 
@@ -339,9 +379,13 @@ export class CaptureCoordinator {
         let terminal = active.terminal;
         if (terminal === undefined) {
           active.controller.abort();
-          terminal = this.commitTerminal(active, {
+          this.closeOutputSession(active);
+          this.finishObservedPhase(active, "cancelled");
+          const outcome = {
             status: "supervisor-shutdown",
-          });
+          } as const;
+          terminal = this.commitTerminal(active, outcome);
+          this.observe("terminal", { identity: active.identity, outcome });
         }
         await this.deliverTerminal(active);
         active.terminalDeferred.resolve(terminal);
@@ -436,6 +480,8 @@ export class CaptureCoordinator {
         terminalDeferred: Promise.withResolvers<CaptureTerminalRecord>(),
         observer,
         phase: "preflight",
+        outputSession: this.createOutputSession(identity),
+        observedPhase: "preflight",
       };
       this.provisional = undefined;
       this.active = active;
@@ -445,8 +491,16 @@ export class CaptureCoordinator {
         identity,
         terminal: active.terminalDeferred.promise,
       });
+      this.observe("admitted", { identity });
+      this.finishObservedPhase(active, "succeeded");
       return await this.runActiveCapture(active, observer);
     } catch (error) {
+      if (this.active === undefined) {
+        this.observe("phaseFinished", {
+          phase: "preflight",
+          outcome: signal.aborted ? "cancelled" : "failed",
+        });
+      }
       if (this.provisional === provisional) this.provisional = undefined;
       if (error instanceof CaptureAdmissionError) throw error;
       if (signal.aborted) {
@@ -466,6 +520,7 @@ export class CaptureCoordinator {
     let exportClosedAt: string | undefined;
     try {
       active.phase = "stopping";
+      this.startObservedPhase(active, "stop-serving");
       const stop = await this.options.supervisor.stopServing(
         terminationBounds(
           this.options.budget.servingShutdownMs,
@@ -477,9 +532,12 @@ export class CaptureCoordinator {
       }
       if (this.now() > active.timeline.deadlines.shutdown) {
         this.invalidate(active, "serving_stop_failed");
+        this.finishObservedPhase(active, "failed");
       } else if (stop.status === "forced") {
         this.invalidate(active, "forced_serving_stop");
+        this.finishObservedPhase(active, "failed");
       } else {
+        this.finishObservedPhase(active, "succeeded");
         active.acceptedAt = this.wallNow().toISOString();
         const accepted: CaptureAcceptedRecord = {
           version: 1,
@@ -511,9 +569,9 @@ export class CaptureCoordinator {
           clearTimeout(acceptanceExpiry);
         }
       }
-
       if (active.invalidReason === undefined) {
         active.phase = "exporting";
+        this.startObservedPhase(active, "export");
         const exportDeadline = active.timeline.exportDeadline(this.now());
         const exportRemaining = active.timeline.remaining(
           exportDeadline,
@@ -540,10 +598,7 @@ export class CaptureCoordinator {
                       this.options.budget.exporterTerminationMs,
                       this.options.budget.forcedConfirmationMs,
                     ),
-                    output: this.output ?? {
-                      onStdout: () => undefined,
-                      onStderr: () => undefined,
-                    },
+                    output: active.outputSession.output,
                     signal: active.controller.signal,
                   },
                 )
@@ -583,7 +638,14 @@ export class CaptureCoordinator {
           }
         } finally {
           clearTimeout(expiry);
+          this.closeOutputSession(active);
+          this.finishObservedPhase(
+            active,
+            active.invalidReason === undefined ? "succeeded" : "failed",
+          );
         }
+      } else {
+        this.closeOutputSession(active);
       }
       captureReason = active.invalidReason;
 
@@ -591,14 +653,17 @@ export class CaptureCoordinator {
         return await active.terminalDeferred.promise;
       }
       active.phase = "recovering";
+      this.startObservedPhase(active, "recover-serving");
       const recovered = await this.recoverServing(active);
       if (!recovered.ok) {
+        this.finishObservedPhase(active, "failed");
         return await this.finish(active, {
           status: "recovery-failed",
           ...(captureReason === undefined ? {} : { captureReason }),
           reason: recovered.reason,
         });
       }
+      this.finishObservedPhase(active, "succeeded");
       const servingRecoveredAt = this.wallNow().toISOString();
       const outcome: CaptureTerminalOutcome =
         captureReason === undefined && exportClosedAt !== undefined
@@ -614,6 +679,7 @@ export class CaptureCoordinator {
             };
       return await this.finish(active, outcome);
     } catch (error) {
+      this.finishObservedPhase(active, "failed");
       if (this.shuttingDown || active.terminal !== undefined) {
         return await active.terminalDeferred.promise;
       }
@@ -622,8 +688,10 @@ export class CaptureCoordinator {
       if (!owned && this.options.supervisor.snapshot().state !== "serving") {
         try {
           active.phase = "recovering";
+          this.startObservedPhase(active, "recover-serving");
           const recovered = await this.recoverServing(active);
           if (recovered.ok) {
+            this.finishObservedPhase(active, "succeeded");
             return await this.finish(active, {
               status: "invalid",
               reason: active.invalidReason ?? "serving_stop_failed",
@@ -631,6 +699,7 @@ export class CaptureCoordinator {
             });
           }
         } catch {
+          this.finishObservedPhase(active, "failed");
           // The terminal result below remains non-authorizing.
         }
       }
@@ -701,7 +770,17 @@ export class CaptureCoordinator {
     active: ActiveWindow,
     outcome: CaptureTerminalOutcome,
   ): Promise<CaptureTerminalRecord> {
+    this.closeOutputSession(active);
+    this.finishObservedPhase(
+      active,
+      outcome.status === "captured"
+        ? "succeeded"
+        : outcome.status === "supervisor-shutdown"
+          ? "cancelled"
+          : "failed",
+    );
     const terminal = this.commitTerminal(active, outcome);
+    this.observe("terminal", { identity: active.identity, outcome });
     await this.deliverTerminal(active);
     active.terminalDeferred.resolve(terminal);
     if (this.active === active) this.active = undefined;
@@ -742,6 +821,69 @@ export class CaptureCoordinator {
     active.terminal = terminal;
     this.recent = terminal;
     return terminal;
+  }
+
+  private createOutputSession(identity: CaptureIdentity): CaptureOutputSession {
+    try {
+      return (
+        this.options.createOutputSession?.(identity) ?? {
+          output: this.output ?? {
+            onStdout: () => undefined,
+            onStderr: () => undefined,
+          },
+          close: () => undefined,
+        }
+      );
+    } catch {
+      return {
+        output: { onStdout: () => undefined, onStderr: () => undefined },
+        close: () => undefined,
+      };
+    }
+  }
+
+  private closeOutputSession(active: ActiveWindow): void {
+    if (active.outputSessionClosed) return;
+    active.outputSessionClosed = true;
+    try {
+      active.outputSession.close();
+    } catch {
+      // Output telemetry is advisory and cannot alter capture authority.
+    }
+    this.observe("outputClosed", { identity: active.identity });
+  }
+
+  private startObservedPhase(
+    active: ActiveWindow,
+    phase: CaptureObservedPhase,
+  ): void {
+    this.finishObservedPhase(active, "succeeded");
+    active.observedPhase = phase;
+    this.observe("phaseStarted", { phase });
+  }
+
+  private finishObservedPhase(
+    active: ActiveWindow,
+    outcome: CaptureObservedOutcome,
+  ): void {
+    const phase = active.observedPhase;
+    if (phase === undefined) return;
+    active.observedPhase = undefined;
+    this.observe("phaseFinished", { phase, outcome });
+  }
+
+  private observe<Method extends keyof CaptureCoordinatorObserver>(
+    method: Method,
+    event: Parameters<CaptureCoordinatorObserver[Method]>[0],
+  ): void {
+    try {
+      const observer = this.observer[method] as
+        | ((value: typeof event) => void)
+        | undefined;
+      observer?.(event);
+    } catch {
+      // Observers are never capture decision inputs.
+    }
   }
 
   private invalidate(active: ActiveWindow, reason: CaptureInvalidReason): void {

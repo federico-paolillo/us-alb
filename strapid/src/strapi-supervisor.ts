@@ -72,6 +72,20 @@ export interface SupervisorSnapshot {
   readonly activePid?: number;
 }
 
+export interface SupervisorObserver {
+  recoveryStarted(event: {
+    readonly source: "capture" | "unexpected-serving-loss";
+  }): void;
+  recoveryFinished(event: {
+    readonly source: "capture" | "unexpected-serving-loss";
+    readonly outcome:
+      | "succeeded"
+      | "failed"
+      | "cancelled"
+      | "ownership-unconfirmed";
+  }): void;
+}
+
 export class StrapiRecoveryError extends Error {
   readonly ownedGroupMayRemain: boolean;
 
