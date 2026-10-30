@@ -6,7 +6,12 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
-const projectName = "b10-config-test";
+const collectorConfigPath = fileURLToPath(
+  new URL("../../otel-config.yml", import.meta.url),
+);
+const projectName = "b11-config-test";
+const collectorImage =
+  "otel/opentelemetry-collector-contrib:0.164.0@sha256:340c9ca6a36617084c6661bdc4f0fe92b7cda5a805d61673ec8db375fddc522b";
 
 const environment: NodeJS.ProcessEnv = {
   PATH: process.env.PATH,
@@ -37,6 +42,9 @@ const environment: NodeJS.ProcessEnv = {
   BACKEND_IMAGE_REPOSITORY: "registry.invalid/backend",
   FRONTEND_IMAGE: `registry.invalid/frontend@sha256:${"c".repeat(64)}`,
   BACKUPD_IMAGE: `registry.invalid/backupd@sha256:${"d".repeat(64)}`,
+  GRAFANA_CLOUD_OTLP_ENDPOINT: "https://otlp-gateway.example.invalid/otlp",
+  GRAFANA_CLOUD_INSTANCE_ID: "instance-placeholder",
+  GRAFANA_CLOUD_API_KEY: "token-placeholder",
   BACKUPD_S3_ENDPOINT: "https://s3.example.invalid",
   BACKUPD_S3_REGION: "test-region",
   BACKUPD_S3_BUCKET: "backup-placeholder",
@@ -74,6 +82,7 @@ interface ComposePort {
 }
 
 interface ComposeService {
+  readonly image?: string;
   readonly environment?: Readonly<Record<string, string | null>>;
   readonly env_file?: unknown;
   readonly secrets?: unknown;
@@ -94,6 +103,7 @@ interface ComposeService {
   readonly network_mode?: string;
   readonly pid?: string;
   readonly ipc?: string;
+  readonly user?: string;
 }
 
 interface ComposeProject {
@@ -180,6 +190,12 @@ const backupdEnvironment = [
   "BACKUPD_UPLOAD_CONCURRENCY",
   "OTEL_EXPORTER_OTLP_ENDPOINT",
   "OTEL_EXPORTER_OTLP_PROTOCOL",
+];
+
+const collectorEnvironment = [
+  "GRAFANA_CLOUD_API_KEY",
+  "GRAFANA_CLOUD_INSTANCE_ID",
+  "GRAFANA_CLOUD_OTLP_ENDPOINT",
 ];
 
 function sorted(values: readonly string[]): string[] {
@@ -292,16 +308,18 @@ function assertRenderedBoundaries(project: ComposeProject): void {
     "backupd",
     "frontend",
     "gateway",
+    "otel-collector",
   ]);
 
   const backend = project.services.backend;
   const backupd = project.services.backupd;
   const frontend = project.services.frontend;
   const gateway = project.services.gateway;
+  const collector = project.services["otel-collector"];
   assert.ok(
     backend !== undefined && backupd !== undefined && frontend !== undefined,
   );
-  assert.ok(gateway !== undefined);
+  assert.ok(gateway !== undefined && collector !== undefined);
 
   assertServiceBoundary("backend", backend, backendEnvironment);
   assertServiceBoundary("backupd", backupd, backupdEnvironment);
@@ -339,6 +357,13 @@ function assertRenderedBoundaries(project: ComposeProject): void {
   assert.equal(backend.stop_grace_period, "45s");
   assert.equal(backupd.stop_grace_period, "45s");
   assert.equal(backupd.depends_on?.backend?.condition, "service_healthy");
+  assert.equal(backend.depends_on, undefined);
+  assert.deepEqual(Object.keys(backupd.depends_on ?? {}), ["backend"]);
+  assert.deepEqual(Object.keys(frontend.depends_on ?? {}), ["backend"]);
+  assert.deepEqual(sorted(Object.keys(gateway.depends_on ?? {})), [
+    "backend",
+    "frontend",
+  ]);
   assert.equal(backend.healthcheck?.test?.[0], "CMD");
   assert.equal(backend.healthcheck?.test?.[1], "/nodejs/bin/node");
   assert.equal(backend.ports, undefined, "backend must not publish a port");
@@ -360,14 +385,48 @@ function assertRenderedBoundaries(project: ComposeProject): void {
   assert.equal(gatewayMounts[0]?.target, "/etc/caddy/Caddyfile");
   assert.equal(gatewayMounts[0]?.read_only, true);
 
-  const allEnvironmentNames = Object.values(project.services).flatMap(
-    (service) => environmentNames(service),
-  );
-  assert.equal(
-    allEnvironmentNames.some((name) => name.startsWith("GRAFANA_")),
-    false,
-    "Grafana settings must wait for the Collector service",
-  );
+  assert.equal(collector.image, collectorImage);
+  assert.deepEqual(environmentNames(collector), collectorEnvironment);
+  assert.equal(collector.env_file, undefined);
+  assert.equal(collector.secrets, undefined);
+  assert.equal(collector.privileged, undefined);
+  assert.notEqual(collector.network_mode, "host");
+  assert.notEqual(collector.pid, "host");
+  assert.notEqual(collector.ipc, "host");
+  assert.deepEqual(Object.keys(collector.networks ?? {}), ["app"]);
+  assert.equal(collector.restart, "unless-stopped");
+  assert.equal(collector.depends_on, undefined);
+  assert.equal(collector.ports, undefined);
+  assert.equal(collector.tmpfs, undefined);
+  assert.equal(collector.read_only, undefined);
+  assert.equal(collector.user, undefined);
+  const collectorMounts = collector.volumes ?? [];
+  assert.equal(collectorMounts.length, 1);
+  assert.equal(collectorMounts[0]?.type, "bind");
+  assert.equal(collectorMounts[0]?.source, collectorConfigPath);
+  assert.equal(collectorMounts[0]?.target, "/etc/otelcol-contrib/config.yaml");
+  assert.equal(collectorMounts[0]?.read_only, true);
+
+  for (const [serviceName, service] of Object.entries(project.services)) {
+    const grafanaEnvironment = environmentNames(service).filter((name) =>
+      name.startsWith("GRAFANA_"),
+    );
+    assert.deepEqual(
+      grafanaEnvironment,
+      serviceName === "otel-collector" ? collectorEnvironment : [],
+      `${serviceName} Grafana Cloud environment boundary changed`,
+    );
+
+    if (serviceName !== "otel-collector") {
+      assert.equal(
+        (service.volumes ?? []).some(
+          (mount) => mount.target === "/etc/otelcol-contrib/config.yaml",
+        ),
+        false,
+        `${serviceName} must not receive the Collector configuration`,
+      );
+    }
+  }
 
   const gatewayPorts = gateway.ports ?? [];
   assert.equal(gatewayPorts.length, 1, "gateway must have one published port");

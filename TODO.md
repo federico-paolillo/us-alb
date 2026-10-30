@@ -316,7 +316,8 @@ provide concrete handoff details without claiming that these activities occurred
   - Design references: “Recommendation and agreed requirements”; “Proposed
     lifecycle and container boundaries”; “Runtime, packages, and tooling.”
 
-- [ ] B11 — Configure the project Collector
+- [x] B11 — Configure the project Collector
+  - Plan: [ExecPlan](.agents/plans/b11-configure-the-project-collector.md)
   - Scope: Add the Collector service and project-owned `otel-config.yml` beside
     Compose, mounted read-only, with OTLP reception and Grafana Cloud forwarding.
     Pass only required deployment values/credentials from `.env`; use private

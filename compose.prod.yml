@@ -96,6 +96,18 @@ services:
     networks:
       - app
 
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.164.0@sha256:340c9ca6a36617084c6661bdc4f0fe92b7cda5a805d61673ec8db375fddc522b
+    environment:
+      GRAFANA_CLOUD_OTLP_ENDPOINT: ${GRAFANA_CLOUD_OTLP_ENDPOINT:?GRAFANA_CLOUD_OTLP_ENDPOINT is required}
+      GRAFANA_CLOUD_INSTANCE_ID: ${GRAFANA_CLOUD_INSTANCE_ID:?GRAFANA_CLOUD_INSTANCE_ID is required}
+      GRAFANA_CLOUD_API_KEY: ${GRAFANA_CLOUD_API_KEY:?GRAFANA_CLOUD_API_KEY is required}
+    restart: unless-stopped
+    volumes:
+      - ./otel-config.yml:/etc/otelcol-contrib/config.yaml:ro
+    networks:
+      - app
+
   frontend:
     image: ${FRONTEND_IMAGE:?FRONTEND_IMAGE is required}
     environment:
